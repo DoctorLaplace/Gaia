@@ -7,6 +7,15 @@ import pandas as pd
 import os
 from tqdm import tqdm
 
+# Import unified credentials from src/credentials.py (local only)
+try:
+    from .credentials import EARTHDATA_USERNAME, EARTHDATA_PASSWORD
+except ImportError:
+    try:
+        from credentials import EARTHDATA_USERNAME, EARTHDATA_PASSWORD
+    except ImportError:
+        EARTHDATA_USERNAME = EARTHDATA_PASSWORD = None
+
 def generate_labeled_inventory(richness_csv, output_path="labeled_inventory.txt"):
     print("\n" + "="*60)
     print("GAIA SMART INVENTORY: Querying NASA Earthdata for Labeled Granules...")
@@ -22,7 +31,13 @@ def generate_labeled_inventory(richness_csv, output_path="labeled_inventory.txt"
     print(f"[*] Loaded {len(sites)} biodiversity sites from {richness_csv}")
 
     # 2. Login to EarthData
-    earthaccess.login(persist=True)
+    # Use credentials from src/credentials.py if available
+    if EARTHDATA_USERNAME and EARTHDATA_PASSWORD:
+        os.environ['EARTHDATA_USERNAME'] = EARTHDATA_USERNAME
+        os.environ['EARTHDATA_PASSWORD'] = EARTHDATA_PASSWORD
+        earthaccess.login(strategy="environment", persist=True)
+    else:
+        earthaccess.login(persist=True)
     
     # 3. Search for ALL available granules
     print("[*] Searching for all granules in 'BioSCape_AVNG_L2B_BRDF_GCFR_2385'...")

@@ -5,6 +5,15 @@ import sys
 import subprocess
 from datetime import datetime
 
+# Import unified credentials from src/credentials.py (local only)
+try:
+    from .credentials import EARTHDATA_USERNAME, EARTHDATA_PASSWORD, S3_ACCESS_KEY, S3_SECRET_KEY
+except ImportError:
+    try:
+        from credentials import EARTHDATA_USERNAME, EARTHDATA_PASSWORD, S3_ACCESS_KEY, S3_SECRET_KEY
+    except ImportError:
+        EARTHDATA_USERNAME = EARTHDATA_PASSWORD = S3_ACCESS_KEY = S3_SECRET_KEY = None
+
 # --- PATHS ---
 S3CMD_PATH = r"C:\Users\silve\AppData\Roaming\Python\Python312\Scripts\s3cmd"
 CONFIG_PATH = r"C:\Users\silve\AppData\Roaming\s3cmd.ini"
@@ -33,8 +42,13 @@ def format_size(bytes):
 def get_existing_s3_files():
     print(f"{PURPLE_LIGHT}[*] Checking current S3 state (s3://gaia-datasets)...{RESET}")
     try:
+        # Ensure S3 credentials from credentials.py are set for the subprocess
+        s3_env = os.environ.copy()
+        if S3_ACCESS_KEY: s3_env['AWS_ACCESS_KEY_ID'] = S3_ACCESS_KEY
+        if S3_SECRET_KEY: s3_env['AWS_SECRET_ACCESS_KEY'] = S3_SECRET_KEY
+        
         # Run s3cmd ls
-        result = subprocess.run(['python', S3CMD_PATH, '-c', CONFIG_PATH, '--no-preserve', '--no-progress', '--quiet', 'ls', 's3://gaia-datasets/'], stdout=subprocess.PIPE, text=True, stderr=subprocess.DEVNULL)
+        result = subprocess.run(['python', S3CMD_PATH, '-c', CONFIG_PATH, '--no-preserve', '--no-progress', '--quiet', 'ls', 's3://gaia-datasets/'], stdout=subprocess.PIPE, text=True, stderr=subprocess.DEVNULL, env=s3_env)
         files = []
         for line in result.stdout.splitlines():
             parts = line.split()
@@ -51,7 +65,13 @@ def production_sync(limit=None):
     
     # 1. Login to Earthdata
     print(f"{PURPLE_LIGHT}[*] Phase 1: Authentication with NASA Earthdata...{RESET}")
-    auth = earthaccess.login(persist=True)
+    # Use credentials from src/credentials.py if available
+    if EARTHDATA_USERNAME and EARTHDATA_PASSWORD:
+        os.environ['EARTHDATA_USERNAME'] = EARTHDATA_USERNAME
+        os.environ['EARTHDATA_PASSWORD'] = EARTHDATA_PASSWORD
+        auth = earthaccess.login(strategy="environment", persist=True)
+    else:
+        auth = earthaccess.login(persist=True)
     
     # 2. Get existing files in S3
     existing_files = get_existing_s3_files()
@@ -128,11 +148,13 @@ def production_sync(limit=None):
                 r.raise_for_status()
                 file_size = int(r.headers.get('content-length', 0))
                 
-                print(f"  {PURPLE_LIGHT}Source:{RESET} {url}")
-                print(f"  {PURPLE_LIGHT}Target:{RESET} {s3_path} ({format_size(file_size)})")
-                
+                # Ensure S3 credentials from credentials.py are set for the subprocess
+                s3_env = os.environ.copy()
+                if S3_ACCESS_KEY: s3_env['AWS_ACCESS_KEY_ID'] = S3_ACCESS_KEY
+                if S3_SECRET_KEY: s3_env['AWS_SECRET_ACCESS_KEY'] = S3_SECRET_KEY
+
                 cmd = ['python', S3CMD_PATH, '-c', CONFIG_PATH, '--no-preserve', '--no-progress', '--quiet', 'put', '-', s3_path]
-                s3_proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                s3_proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.DEVNULL, env=s3_env)
                 
                 downloaded = 0
                 file_start_time = time.time()

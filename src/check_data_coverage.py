@@ -4,9 +4,24 @@ import pandas as pd
 from tqdm import tqdm
 from collections import defaultdict
 
+# Import unified credentials from src/credentials.py (local only)
+try:
+    from .credentials import EARTHDATA_USERNAME, EARTHDATA_PASSWORD
+except ImportError:
+    try:
+        from credentials import EARTHDATA_USERNAME, EARTHDATA_PASSWORD
+    except ImportError:
+        EARTHDATA_USERNAME = EARTHDATA_PASSWORD = None
+
 def prioritize_coverage(richness_csv, nc_dir, budget=20):
     print("[*] Accessing NASA Earthdata...")
-    earthaccess.login(persist=True)
+    # Use credentials from src/credentials.py if available
+    if EARTHDATA_USERNAME and EARTHDATA_PASSWORD:
+        os.environ['EARTHDATA_USERNAME'] = EARTHDATA_USERNAME
+        os.environ['EARTHDATA_PASSWORD'] = EARTHDATA_PASSWORD
+        earthaccess.login(strategy="environment", persist=True)
+    else:
+        earthaccess.login(persist=True)
     
     # 1. Load Sites
     df = pd.read_csv(richness_csv)

@@ -1,7 +1,3 @@
-"""
-GAIA SMART SYNC: Stream ONLY labeled granules from EarthData to S3 (or local).
-Uses 'labeled_inventory.txt' by default to save 400GB+ of bandwidth.
-"""
 import earthaccess
 import os
 import time
@@ -15,6 +11,15 @@ import queue
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from tqdm import tqdm
+
+# Import unified credentials from src/credentials.py (local only)
+try:
+    from .credentials import EARTHDATA_USERNAME, EARTHDATA_PASSWORD, S3_ACCESS_KEY, S3_SECRET_KEY, S3_ENDPOINT
+except ImportError:
+    try:
+        from credentials import EARTHDATA_USERNAME, EARTHDATA_PASSWORD, S3_ACCESS_KEY, S3_SECRET_KEY, S3_ENDPOINT
+    except ImportError:
+        EARTHDATA_USERNAME = EARTHDATA_PASSWORD = S3_ACCESS_KEY = S3_SECRET_KEY = S3_ENDPOINT = None
 
 # --- PATHS ---
 S3CMD_PATH = r"C:\Users\silve\AppData\Roaming\Python\Python312\Scripts\s3cmd"
@@ -186,8 +191,13 @@ def sync_worker(granule_info):
         # 3. Deliver
         if s3_upload:
             s3_path = f"s3://gaia-datasets/{res}m/{filename}"
+            # Ensure S3 credentials from credentials.py are set for the subprocess
+            s3_env = os.environ.copy()
+            if S3_ACCESS_KEY: s3_env['AWS_ACCESS_KEY_ID'] = S3_ACCESS_KEY
+            if S3_SECRET_KEY: s3_env['AWS_SECRET_ACCESS_KEY'] = S3_SECRET_KEY
+            
             res_proc = subprocess.run(['python', S3CMD_PATH, '-c', CONFIG_PATH, 'put', processed_file, s3_path], 
-                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=s3_env)
             if res_proc.returncode != 0:
                 raise Exception(f"S3 Upload failed: {res_proc.stderr}")
         elif local_dir:
@@ -216,7 +226,13 @@ def smart_sync(inventory_path, limit=None, s3_upload=True, local_dir=None, res=3
         safe_print(f"{RED}[!] Error: {inventory_path} not found. Run generate_labeled_inventory.py first.{RESET}")
         return
 
-    earthaccess.login(persist=True)
+    # Use credentials from src/credentials.py if available
+    if EARTHDATA_USERNAME and EARTHDATA_PASSWORD:
+        os.environ['EARTHDATA_USERNAME'] = EARTHDATA_USERNAME
+        os.environ['EARTHDATA_PASSWORD'] = EARTHDATA_PASSWORD
+        earthaccess.login(strategy="environment", persist=True)
+    else:
+        earthaccess.login(persist=True)
     
     if s3_upload:
         existing = get_existing_s3_files(res=res)
