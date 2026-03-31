@@ -1,5 +1,15 @@
 import earthaccess
 import os
+import sys
+# Import credentials from src/credentials.py (local only)
+try:
+    from ..credentials import EARTHDATA_USERNAME, EARTHDATA_PASSWORD
+except ImportError:
+    try:
+        from credentials import EARTHDATA_USERNAME, EARTHDATA_PASSWORD
+    except ImportError:
+        EARTHDATA_USERNAME = None
+        EARTHDATA_PASSWORD = None
 
 def setup_bioscape():
     """
@@ -16,9 +26,13 @@ def setup_bioscape():
         
     # Standard login doesn't take user/pass directly in the call easily without env vars
     # We will set them as environment variables temporarily for the session
-    os.environ['EARTHDATA_USERNAME'] = "valifor"
-    os.environ['EARTHDATA_PASSWORD'] = "Earthdataskulblaka1!"
-    auth = earthaccess.login(strategy="environment")
+    if EARTHDATA_USERNAME and EARTHDATA_PASSWORD:
+        os.environ['EARTHDATA_USERNAME'] = EARTHDATA_USERNAME
+        os.environ['EARTHDATA_PASSWORD'] = EARTHDATA_PASSWORD
+        auth = earthaccess.login(strategy="environment")
+    else:
+        print("[!] No credentials found in src/credentials.py. Please set them manually.")
+        auth = earthaccess.login(strategy="interactive", persist=True)
 
     # Ensure data_dir is always in the project root/data, not src/data
     script_dir = os.path.dirname(os.path.abspath(__file__))
