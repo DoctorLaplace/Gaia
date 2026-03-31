@@ -26,7 +26,7 @@ To exceed an R² of 0 with the current ~450 sites, we should shift from pure Dee
 
 ---
 
-## 💡 Note on Patch Size and Context
+## Note on Patch Size and Context
 The model currently trains on a **16x16 patch** (at 30m resolution).
 
 *   **Spatial Coverage:** A 16x16 patch at 30m covers **480m x 480m** (approx. 23 hectares).

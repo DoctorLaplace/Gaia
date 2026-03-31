@@ -2,6 +2,18 @@ import os
 import fsspec
 import threading
 import multiprocessing
+import sys
+
+# Import unified credentials from src/credentials.py (local only)
+try:
+    from .credentials import S3_ACCESS_KEY, S3_SECRET_KEY, S3_ENDPOINT
+except ImportError:
+    try:
+        from credentials import S3_ACCESS_KEY, S3_SECRET_KEY, S3_ENDPOINT
+    except ImportError:
+        S3_ACCESS_KEY = None
+        S3_SECRET_KEY = None
+        S3_ENDPOINT = None
 
 # Global singletons for thread safety
 _S3_FS = None
@@ -59,10 +71,10 @@ def get_s3_fs():
         if _S3_FS is not None:
             return _S3_FS
             
-        # Attempt to load credentials
-        access_key = os.environ.get('AWS_ACCESS_KEY_ID')
-        secret_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
-        endpoint = os.environ.get('AWS_S3_ENDPOINT')
+        # Attempt to load credentials (Priority: Env > credentials.py > s3cmd.ini)
+        access_key = os.environ.get('AWS_ACCESS_KEY_ID') or S3_ACCESS_KEY
+        secret_key = os.environ.get('AWS_SECRET_ACCESS_KEY') or S3_SECRET_KEY
+        endpoint = os.environ.get('AWS_S3_ENDPOINT') or S3_ENDPOINT
         
         if not access_key:
             paths = [
