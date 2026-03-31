@@ -1,0 +1,26 @@
+# Gaia Python .gitignore
+
+# Ignore *contents* of these folders but keep the folders themselves
+data/*
+checkpoints/*
+tmp/*
+
+# Except for .gitkeep files to ensure directories are tracked
+!data/.gitkeep
+!checkpoints/.gitkeep
+!tmp/.gitkeep
+
+# Common Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# OS files
+.DS_Store
+Thumbs.db

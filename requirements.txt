@@ -1,0 +1,28 @@
+# Gaia — Masked Spectral-Spatial Vision Transformer
+# Core
+torch>=2.0
+torchvision>=0.15
+numpy
+scipy
+scikit-learn
+
+# Hyperspectral I/O
+spectral
+h5py
+
+# Visualization & Logging
+matplotlib
+seaborn
+tqdm
+
+# Config
+PyYAML>=6.0.0
+
+# Notebooks (optional)
+jupyter
+ipykernel
+einops
+earthaccess
+netcdf4
+xarray
+pandas

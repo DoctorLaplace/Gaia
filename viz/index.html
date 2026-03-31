@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaia Geospatial Explorer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --glass: rgba(10, 10, 15, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #4f46e5;
+            --accent-glow: rgba(79, 70, 229, 0.5);
+            --text: #e2e8f0;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            height: 100%;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: #000;
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            pointer-events: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            width: 320px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            margin: 0; font-size: 1rem; font-weight: 600;
+            background: linear-gradient(90deg, #fff, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.01em;
+        }
+
+        .controls {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 400;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .band-info {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-glow);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+            background: var(--accent);
+            border-color: #fff;
+        }
+
+        .patch-canvas {
+            image-rendering: pixelated;
+        }
+
+        .leaflet-popup-content-wrapper {
+            background: var(--glass) !important;
+            color: var(--text) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .richness-tag {
+            color: #4ade80;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .legend {
+            background: rgba(20, 20, 25, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 0.7rem;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .legend-title { font-weight: bold; margin-bottom: 4px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.05em; }
+        .legend-bar { height: 8px; border-radius: 4px; background: linear-gradient(to right, #00ff00, #ff0000); margin: 4px 0; }
+        .legend-labels { display: flex; justify-content: space-between; opacity: 0.6; }
+    </style>
+</head>
+<body>
+    <div id="loader">
+        <div class="spinner"></div>
+        <div id="loader-text">Loading Geospatial Data...</div>
+    </div>
+
+    <div class="ui-overlay">
+        <div class="glass-panel">
+            <header>
+                <div>
+                    <h1>Gaia Explorer</h1>
+                    <div style="font-size: 0.8rem; opacity: 0.6;">NASA BioSCape Hyperspectral Visualization</div>
+                </div>
+                <div class="band-info"><span id="wavelength">400.0</span> nm</div>
+            </header>
+            
+            <div class="slider-container">
+                <div class="slider-header">
+                    <span>Spectral Band Selection</span>
+                    <span>Band: <span id="band-index">1</span> of 200</span>
+                </div>
+                <input type="range" id="band-slider" min="0" max="199" value="0">
+            </div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="legend">
+        <div class="legend-title">Species Richness</div>
+        <div class="legend-bar"></div>
+        <div class="legend-labels">
+            <span>Low</span>
+            <span id="max-richness-label">High</span>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let metadata = null;
+        let patchesData = null;
+        let map = null;
+        let siteElements = [];
+
+        async function init() {
+            const loader = document.getElementById('loader-text');
+            
+            if (window.location.protocol === 'file:') {
+                loader.innerHTML = `<span style="color: #f59e0b"><b>Security Error:</b> Browser blocked local file access.</span><br><br><small>You MUST use a server (http://localhost:8000) to view this.</small>`;
+                return;
+            }
+
+            try {
+                const metaUrl = new URL('data/metadata.json', window.location.href);
+                console.log("Fetching metadata from:", metaUrl.href);
+                const metaRes = await fetch(metaUrl.href, { cache: 'no-store' });
+                if (!metaRes.ok) throw new Error(`Metadata not found (HTTP ${metaRes.status})`);
+                metadata = await metaRes.json();
+
+                const patchUrl = new URL('data/patches.dat', window.location.href);
+                console.log("Fetching binary patches from:", patchUrl.href);
+                const patchRes = await fetch(patchUrl.href, { cache: 'no-store' });
+                if (!patchRes.ok) throw new Error(`Patches binary not found (HTTP ${patchRes.status})`);
+                const buffer = await patchRes.arrayBuffer();
+                patchesData = new Uint8Array(buffer);
+
+                loader.innerText = "Loading Flightline Footprints (30MB)...";
+                const footprintUrl = new URL('data/footprints.json', window.location.href);
+                const footprintRes = await fetch(footprintUrl.href);
+                const footprints = await footprintRes.json();
+
+                setupMap(footprints);
+                fadeOutLoader();
+            } catch (err) {
+                console.error("Fetch Error Detail:", err);
+                loader.innerHTML = `<span style="color: #ef4444"><b>Network Error:</b> ${err.message}</span><br><br><small style="opacity:0.6">Try Ctrl+F5 to clear cache</small>`;
+            }
+        }
+
+        function fadeOutLoader() {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 500);
+        }
+
+        function setupMap(footprints) {
+            map = L.map('map', {
+                attributionControl: false,
+                zoomControl: false
+            }).setView([-34.3, 19.3], 10);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+            if (footprints) {
+                L.geoJSON(footprints, {
+                    style: {
+                        color: '#4c1d95',
+                        weight: 0.5,
+                        fillColor: '#4c1d95',
+                        fillOpacity: 0.1,
+                        interactive: false
+                    }
+                }).addTo(map);
+            }
+
+            const slider = document.getElementById('band-slider');
+            const bandIdxDisp = document.getElementById('band-index');
+            const waveDisp = document.getElementById('wavelength');
+
+            const lats = metadata.sites.map(s => s.lat);
+            const lons = metadata.sites.map(s => s.lon);
+            map.fitBounds([
+                [Math.min(...lats), Math.min(...lons)],
+                [Math.max(...lats), Math.max(...lons)]
+            ], { padding: [100, 100] });
+
+            metadata.sites.forEach((site, i) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 16;
+                canvas.height = 16;
+
+                // Use precise geographic bounds from metadata
+                const bounds = site.bounds;
+
+                const overlay = L.imageOverlay('', bounds, {
+                    interactive: true,
+                    opacity: 1.0,
+                    className: 'patch-canvas'
+                }).addTo(map);
+
+                const maxRichness = Math.max(...metadata.sites.map(s => s.richness || 1), 1);
+                document.getElementById('max-richness-label').innerText = Math.round(maxRichness);
+                const richness = site.richness || 0;
+                const ratio = richness / maxRichness;
+                const hue = (1 - ratio) * 120;
+                const color = `hsl(${hue}, 100%, 50%)`;
+
+                const marker = L.circleMarker([site.lat, site.lon], {
+                    radius: 4,
+                    fillColor: color,
+                    color: "#fff",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.9
+                }).addTo(map);
+
+                const popupHtml = `
+                    <div style="color: white; min-width: 140px;">
+                        <b style="font-size: 0.8rem; opacity: 0.6;">SITE ${i+1}</b><br>
+                        <b style="color: ${color}; font-size: 1rem;">${richness.toFixed(1)} Richness</b><br>
+                        <small style="opacity: 0.5;">${site.lat.toFixed(4)}, ${site.lon.toFixed(4)}</small>
+                    </div>
+                `;
+
+                overlay.bindPopup(popupHtml);
+                marker.bindPopup(popupHtml);
+
+                siteElements.push({
+                    canvas,
+                    ctx: canvas.getContext('2d'),
+                    overlay,
+                    marker
+                });
+            });
+
+            const updateBands = (bandIdx) => {
+                const wave = metadata.wavelengths[bandIdx];
+                bandIdxDisp.innerText = bandIdx + 1;
+                waveDisp.innerText = wave.toFixed(1);
+
+                const patchSize = 16 * 16;
+                const bandStride = 200 * patchSize;
+
+                siteElements.forEach((el, sIdx) => {
+                    const ctx = el.ctx;
+                    const imgData = ctx.createImageData(16, 16);
+                    const baseOffset = sIdx * bandStride + bandIdx * patchSize;
+                    
+                    for (let p = 0; p < patchSize; p++) {
+                        const val = patchesData[baseOffset + p];
+                        const idx = p * 4;
+                        imgData.data[idx] = val;
+                        imgData.data[idx+1] = val;
+                        imgData.data[idx+2] = val;
+                        imgData.data[idx+3] = 255;
+                    }
+                    ctx.putImageData(imgData, 0, 0);
+                    el.overlay.setUrl(el.canvas.toDataURL());
+                });
+            };
+
+            slider.oninput = (e) => updateBands(parseInt(e.target.value));
+            updateBands(0);
+        }
+
+        init();
+    </script>
+</body>
+</html>

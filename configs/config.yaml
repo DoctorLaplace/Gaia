@@ -1,0 +1,57 @@
+# ──────────────────────────────────────────────
+# Gaia — Project Configuration
+# ──────────────────────────────────────────────
+
+project:
+  name: "Gaia"
+  description: "Masked Spectral-Spatial Vision Transformer for Hyperspectral Imagery"
+
+# ── Dataset paths ──
+data:
+  indian_pines:
+    image: "data/indian_pines/Indian_pines_corrected.mat"
+    ground_truth: "data/indian_pines/Indian_pines_gt.mat"
+    image_key: "indian_pines_corrected"
+    gt_key: "indian_pines_gt"
+    num_bands: 200
+    spatial_size: [145, 145]
+    num_classes: 16
+
+  pavia_university:
+    image: "data/pavia_university/PaviaU.mat"
+    ground_truth: "data/pavia_university/PaviaU_gt.mat"
+    image_key: "paviaU"
+    gt_key: "paviaU_gt"
+    num_bands: 103
+    spatial_size: [610, 340]
+    num_classes: 9
+
+  # Future: AVIRIS-NG BioSCape data
+  # aviris_ng:
+  #   image: "data/aviris_ng/..."
+  #   num_bands: ~430
+  #   spatial_size: [TBD]
+  #   pixel_size_m: 5
+
+# ── BioSCape Production ──
+bioscape:
+  use_s3: false
+  nc_dir_local: "data/bioscape/30m"    # Use "data/bioscape/5m" for full-res on supercomputer
+  nc_dir_s3: "s3://gaia-datasets"
+  
+  # S3 Performance (Turbo Profile)
+  s3_block_size_kb: 8192      # 8MB blocks for reduced S3 requests
+  s3_cache_size_mb: 500       
+  rdcc_nbytes_mb: 64          # 32MB HDF5 chunk cache per worker
+  num_workers: 8              # Increased parallel S3 loaders
+  
+  richness_csv: "data/bioscape/western_cape_site_embeddings.csv"
+  patch_size: 16
+  batch_size: 16
+  epochs: 250
+  learning_rate: 0.0001
+  val_split: 0.1
+
+# ── Device ──
+device: "cuda"  # "cuda" or "cpu"
+seed: 42
