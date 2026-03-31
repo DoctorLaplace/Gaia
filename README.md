@@ -14,8 +14,13 @@ Gaia is a hyperspectral foundation model pipeline designed to predict Species Ri
 pip install -r requirements.txt
 ```
 
-### 3. Data Acquisition (Smart Sync)
-Downloads AVIRIS-NG granules, applies Dr. Clark's Bad Band List (BBL), and optionally downsamples.
+### 3. Credentials Setup (CRITICAL)
+Before running any scripts, you **must** configure your Earthdata and S3 access:
+- Follow the instructions in **[setup.md](setup.md)** to create your private `src/credentials.py` file.
+- This ensures the data acquisition and S3 sync processes can authenticate correctly.
+
+### 4. Data Acquisition (Smart Sync)
+Downloads AVIRIS-NG granules, applies Dr. Clark's Bad Band List (BBL), and optionally downsamples. 
 Data is automatically organized by resolution: `data/bioscape/30m/` and `data/bioscape/5m/`.
 
 #### Option A: Targeted Sync (Recommended, ~535 labeled granules)
