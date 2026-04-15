@@ -1,0 +1,71 @@
+# ──────────────────────────────────────────────────────────
+# Gaia Embedding Creation — Native AVIRIS-NG Foundation Model
+# ──────────────────────────────────────────────────────────
+
+data:
+  # ── Resolution ──
+  # Default resolution for training. Override with --res 5 or --res 30.
+  default_res: 30
+
+  # ── Data Directories ──
+  # Paths use {res} as placeholder, replaced at runtime by the resolution.
+  # The existing Gaia pipeline keeps labeled granules in data/bioscape/{res}m/.
+  # We do NOT add to that directory. Additional SSL-only granules go into our own.
+  # Pre-training reads from BOTH. Fine-tuning reads only from labeled.
+  labeled_nc_dir: "data/bioscape/{res}m"                # existing labeled granules (read-only)
+  ssl_nc_dir: "embedding_creation/data/{res}m"          # additional unlabeled granules (SSL)
+  richness_csv: "data/bioscape/western_cape_site_embeddings.csv"
+  
+  # Band configuration
+  # AVIRIS-NG has 425 raw bands. After BBL filtering = 373 good bands.
+  # We trim the last 3 (noisiest SWIR2 edge bands) to get 370.
+  # 370 / spectral_patch_size(10) = 37 clean spectral groups.
+  num_bands: 370
+  bands_to_trim: 3            # drop last N bands from 373
+  patch_size: 16              # spatial patch size in pixels
+
+model:
+  dim: 96
+  depth: 4                    # number of transformer layers (applied twice: spatial + spectral)
+  heads: 8
+  mlp_dim: 192                # 2x dim
+  spectral_patch_size: 10     # bands per spectral token
+  spatial_patch_size: 1       # pixels per spatial token side (1 = pixelwise)
+  dropout: 0.1
+  emb_dropout: 0.1
+
+pretrain:
+  mask_ratio: 0.6             # fraction of tokens to mask
+  mask_block_size: 4          # spatial block size for blockwise masking (4 = 4x4 pixel blocks)
+  epochs: 200
+  batch_size: 4               # safe for RTX 3060 12GB with fp16
+  lr: 1.5e-4
+  weight_decay: 0.05
+  warmup_epochs: 10
+  fp16: true
+  num_workers: 0              # 0 for Windows, increase on Linux
+  patches_per_granule: 200    # random patches extracted per granule per epoch
+  checkpoint_every: 20        # save checkpoint every N epochs
+  checkpoint_dir: "embedding_creation/checkpoints"
+
+finetune:
+  epochs: 250
+  batch_size: 8
+  lr: 1.0e-4
+  weight_decay: 0.05
+  freeze_encoder: true
+  unfreeze_epoch: 50
+  patience: 25
+  fp16: true
+  num_workers: 0
+  val_split: 0.1
+  checkpoint_dir: "embedding_creation/checkpoints"
+
+# ── Test Run Overrides ──
+# Applied when --test-run is passed. Keeps everything runnable on weak GPUs.
+test_run:
+  pretrain_epochs: 2
+  finetune_epochs: 3
+  batch_size: 2
+  patches_per_granule: 10
+  max_granules: 5             # only use first N granules
