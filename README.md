@@ -1,6 +1,6 @@
-# Gaia: Biodiversity Transformation Engine
+# Gaia: A Masked Vision Transformer for Species Richness Prediction from Hyperspectral Imagery
 
-Gaia is a hyperspectral foundation model pipeline designed to predict Species Richness across the Greater Cape Floristic Region (South Africa) using NASA BioSCape data.
+Gaia is a masked spatial-spectral vision transformer fine-tuned on EnMAP foundation weights to predict animal species richness (birds, frogs, and insects) from AVIRIS-NG hyperspectral imagery across the Greater Cape Floristic Region (South Africa) using NASA BioSCape data.
 
 ## QuickStart
 
