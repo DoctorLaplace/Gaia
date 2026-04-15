@@ -123,8 +123,7 @@ def smart_sync(inventory_path, limit=None, s3_upload=True, local_dir=None, res=3
     if s3_upload:
         existing = get_existing_s3_files(res=res)
     elif local_dir and os.path.isdir(local_dir):
-        existing = {f.replace('.nc', '').split('_L2B_')[0] 
-                    for f in os.listdir(local_dir) if f.endswith('.nc')}
+        existing = {f for f in os.listdir(local_dir) if f.endswith('.nc')}
         # Also keep full filenames for exact matching in the transfer loop
         existing_files = {f for f in os.listdir(local_dir) if f.endswith('.nc')}
     else:
