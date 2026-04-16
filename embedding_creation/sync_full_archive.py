@@ -164,7 +164,7 @@ def sync(args):
         chunk = new_ids[i:i + 50]
         results = earthaccess.search_data(
             short_name="BioSCape_AVNG_L2B_BRDF_GCFR_2385",
-            granule_name=chunk
+            granule_ur=chunk
         )
         granules.extend(results)
     print(f"[OK] Found {len(granules)} granules.")
