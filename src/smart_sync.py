@@ -243,7 +243,7 @@ def smart_sync(inventory_path, limit=None, s3_upload=True, local_dir=None, res=3
     for i in range(0, len(new_ids), chunk_size):
         if stop_event.is_set(): return
         chunk = new_ids[i:i + chunk_size]
-        results = earthaccess.search_data(short_name="BioSCape_AVNG_L2B_BRDF_GCFR_2385", granule_name=chunk)
+        results = earthaccess.search_data(short_name="BioSCape_AVNG_L2B_BRDF_GCFR_2385", granule_ur=chunk)
         granules.extend(results)
     
     safe_print(f"{GREEN}[OK] Discovery Complete: {len(granules)} granules ready for transfer.{RESET}\n")
