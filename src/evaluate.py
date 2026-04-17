@@ -43,7 +43,7 @@ def compute_metrics(targets, preds):
 
 def evaluate(nc_dir=None):
     print("\n" + "═"*60)
-    print("  GAIA MODEL EVALUATION (PREMIUM VIZ)")
+    print("  GAIA MODEL EVALUATION")
     print("═"*60)
     
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

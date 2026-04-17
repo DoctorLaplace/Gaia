@@ -148,7 +148,7 @@ def enforce_dataset_boundaries(labeled_dir, ssl_dir, labeled_inventory_path):
                     print(f"  {Colors.FAIL}[!] Locked: Cannot move {f} (File is currently open/in-use){Colors.ENDC}")
                 
     if actions_taken == 0:
-        print(f"  {Colors.OKGREEN}[OK] Dataset boundaries are perfectly tight ({scanned_files} files verified).{Colors.ENDC}")
+        print(f"  {Colors.OKGREEN}[OK] Dataset boundaries are perfectly fit ({scanned_files} files verified).{Colors.ENDC}")
     else:
         print(f"  {Colors.OKGREEN}[OK] Re-aligned {actions_taken} files to their correct architectural boundaries.{Colors.ENDC}")
 
