@@ -18,6 +18,11 @@ tqdm
 # Config
 PyYAML>=6.0.0
 
+# Hyperspectral Mapping & S3
+pyproj
+fsspec
+s3fs
+
 # Notebooks (optional)
 jupyter
 ipykernel

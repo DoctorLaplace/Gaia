@@ -103,7 +103,7 @@ class MultiFlightBioScapeDataset(Dataset):
             print(f"{Colors.OKGREEN}[✔] Loaded {len(self.mappings)} sites from cache.{Colors.ENDC}")
             return
 
-        self._initialize_mapping(richness_csv, nc_paths, patch_size)
+        self._initialize_mapping(richness_csv, nc_paths, patch_size, cache_path)
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -115,7 +115,7 @@ class MultiFlightBioScapeDataset(Dataset):
         self.__dict__.update(state)
         self.cache_lock = threading.Lock()
 
-    def _initialize_mapping(self, richness_csv, nc_paths, patch_size):
+    def _initialize_mapping(self, richness_csv, nc_paths, patch_size, cache_path=None):
         self.richness_df = pd.read_csv(richness_csv)
         self.richness_df = self.richness_df.rename(columns={'Latitude': 'lat', 'Longitude': 'lon', 'richness': 'richness', 'Richness': 'richness'})
         
