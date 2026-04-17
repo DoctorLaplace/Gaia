@@ -13,6 +13,18 @@ from sklearn.metrics import r2_score
 import fsspec
 import yaml
 import threading
+
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 from concurrent.futures import ThreadPoolExecutor
 
 # Add project root to path
@@ -45,7 +57,7 @@ class GaiaTransferModel(nn.Module):
         )
 
     def load_foundation_weights(self, checkpoint_path, device):
-        print(f"[*] Loading foundation weights from {checkpoint_path}")
+        print(f"{Colors.OKBLUE}[*] Loading foundation weights from {checkpoint_path{Colors.ENDC}})
         ckpt = torch.load(checkpoint_path, map_location=device, weights_only=False)
         state_dict = ckpt.get('model_state_dict', ckpt)
         new_state_dict = {}
@@ -85,10 +97,10 @@ class MultiFlightBioScapeDataset(Dataset):
         # Try loading from cache
         if cache_path and os.path.exists(cache_path):
             import json
-            print(f"[*] Loading mapping from cache: {cache_path}")
+            print(f"{Colors.OKBLUE}[*] Loading mapping from cache: {cache_path{Colors.ENDC}})
             with open(cache_path, 'r') as f:
                 self.mappings = json.load(f)
-            print(f"[✔] Loaded {len(self.mappings)} sites from cache.")
+            print(f"{Colors.OKGREEN}[✔] Loaded {len(self.mappings)} sites from cache{Colors.ENDC}.)
             return
 
         self._initialize_mapping(richness_csv, nc_paths, patch_size)
@@ -107,7 +119,7 @@ class MultiFlightBioScapeDataset(Dataset):
         self.richness_df = pd.read_csv(richness_csv)
         self.richness_df = self.richness_df.rename(columns={'Latitude': 'lat', 'Longitude': 'lon', 'richness': 'richness', 'Richness': 'richness'})
         
-        print(f"[*] Mapping {len(self.richness_df)} potential sites across {len(nc_paths)} flightlines...")
+        print(f"{Colors.OKBLUE}[*] Mapping {len(self.richness_df)} potential sites across {len(nc_paths)} flightlines..{Colors.ENDC}.)
         
         # Parallel mapping with spatial filtering
         from concurrent.futures import ThreadPoolExecutor
@@ -152,9 +164,9 @@ class MultiFlightBioScapeDataset(Dataset):
             os.makedirs(os.path.dirname(cache_path), exist_ok=True)
             with open(cache_path, 'w') as f:
                 json.dump(self.mappings, f)
-            print(f"[✔] Mapping cached to {cache_path}")
+            print(f"{Colors.OKGREEN}[✔] Mapping cached to {cache_path{Colors.ENDC}})
                     
-        print(f"[✔] Dataset Ready: {len(self.mappings)} unique sites.")
+        print(f"{Colors.OKGREEN}[✔] Dataset Ready: {len(self.mappings)} unique sites{Colors.ENDC}.)
 
     def compute_band_stats(self, cache_path=None):
         """Compute global per-band mean/std across ALL patches. Results are cached to disk."""
@@ -164,10 +176,10 @@ class MultiFlightBioScapeDataset(Dataset):
                 stats = json.load(f)
             self.band_mean = torch.tensor(stats['mean']).reshape(200, 1, 1)
             self.band_std = torch.tensor(stats['std']).reshape(200, 1, 1)
-            print(f"[*] Loaded band stats from cache: {cache_path}")
+            print(f"{Colors.OKBLUE}[*] Loaded band stats from cache: {cache_path{Colors.ENDC}})
             return
         
-        print(f"[*] Computing global band statistics across {len(self)} patches...")
+        print(f"{Colors.OKBLUE}[*] Computing global band statistics across {len(self)} patches..{Colors.ENDC}.)
         
         running_sum = torch.zeros(200)
         running_sq_sum = torch.zeros(200)
@@ -201,7 +213,7 @@ class MultiFlightBioScapeDataset(Dataset):
                 n_pixels += p_pixels
                 
         if n_pixels == 0:
-            print("[!] Could not compute band stats (no valid pixels found).")
+            print(f"{Colors.FAIL}[!] Could not compute band stats (no valid pixels found){Colors.ENDC}.)
             return
             
         global_mean = running_sum / n_pixels
@@ -215,7 +227,7 @@ class MultiFlightBioScapeDataset(Dataset):
             os.makedirs(os.path.dirname(cache_path), exist_ok=True)
             with open(cache_path, 'w') as f:
                 json.dump({'mean': global_mean.tolist(), 'std': global_std.tolist()}, f)
-            print(f"[✔] Band stats cached to {cache_path}")
+            print(f"{Colors.OKGREEN}[✔] Band stats cached to {cache_path{Colors.ENDC}})
     
     def set_band_stats(self, band_mean, band_std):
         """Set global band stats from checkpoint (for evaluation)."""
@@ -259,10 +271,10 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     patch_size = b_cfg.get('patch_size', 16)
     
     device = torch.device(config.get('device', 'cuda') if torch.cuda.is_available() else "cpu")
-    print(f"Gaia Fine-Tuning ({'S3' if nc_dir.startswith('s3') else 'Local'}) on {device}")
+    print(f"{Colors.HEADER}===================================================={Colors.ENDC}\n{Colors.HEADER}Gaia FIne-Tuning ({'S3' if nc_dir.startswith('s3') else 'Local'}) on {device}")
     
     if test_run:
-        print("[!] TEST RUN ENABLED: Using only 2 granules and 1 epoch.")
+        print(f"{Colors.FAIL}[!] TEST RUN ENABLED: Using only 2 granules and 1 epoch{Colors.ENDC}.)
         epochs = 1
     
     # Use fsspec for S3 directory listing
@@ -273,7 +285,7 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
         nc_paths = [os.path.join(nc_dir, f) for f in os.listdir(nc_dir) if f.endswith('.nc')]
         
     if not nc_paths:
-        print(f"[!] No NetCDF files found in {nc_dir}")
+        print(f"{Colors.FAIL}[!] No NetCDF files found in {nc_dir{Colors.ENDC}})
         return
         
     if test_run:
@@ -285,7 +297,7 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     
     full_dataset = MultiFlightBioScapeDataset(nc_paths, richness_csv, patch_size=patch_size, augment=True, cache_path=mapping_cache)
     if len(full_dataset) == 0:
-        print("[!] No training samples found. Stopping.")
+        print(f"{Colors.FAIL}[!] No training samples found. Stopping{Colors.ENDC}.)
         return
     
     # Compute global per-band normalization stats (cached to disk)
@@ -304,7 +316,7 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     all_richness = np.array([m[3] for m in full_dataset.mappings])
     richness_mean = float(all_richness.mean())
     richness_std = float(all_richness.std()) + 1e-6
-    print(f"[*] Richness Stats: mean={richness_mean:.1f}, std={richness_std:.1f}, min={all_richness.min():.0f}, max={all_richness.max():.0f}")
+    print(f"{Colors.OKBLUE}[*] Richness Stats: mean={richness_mean:.1f}, std={richness_std:.1f}, min={all_richness.min():.0f}, max={all_richness.max():.0f{Colors.ENDC}})
         
     indices = np.arange(len(full_dataset))
     val_split = b_cfg.get('val_split', 0.2)
@@ -322,7 +334,7 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     if os.name == 'nt' and not nc_dir.startswith("s3"):
         num_workers = 0
     
-    print(f"[*] Enabling {num_workers} workers for {'S3' if nc_dir.startswith('s3') else 'Local'} streaming...")
+    print(f"{Colors.OKBLUE}[*] Enabling {num_workers} workers for {'S3' if nc_dir.startswith('s3') else 'Local'} streaming..{Colors.ENDC}.)
         
     train_loader = DataLoader(Subset(full_dataset, train_idx), batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
     val_loader = DataLoader(Subset(full_dataset, val_idx), batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
@@ -341,9 +353,9 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
             param.requires_grad = True
         trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
         total = sum(p.numel() for p in model.parameters())
-        print(f"[*] Encoder FROZEN: {trainable}/{total} params trainable ({trainable/total*100:.1f}%)")
+        print(f"{Colors.OKBLUE}[*] Encoder FROZEN: {trainable}/{total} params trainable ({trainable/total*100:.1f}%{Colors.ENDC}))
     else:
-        print(f"[*] Full fine-tuning: all parameters trainable")
+        print(f"{Colors.OKBLUE}[*] Full fine-tuning: all parameters trainabl{Colors.ENDC}e)
         
     lr = b_cfg['learning_rate']
     criterion = nn.MSELoss()
@@ -364,7 +376,7 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     for epoch in range(1, epochs + 1):
         # --- Progressive unfreezing ---
         if freeze_encoder and unfreeze_epoch and epoch == unfreeze_epoch:
-            print(f"\n[*] Epoch {epoch}: UNFREEZING encoder for fine-tuning")
+            print(f"{Colors.OKBLUE}\n[*] Epoch {epoch}: UNFREEZING encoder for fine-tunin{Colors.ENDC}g)
             for param in model.encoder.parameters():
                 param.requires_grad = True
             # Reset optimizer with lower LR for encoder layers
@@ -421,7 +433,7 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
                 
         epoch_r2 = r2_score(val_targets, val_preds) if len(val_targets) > 1 else 0
         avg_loss = train_loss / len(train_loader)
-        print(f"[*] Epoch {epoch} - Loss: {avg_loss:.4f} | Val R²: {epoch_r2:.4f} | LR: {optimizer.param_groups[0]['lr']:.6f}")
+        print(f"{Colors.OKBLUE}[*] Epoch {epoch} - Loss: {avg_loss:.4f} | Val R²: {epoch_r2:.4f} | LR: {optimizer.param_groups[0]['lr']:.6f{Colors.ENDC}})
         
         if epoch_r2 > best_r2:
             best_r2 = epoch_r2
@@ -434,14 +446,14 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
                 'band_std': full_dataset.band_std.flatten().tolist(),
             }
             torch.save(ckpt_data, os.path.join(project_root, "checkpoints", "gaia_bioscape_best.pth"))
-            print(f"[OK] New Best Model Saved (R²: {best_r2:.4f})")
+            print(f"{Colors.OKGREEN}[OK] New Best Model Saved (R²: {best_r2:.4f}{Colors.ENDC}))
         else:
             patience_counter += 1
             if patience_counter >= patience:
-                print(f"\n[*] Early stopping at epoch {epoch} (no improvement for {patience} epochs)")
+                print(f"{Colors.OKBLUE}\n[*] Early stopping at epoch {epoch} (no improvement for {patience} epochs{Colors.ENDC}))
                 break
             
-    print(f"\n[OK] Training Complete. Best R²: {best_r2:.4f}")
+    print(f"{Colors.OKGREEN}\n[OK] Training Complete. Best R²: {best_r2:.4f{Colors.ENDC}})
 
 if __name__ == "__main__":
     import argparse

@@ -73,7 +73,7 @@ def cleanup_tmp(tmp_dir):
                     size = os.path.getsize(filepath)
                     os.remove(filepath)
                     freed_bytes += size
-                    print(f"  {Colors.WARNING}[🧹] Removed orphan file: {f} ({size / 1024**2:.1f} MB){Colors.ENDC}")
+                    print(f"  {Colors.WARNING}[*] Removed orphan file: {f} ({size / 1024**2:.1f} MB){Colors.ENDC}")
                 except Exception as e:
                     print(f"  {Colors.FAIL}[!] Failed to remove {f}: {e}{Colors.ENDC}")
     
@@ -89,7 +89,7 @@ def downsample_netcdf(input_path, output_path, res_target, tile_size):
     import gc
 
     factor = max(1, int(res_target // 5))
-    print(f"  {Colors.OKCYAN}[⚙️] Processing NetCDF (Resolution: {res_target}m, Downsample Factor: {factor}x){Colors.ENDC}")
+    print(f"  {Colors.OKCYAN}[*] Processing NetCDF (Resolution: {res_target}m, Downsample Factor: {factor}x){Colors.ENDC}")
 
     with h5py.File(input_path, 'r') as src:
         wavelengths = src['reflectance/wavelength'][()]
@@ -144,7 +144,7 @@ def downsample_netcdf(input_path, output_path, res_target, tile_size):
 
         # Setup Tile Processing
         tile_h = max(factor, (tile_size // factor) * factor) # Ensure tile height is a multiple of factor
-        print(f"  {Colors.OKBLUE}[ℹ️] Memory Config: Tiled processing (Size: {tile_h} lines/batch){Colors.ENDC}")
+        print(f"  {Colors.OKBLUE}[*] Memory Config: Tiled processing (Size: {tile_h} lines/batch){Colors.ENDC}")
 
         with h5py.File(output_path, 'w') as dst:
             proj_ds = dst.create_dataset('projection', data=np.uint8(0))
@@ -169,7 +169,7 @@ def downsample_netcdf(input_path, output_path, res_target, tile_size):
             grp.create_dataset('fwhm', data=fwhm.astype(np.float32))
 
             # Process in tiles along Y axis
-            print(f"  {Colors.OKCYAN}[⏳] Processing tiles (Total Height: {h_new})...{Colors.ENDC}")
+            print(f"  {Colors.OKCYAN}[*] Processing tiles (Total Height: {h_new})...{Colors.ENDC}")
             with tqdm(total=h_new, unit='lines', desc="Processing", leave=False) as pbar:
                 for y in range(0, h_new, tile_h):
                     y_end = min(y + tile_h, h_new)
@@ -297,7 +297,7 @@ def sync(args):
                 r.raise_for_status()
                 total_size = int(r.headers.get('content-length', 0))
                 with tqdm(total=total_size, unit='B', unit_scale=True,
-                         desc=f"  {Colors.OKCYAN}[↓] Downloading{Colors.ENDC}", leave=False, 
+                         desc=f"  {Colors.OKCYAN}[*] Downloading{Colors.ENDC}", leave=False, 
                          bar_format='{l_bar}{bar:20}{r_bar}') as pbar:
                     with open(temp_file, 'wb') as dest:
                         for chunk in r.iter_content(chunk_size=1024*1024):
@@ -313,7 +313,7 @@ def sync(args):
             if os.path.exists(target):
                 os.remove(target)
             os.replace(processed_file, target)
-            print(f"  {Colors.OKGREEN}[✓] Successfully deployed to core directories.{Colors.ENDC}")
+            print(f"  {Colors.OKGREEN}[OK] Successfully deployed to core directories.{Colors.ENDC}")
 
         except Exception as e:
             print(f"  {Colors.FAIL}[!] Critical Error encountered over granule: {e}{Colors.ENDC}")
