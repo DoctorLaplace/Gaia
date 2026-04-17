@@ -89,6 +89,71 @@ def cleanup_tmp(tmp_dir):
         print(f"{Colors.OKGREEN}[OK] Temporary directory is clean.{Colors.ENDC}")
 
 
+def enforce_dataset_boundaries(labeled_dir, ssl_dir, labeled_inventory_path):
+    import shutil
+    print(f"\n{Colors.OKBLUE}[*] Auditing dataset boundaries (Labeled vs SSL)...{Colors.ENDC}")
+    
+    if not os.path.exists(labeled_inventory_path):
+        print(f"  {Colors.WARNING}[!] labeled_inventory.txt not found. Skipping deduplication.{Colors.ENDC}")
+        return
+        
+    with open(labeled_inventory_path, 'r') as f:
+        labeled_ids = set([l.strip().replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "") for l in f if l.strip()])
+        
+    actions_taken = 0
+    scanned_files = 0
+        
+    # Check Labeled Dir
+    if os.path.exists(labeled_dir):
+        for f in os.listdir(labeled_dir):
+            if not f.endswith('.nc'): continue
+            scanned_files += 1
+            f_id = f.replace('.nc', '').split('_L2B_')[0].replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "")
+            
+            # If it is NOT labeled, it belongs in SSL
+            if f_id not in labeled_ids:
+                src = os.path.join(labeled_dir, f)
+                dst = os.path.join(ssl_dir, f)
+                try:
+                    if os.path.exists(dst):
+                        os.remove(src)
+                        print(f"  {Colors.WARNING}[-] Deduplicated: Deleted {f} from Labeled (already in SSL){Colors.ENDC}")
+                    else:
+                        shutil.move(src, dst)
+                        print(f"  {Colors.OKCYAN}[->] Routed to SSL: {f} (Unlabeled){Colors.ENDC}")
+                    actions_taken += 1
+                except PermissionError:
+                    print(f"  {Colors.FAIL}[!] Locked: Cannot move {f} (File is currently open/in-use){Colors.ENDC}")
+                
+    # Check SSL Dir
+    if os.path.exists(ssl_dir):
+        for f in os.listdir(ssl_dir):
+            if not f.endswith('.nc'): continue
+            scanned_files += 1
+            f_id = f.replace('.nc', '').split('_L2B_')[0].replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "")
+            
+            # If it IS labeled, it belongs in Labeled
+            if f_id in labeled_ids:
+                src = os.path.join(ssl_dir, f)
+                dst = os.path.join(labeled_dir, f)
+                try:
+                    if os.path.exists(dst):
+                        os.remove(src)
+                        print(f"  {Colors.WARNING}[-] Deduplicated: Deleted {f} from SSL (already in Labeled){Colors.ENDC}")
+                    else:
+                        shutil.move(src, dst)
+                        print(f"  {Colors.OKGREEN}[->] Routed to Labeled: {f} (Ground-Truth){Colors.ENDC}")
+                    actions_taken += 1
+                except PermissionError:
+                    print(f"  {Colors.FAIL}[!] Locked: Cannot move {f} (File is currently open/in-use){Colors.ENDC}")
+                
+    if actions_taken == 0:
+        print(f"  {Colors.OKGREEN}[OK] Dataset boundaries are perfectly tight ({scanned_files} files verified).{Colors.ENDC}")
+    else:
+        print(f"  {Colors.OKGREEN}[OK] Re-aligned {actions_taken} files to their correct architectural boundaries.{Colors.ENDC}")
+
+
+
 def downsample_netcdf(input_path, output_path, res_target, tile_size):
     """Apply BBL filtering and spatial downsampling with memory-efficient tiling."""
     import h5py
@@ -232,6 +297,7 @@ def sync(args):
     
     # Pre-flight cleanup
     cleanup_tmp(tmp_dir)
+    enforce_dataset_boundaries(labeled_dir, output_dir, os.path.join(PROJECT_ROOT, "labeled_inventory.txt"))
 
     print(f"\n{Colors.OKBLUE}[*] Directories:{Colors.ENDC}")
     print(f"    - Output Folder:  {Colors.BOLD}{output_dir}{Colors.ENDC}")

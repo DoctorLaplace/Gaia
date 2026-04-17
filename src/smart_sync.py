@@ -60,6 +60,68 @@ def print_banner():
     safe_print(f"      GAIA SMART SYNC: TARGETED DATA ACQUISITION")
     safe_print("="*70 + f"{RESET}\n")
 
+def enforce_dataset_boundaries(labeled_dir, ssl_dir, inventory_path):
+    import shutil
+    safe_print(f"\n{PURPLE}[*] Auditing dataset boundaries (Labeled vs SSL)...{RESET}")
+    
+    if not os.path.exists(inventory_path):
+        safe_print(f"  {RED}[!] inventory file not found. Skipping deduplication.{RESET}")
+        return
+        
+    with open(inventory_path, 'r') as f:
+        labeled_ids = set([l.strip().replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "") for l in f if l.strip()])
+        
+    actions_taken = 0
+    scanned_files = 0
+        
+    # Check Labeled Dir
+    if os.path.exists(labeled_dir):
+        for f in os.listdir(labeled_dir):
+            if not f.endswith('.nc'): continue
+            scanned_files += 1
+            f_id = f.replace('.nc', '').split('_L2B_')[0].replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "")
+            
+            if f_id not in labeled_ids:
+                src = os.path.join(labeled_dir, f)
+                dst = os.path.join(ssl_dir, f)
+                try:
+                    if os.path.exists(dst):
+                        os.remove(src)
+                        safe_print(f"  {RED}[-] Deduplicated: Deleted {f} from Labeled (already in SSL){RESET}")
+                    else:
+                        shutil.move(src, dst)
+                        safe_print(f"  {CYAN}[->] Routed to SSL: {f} (Unlabeled){RESET}")
+                    actions_taken += 1
+                except PermissionError:
+                    safe_print(f"  {RED}[!] Locked: Cannot move {f} (File is currently open/in-use){RESET}")
+                
+    # Check SSL Dir
+    if os.path.exists(ssl_dir):
+        for f in os.listdir(ssl_dir):
+            if not f.endswith('.nc'): continue
+            scanned_files += 1
+            f_id = f.replace('.nc', '').split('_L2B_')[0].replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "")
+            
+            if f_id in labeled_ids:
+                src = os.path.join(ssl_dir, f)
+                dst = os.path.join(labeled_dir, f)
+                try:
+                    if os.path.exists(dst):
+                        os.remove(src)
+                        safe_print(f"  {RED}[-] Deduplicated: Deleted {f} from SSL (already in Labeled){RESET}")
+                    else:
+                        shutil.move(src, dst)
+                        safe_print(f"  {GREEN}[->] Routed to Labeled: {f} (Ground-Truth){RESET}")
+                    actions_taken += 1
+                except PermissionError:
+                    safe_print(f"  {RED}[!] Locked: Cannot move {f} (File is currently open/in-use){RESET}")
+                
+    if actions_taken == 0:
+        safe_print(f"  {GREEN}[OK] Dataset boundaries are perfectly tight ({scanned_files} files verified).{RESET}")
+    else:
+        safe_print(f"  {GREEN}[OK] Re-aligned {actions_taken} files to their correct architectural boundaries.{RESET}")
+
+
 def get_existing_s3_files(res=30):
     s3_url = f"s3://gaia-datasets/{res}m/"
     safe_print(f"{CYAN}[*] Checking current S3 state ({s3_url})...{RESET}")
@@ -218,12 +280,26 @@ def smart_sync(inventory_path, limit=None, s3_upload=True, local_dir=None, res=3
 
     earthaccess.login(persist=True)
     
+    # Establish local directories
+    if local_dir == 'auto' or not local_dir:
+        local_dir = f"data/bioscape/{res}m"
+        
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    ssl_dir = os.path.join(project_root, f"embedding_creation/data/{res}m")
+    labeled_dir = os.path.join(project_root, local_dir)
+    os.makedirs(ssl_dir, exist_ok=True)
+    os.makedirs(labeled_dir, exist_ok=True)
+    
+    # Run Pre-flight Routing
+    enforce_dataset_boundaries(labeled_dir, ssl_dir, inventory_path)
+    
     if s3_upload:
         existing = get_existing_s3_files(res=res)
-    elif local_dir and os.path.isdir(local_dir):
-        existing = {f.replace('.nc', '').split('_L2B_')[0] for f in os.listdir(local_dir) if f.endswith('.nc')}
     else:
         existing = set()
+        for d in [labeled_dir, ssl_dir]:
+            if os.path.exists(d):
+                existing.update({f.replace('.nc', '').split('_L2B_')[0] for f in os.listdir(d) if f.endswith('.nc')})
     
     with open(inventory_path, 'r') as f:
         target_ids = [l.strip() for l in f if l.strip()]
@@ -290,7 +366,7 @@ if __name__ == "__main__":
     smart_sync(
         args.inventory, 
         limit=args.limit, 
-        s3_upload=(args.local is None),
+        s3_upload=(args.local is None and not os.path.exists('data/bioscape')), # simple heuristic
         local_dir=local_dir,
         res=args.res,
         workers=args.workers
