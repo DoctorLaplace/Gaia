@@ -22,7 +22,7 @@ CONFIG_PATH = r"C:\Users\silve\AppData\Roaming\s3cmd.ini"
 
 # --- ANSI COLORS ---
 GREEN = "\033[92m"
-PURPLE = "\033[95m"
+PURPLE = "\033[1;95m"
 CYAN = "\033[96m"
 RED = "\033[91m"
 RESET = "\033[0m"
