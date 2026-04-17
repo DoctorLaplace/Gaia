@@ -25,6 +25,17 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 from tqdm import tqdm
 
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
 
@@ -127,7 +138,7 @@ def finetune(args):
     # Resolution
     res = args.res or cfg['data']['default_res']
     cfg = resolve_res(cfg, res)
-    print(f"[*] Resolution: {res}m")
+    print(f"{Colors.OKCYAN}[*] Resolution: {res}m{Colors.ENDC}")
 
     epochs = cfg['finetune']['epochs']
     batch_size = cfg['finetune']['batch_size']
@@ -140,7 +151,7 @@ def finetune(args):
     os.makedirs(ckpt_dir, exist_ok=True)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"[*] Device: {device}")
+    print(f"{Colors.OKBLUE}[*] Device: {device}{Colors.ENDC}")
 
     # ── Dataset ──
     # Fine-tuning only uses the labeled granules (existing 535)
@@ -155,7 +166,7 @@ def finetune(args):
         if 'band_mean' in ckpt:
             band_mean = torch.tensor(ckpt['band_mean']).reshape(cfg['data']['num_bands'], 1, 1)
             band_std = torch.tensor(ckpt['band_std']).reshape(cfg['data']['num_bands'], 1, 1)
-            print(f"[*] Loaded band normalization stats from pre-training checkpoint")
+            print(f"{Colors.OKGREEN}[OK] Loaded band normalization stats from pre-training checkpoint{Colors.ENDC}")
 
     dataset = AvirisRichnessDataset(
         nc_dir=nc_dir,
@@ -177,8 +188,8 @@ def finetune(args):
     all_richness = np.array([m[3] for m in dataset.mappings])
     richness_mean = float(all_richness.mean())
     richness_std = float(all_richness.std()) + 1e-6
-    print(f"[*] Richness: mean={richness_mean:.1f}, std={richness_std:.1f}, "
-          f"range=[{all_richness.min():.0f}, {all_richness.max():.0f}]")
+    print(f"{Colors.OKBLUE}[*] Richness: mean={richness_mean:.1f}, std={richness_std:.1f}, "
+          f"range=[{all_richness.min():.0f}, {all_richness.max():.0f}]{Colors.ENDC}")
 
     # Train/val split
     indices = np.arange(len(dataset))
@@ -228,8 +239,8 @@ def finetune(args):
             param.requires_grad = True
         trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
         total = sum(p.numel() for p in model.parameters())
-        print(f"[*] Encoder FROZEN: {trainable:,}/{total:,} params trainable "
-              f"({trainable/total*100:.1f}%)")
+        print(f"{Colors.OKBLUE}[*] Encoder FROZEN: {trainable:,}/{total:,} params trainable "
+              f"({trainable/total*100:.1f}%){Colors.ENDC}")
 
     # ── Optimizer ──
     criterion = nn.MSELoss()
@@ -244,11 +255,11 @@ def finetune(args):
     scaler = GradScaler(enabled=fp16)
 
     # ── Training ──
-    print(f"\n{'='*60}")
-    print(f"  AVIRIS-NG Richness Fine-tuning (370 native bands)")
-    print(f"  Epochs: {epochs}  |  Train: {len(train_idx)}  |  Val: {len(val_idx)}")
-    print(f"  Freeze: {freeze_encoder}  |  Unfreeze at: {unfreeze_epoch}")
-    print(f"{'='*60}\n")
+    print(f"\n{Colors.HEADER}{'='*60}{Colors.ENDC}")
+    print(f"{Colors.HEADER}  AVIRIS-NG Richness Fine-tuning (370 native bands){Colors.ENDC}")
+    print(f"{Colors.OKCYAN}  Epochs: {epochs}  |  Train: {len(train_idx)}  |  Val: {len(val_idx)}{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}  Freeze: {freeze_encoder}  |  Unfreeze at: {unfreeze_epoch}{Colors.ENDC}")
+    print(f"{Colors.HEADER}{'='*60}{Colors.ENDC}\n")
 
     best_r2 = -float('inf')
     patience_counter = 0
@@ -256,7 +267,7 @@ def finetune(args):
     for epoch in range(1, epochs + 1):
         # Progressive unfreezing
         if freeze_encoder and unfreeze_epoch and epoch == unfreeze_epoch:
-            print(f"\n[*] Epoch {epoch}: UNFREEZING encoder")
+            print(f"\n{Colors.WARNING}[*] Epoch {epoch}: UNFREEZING encoder{Colors.ENDC}")
             for param in model.encoder.parameters():
                 param.requires_grad = True
             optimizer = optim.AdamW([
@@ -271,7 +282,7 @@ def finetune(args):
 
         model.train()
         train_loss = 0
-        pbar = tqdm(train_loader, desc=f"Epoch {epoch}/{epochs}", leave=False)
+        pbar = tqdm(train_loader, desc=f"{Colors.OKCYAN}Epoch {epoch}/{epochs}{Colors.ENDC}", leave=False)
 
         for patches, labels in pbar:
             patches = patches.to(device)
@@ -305,8 +316,8 @@ def finetune(args):
 
         epoch_r2 = r2_score(val_targets, val_preds) if len(val_targets) > 1 else 0
         avg_loss = train_loss / max(len(train_loader), 1)
-        print(f"[Epoch {epoch:3d}/{epochs}] "
-              f"Loss: {avg_loss:.4f} | Val R2: {epoch_r2:.4f} | "
+        print(f"{Colors.OKCYAN}[Epoch {epoch:3d}/{epochs}]{Colors.ENDC} "
+              f"Loss: {Colors.BOLD}{avg_loss:.4f}{Colors.ENDC} | Val R2: {Colors.OKGREEN}{epoch_r2:.4f}{Colors.ENDC} | "
               f"LR: {optimizer.param_groups[0]['lr']:.6f}")
 
         if epoch_r2 > best_r2:
@@ -321,15 +332,15 @@ def finetune(args):
                 'config': cfg,
                 'best_r2': best_r2,
             }, os.path.join(ckpt_dir, "finetuned_aviris_best.pth"))
-            print(f"    -> New best R2: {best_r2:.4f} (saved)")
+            print(f"    {Colors.OKGREEN}-> New best R2: {best_r2:.4f} (saved){Colors.ENDC}")
         else:
             patience_counter += 1
             if patience_counter >= patience:
-                print(f"\n[*] Early stopping at epoch {epoch} "
-                      f"(no improvement for {patience} epochs)")
+                print(f"\n{Colors.WARNING}[*] Early stopping at epoch {epoch} "
+                      f"(no improvement for {patience} epochs){Colors.ENDC}")
                 break
 
-    print(f"\n[OK] Fine-tuning complete. Best R2: {best_r2:.4f}")
+    print(f"\n{Colors.OKGREEN}[OK] Fine-tuning complete. Best R2: {best_r2:.4f}{Colors.ENDC}")
     dataset.close()
 
 

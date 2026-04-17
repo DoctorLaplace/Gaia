@@ -24,6 +24,17 @@ from torch.cuda.amp import GradScaler, autocast
 from tqdm import tqdm
 from einops import rearrange
 
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 # Add project root so we can import from src/
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
@@ -209,7 +220,7 @@ def pretrain(args):
     # Resolution
     res = args.res or cfg['data']['default_res']
     cfg = resolve_res(cfg, res)
-    print(f"[*] Resolution: {res}m")
+    print(f"{Colors.OKCYAN}[*] Resolution: {res}m{Colors.ENDC}")
 
     epochs = cfg['pretrain']['epochs']
     batch_size = cfg['pretrain']['batch_size']
@@ -220,10 +231,10 @@ def pretrain(args):
     os.makedirs(ckpt_dir, exist_ok=True)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"[*] Device: {device}")
+    print(f"{Colors.OKBLUE}[*] Device: {device}{Colors.ENDC}")
     if device.type == 'cuda':
-        print(f"    GPU: {torch.cuda.get_device_name()}")
-        print(f"    VRAM: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
+        print(f"    {Colors.BOLD}GPU: {torch.cuda.get_device_name()}{Colors.ENDC}")
+        print(f"    {Colors.BOLD}VRAM: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB{Colors.ENDC}")
 
     # ── Dataset ──
     # Read from BOTH the existing labeled granules AND the SSL-only archive
@@ -233,7 +244,7 @@ def pretrain(args):
 
     nc_dirs = [labeled_dir, ssl_dir]
     dir_summary = [f"{d} ({'exists' if os.path.isdir(d) else 'missing'})" for d in nc_dirs]
-    print(f"[*] Loading SSL dataset from:")
+    print(f"{Colors.OKBLUE}[*] Loading SSL dataset from:{Colors.ENDC}")
     for s in dir_summary:
         print(f"    {s}")
 
@@ -246,10 +257,10 @@ def pretrain(args):
         max_granules=max_granules,
         augment=True,
     )
-    print(f"[OK] {len(dataset)} patches from {len(dataset.granule_meta)} granules")
+    print(f"{Colors.OKGREEN}[OK] {len(dataset)} patches from {len(dataset.granule_meta)} granules{Colors.ENDC}")
 
     if len(dataset) == 0:
-        print("[!] No data found. Check nc_dir path.")
+        print(f"{Colors.FAIL}[!] No data found. Check nc_dir path.{Colors.ENDC}")
         return
 
     # Compute or load band stats
@@ -259,12 +270,12 @@ def pretrain(args):
             stats = json.load(f)
         dataset.band_mean = torch.tensor(stats['mean']).reshape(cfg['data']['num_bands'], 1, 1)
         dataset.band_std = torch.tensor(stats['std']).reshape(cfg['data']['num_bands'], 1, 1)
-        print(f"[*] Loaded band stats from {stats_path}")
+        print(f"{Colors.OKBLUE}[*] Loaded band stats from {stats_path}{Colors.ENDC}")
     else:
         mean, std = dataset.compute_band_stats(max_samples=min(2000, len(dataset)))
         with open(stats_path, 'w') as f:
             json.dump({'mean': mean.flatten().tolist(), 'std': std.flatten().tolist()}, f)
-        print(f"[OK] Band stats saved to {stats_path}")
+        print(f"{Colors.OKGREEN}[OK] Band stats saved to {stats_path}{Colors.ENDC}")
 
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True,
                         num_workers=num_workers, pin_memory=True, drop_last=True)
@@ -286,7 +297,7 @@ def pretrain(args):
     ).to(device)
 
     num_params = sum(p.numel() for p in model.parameters())
-    print(f"[*] Model: {num_params:,} parameters ({num_params * 4 / 1024**2:.1f} MB fp32)")
+    print(f"{Colors.OKBLUE}[*] Model: {num_params:,} parameters ({num_params * 4 / 1024**2:.1f} MB fp32){Colors.ENDC}")
     print(f"    Tokens per sample: {model.num_patches} "
           f"({model.num_spectral_patches} spectral x {model.num_spatial_patches} spatial)")
 
@@ -302,13 +313,13 @@ def pretrain(args):
     warmup_epochs = cfg['pretrain']['warmup_epochs']
 
     # ── Training ──
-    print(f"\n{'='*60}")
-    print(f"  AVIRIS-NG SimMIM Pre-training")
-    print(f"  Epochs: {epochs}  |  Batch: {batch_size}  |  LR: {lr}")
-    print(f"  Mask: {cfg['pretrain']['mask_ratio']*100:.0f}%  |  "
+    print(f"\n{Colors.HEADER}{'='*60}{Colors.ENDC}")
+    print(f"{Colors.HEADER}  AVIRIS-NG SimMIM Pre-training{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}  Epochs: {epochs}  |  Batch: {batch_size}  |  LR: {lr}{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}  Mask: {cfg['pretrain']['mask_ratio']*100:.0f}%  |  "
           f"Block: {cfg['pretrain']['mask_block_size']}x{cfg['pretrain']['mask_block_size']}  |  "
-          f"FP16: {fp16}")
-    print(f"{'='*60}\n")
+          f"FP16: {fp16}{Colors.ENDC}")
+    print(f"{Colors.HEADER}{'='*60}{Colors.ENDC}\n")
 
     best_loss = float('inf')
     start_time = time.time()
@@ -324,7 +335,7 @@ def pretrain(args):
             for pg in optimizer.param_groups:
                 pg['lr'] = warmup_lr
 
-        pbar = tqdm(loader, desc=f"Epoch {epoch}/{epochs}", leave=False)
+        pbar = tqdm(loader, desc=f"{Colors.OKCYAN}Epoch {epoch}/{epochs}{Colors.ENDC}", leave=False)
         for batch in pbar:
             batch = batch.to(device)
 
@@ -351,8 +362,8 @@ def pretrain(args):
         current_lr = optimizer.param_groups[0]['lr']
         elapsed = time.time() - start_time
 
-        print(f"[Epoch {epoch:3d}/{epochs}] "
-              f"Loss: {avg_loss:.4f} | "
+        print(f"{Colors.OKCYAN}[Epoch {epoch:3d}/{epochs}]{Colors.ENDC} "
+              f"Loss: {Colors.BOLD}{avg_loss:.4f}{Colors.ENDC} | "
               f"LR: {current_lr:.6f} | "
               f"Time: {elapsed:.0f}s")
 
@@ -370,6 +381,7 @@ def pretrain(args):
                 'band_mean': dataset.band_mean.flatten().tolist(),
                 'band_std': dataset.band_std.flatten().tolist(),
             }, os.path.join(ckpt_dir, "pretrained_aviris_best.pth"))
+            print(f"    {Colors.OKGREEN}-> New Best Loss: {best_loss:.4f} (Saved){Colors.ENDC}")
 
         if epoch % cfg['pretrain']['checkpoint_every'] == 0:
             torch.save({
@@ -382,9 +394,9 @@ def pretrain(args):
             }, os.path.join(ckpt_dir, f"pretrained_aviris_ep{epoch}.pth"))
 
     total_time = time.time() - start_time
-    print(f"\n[OK] Pre-training complete. Best loss: {best_loss:.4f}")
+    print(f"\n{Colors.OKGREEN}[OK] Pre-training complete. Best loss: {best_loss:.4f}{Colors.ENDC}")
     print(f"     Total time: {total_time/60:.1f} min")
-    print(f"     Checkpoint: {ckpt_dir}/pretrained_aviris_best.pth")
+    print(f"     Checkpoint: {Colors.BOLD}{ckpt_dir}/pretrained_aviris_best.pth{Colors.ENDC}")
 
     dataset.close()
 
