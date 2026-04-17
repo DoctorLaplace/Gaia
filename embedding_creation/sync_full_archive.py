@@ -21,6 +21,12 @@ import uuid
 import numpy as np
 from tqdm import tqdm
 
+try:
+    import psutil
+    def get_ram(): return f"{psutil.virtual_memory().percent}%"
+except ImportError:
+    def get_ram(): return "N/A"
+
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
 
@@ -189,6 +195,7 @@ def downsample_netcdf(input_path, output_path, res_target, tile_size):
                     dst_cube[:, out_y:out_y_end, :] = cube_chunk.astype(np.float32)
                     
                     pbar.update(y_end - y)
+                    pbar.set_postfix_str(f"RAM: {get_ram()}")
                     
                     # Memory management
                     del cube_chunk
@@ -304,6 +311,7 @@ def sync(args):
                             if chunk:
                                 dest.write(chunk)
                                 pbar.update(len(chunk))
+                                pbar.set_postfix_str(f"RAM: {get_ram()}")
                                 total_bytes += len(chunk)
 
             # Tiled Processing execution
