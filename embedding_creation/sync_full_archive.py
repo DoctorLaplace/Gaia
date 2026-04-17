@@ -108,7 +108,7 @@ def enforce_dataset_boundaries(labeled_dir, ssl_dir, labeled_inventory_path):
         for f in os.listdir(labeled_dir):
             if not f.endswith('.nc'): continue
             scanned_files += 1
-            f_id = f.replace('.nc', '').split('_L2B_')[0].replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "")
+            f_id = f.replace('.nc', '').replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "")
             
             # If it is NOT labeled, it belongs in SSL
             if f_id not in labeled_ids:
@@ -130,7 +130,7 @@ def enforce_dataset_boundaries(labeled_dir, ssl_dir, labeled_inventory_path):
         for f in os.listdir(ssl_dir):
             if not f.endswith('.nc'): continue
             scanned_files += 1
-            f_id = f.replace('.nc', '').split('_L2B_')[0].replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "")
+            f_id = f.replace('.nc', '').replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "")
             
             # If it IS labeled, it belongs in Labeled
             if f_id in labeled_ids:
