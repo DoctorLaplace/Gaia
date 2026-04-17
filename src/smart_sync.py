@@ -68,6 +68,10 @@ def enforce_dataset_boundaries(labeled_dir, ssl_dir, inventory_path):
         safe_print(f"  {RED}[!] inventory file not found. Skipping deduplication.{RESET}")
         return
         
+    # Ensure directories exist before routing
+    os.makedirs(labeled_dir, exist_ok=True)
+    os.makedirs(ssl_dir, exist_ok=True)
+        
     with open(inventory_path, 'r') as f:
         labeled_ids = set([l.strip().replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "").replace(".nc", "") for l in f if l.strip()])
         
