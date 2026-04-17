@@ -39,8 +39,8 @@ pretrain:
   mask_ratio: 0.6             # fraction of tokens to mask
   mask_block_size: 4          # spatial block size for blockwise masking (4 = 4x4 pixel blocks)
   epochs: 200
-  batch_size: 48               # Max Performance for NVIDIA A100 (80GB)
-  lr: 5.0e-4                   # Scaled for larger batch size
+  batch_size: 24               # Scaled for 40GB A100 (Safe buffer)
+  lr: 3.0e-4                   # Scaled for batch 24
   weight_decay: 0.05
   warmup_epochs: 10
   fp16: true
@@ -51,8 +51,8 @@ pretrain:
 
 finetune:
   epochs: 250
-  batch_size: 32               # Optimized for A100
-  lr: 2.0e-4                   # Scaled for larger batch size
+  batch_size: 16               # Scaled for 40GB A100 (Safe buffer)
+  lr: 1.5e-4
   weight_decay: 0.05
   freeze_encoder: true
   unfreeze_epoch: 50
