@@ -98,7 +98,7 @@ def enforce_dataset_boundaries(labeled_dir, ssl_dir, labeled_inventory_path):
         return
         
     with open(labeled_inventory_path, 'r') as f:
-        labeled_ids = set([l.strip().replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "") for l in f if l.strip()])
+        labeled_ids = set([l.strip().replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "").replace(".nc", "") for l in f if l.strip()])
         
     actions_taken = 0
     scanned_files = 0
