@@ -23,6 +23,7 @@ data:
   num_bands: 370
   bands_to_trim: 3            # drop last N bands from 373
   patch_size: 16              # spatial patch size in pixels
+  tile_size: 1000             # lines to process at a time (larger for high RAM)
 
 model:
   dim: 96
@@ -43,7 +44,7 @@ pretrain:
   weight_decay: 0.05
   warmup_epochs: 10
   fp16: true
-  num_workers: 1              # 0 for Windows, increase on Linux
+  num_workers: 0              # 0 for Windows, increase on Linux
   patches_per_granule: 50    # random patches extracted per granule per epoch
   checkpoint_every: 20        # save checkpoint every N epochs
   checkpoint_dir: "embedding_creation/checkpoints"

@@ -50,55 +50,149 @@ BBL = [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 GOOD_INDICES = np.array([i for i, val in enumerate(BBL) if val == 1])
 
 
-def downsample_netcdf(input_path, output_path, res_target):
-    """Apply BBL filtering and spatial downsampling."""
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+def cleanup_tmp(tmp_dir):
+    """Removes orphaned temp and proc files to prevent disk exhaustion."""
+    print(f"{Colors.OKBLUE}[*] Cleaning up temporary directory...{Colors.ENDC}")
+    freed_bytes = 0
+    if os.path.exists(tmp_dir):
+        for f in os.listdir(tmp_dir):
+            if f.startswith("temp_") or f.startswith("proc_"):
+                filepath = os.path.join(tmp_dir, f)
+                try:
+                    size = os.path.getsize(filepath)
+                    os.remove(filepath)
+                    freed_bytes += size
+                    print(f"  {Colors.WARNING}[🧹] Removed orphan file: {f} ({size / 1024**2:.1f} MB){Colors.ENDC}")
+                except Exception as e:
+                    print(f"  {Colors.FAIL}[!] Failed to remove {f}: {e}{Colors.ENDC}")
+    
+    if freed_bytes > 0:
+        print(f"{Colors.OKGREEN}[OK] Freed {freed_bytes / 1024**3:.2f} GB of disk space.{Colors.ENDC}")
+    else:
+        print(f"{Colors.OKGREEN}[OK] Temporary directory is clean.{Colors.ENDC}")
+
+
+def downsample_netcdf(input_path, output_path, res_target, tile_size):
+    """Apply BBL filtering and spatial downsampling with memory-efficient tiling."""
     import h5py
+    import gc
 
     factor = max(1, int(res_target // 5))
+    print(f"  {Colors.OKCYAN}[⚙️] Processing NetCDF (Resolution: {res_target}m, Downsample Factor: {factor}x){Colors.ENDC}")
 
     with h5py.File(input_path, 'r') as src:
-        cube = src['reflectance/reflectance'][()]
         wavelengths = src['reflectance/wavelength'][()]
         fwhm = src['reflectance/fwhm'][()]
+        
+        # Determine source dataset
+        if 'reflectance/reflectance' in src:
+            src_cube = src['reflectance/reflectance']
+        else:
+            src_cube = src['reflectance']
+            
+        b_total, h_total, w_total = src_cube.shape
 
-        # BBL filter
-        cube = cube[GOOD_INDICES]
+        # Filter BBL
         wavelengths = wavelengths[GOOD_INDICES]
         fwhm = fwhm[GOOD_INDICES]
+        b_new = len(GOOD_INDICES)
 
-        # Spatial downsampling
+        # Calculate new dimensions
         if factor > 1:
-            b, h, w = cube.shape
-            h_new = (h // factor) * factor
-            w_new = (w // factor) * factor
-            cube = cube[:, :h_new, :w_new]
-            cube = cube.reshape(b, h_new // factor, factor, w_new // factor, factor)
-            cube = cube.mean(axis=(2, 4))
+            h_new = (h_total // factor) * factor
+            w_new = (w_total // factor) * factor
+            out_h = h_new // factor
+            out_w = w_new // factor
+        else:
+            out_h, out_w = h_total, w_total
+            h_new, w_new = h_total, w_total
 
-        # GeoTransform
-        gt_str = src['projection'].attrs.get('GeoTransform', None)
+        # GeoTransform adjustments
+        gt_str = None
+        if 'projection' in src and 'GeoTransform' in src['projection'].attrs:
+            gt_str = src['projection'].attrs['GeoTransform']
+        elif 'reflectance' in src and 'GeoTransform' in src['reflectance'].attrs:
+             gt_str = src['reflectance'].attrs['GeoTransform']
+
         if gt_str is not None:
             if isinstance(gt_str, bytes):
                 gt_str = gt_str.decode()
-            gt = [float(x) for x in gt_str.split()]
+            if isinstance(gt_str, str):
+                gt = [float(x) for x in gt_str.split()]
+            else:
+                 gt = list(gt_str)
             gt[1] *= factor
             gt[5] *= factor
             gt_out = " ".join(str(v) for v in gt)
         else:
             gt_out = None
-        proj_wkt = src['projection'].attrs.get('spatial_ref', None)
+            
+        proj_wkt = None
+        if 'projection' in src and 'spatial_ref' in src['projection'].attrs:
+             proj_wkt = src['projection'].attrs['spatial_ref']
 
-    with h5py.File(output_path, 'w') as dst:
-        proj_ds = dst.create_dataset('projection', data=np.uint8(0))
-        if gt_out:
-            proj_ds.attrs['GeoTransform'] = gt_out
-        if proj_wkt is not None:
-            proj_ds.attrs['spatial_ref'] = proj_wkt
-        grp = dst.create_group('reflectance')
-        grp.create_dataset('reflectance', data=cube.astype(np.float32),
-                          compression='gzip', compression_opts=4)
-        grp.create_dataset('wavelength', data=wavelengths.astype(np.float32))
-        grp.create_dataset('fwhm', data=fwhm.astype(np.float32))
+        # Setup Tile Processing
+        tile_h = max(factor, (tile_size // factor) * factor) # Ensure tile height is a multiple of factor
+        print(f"  {Colors.OKBLUE}[ℹ️] Memory Config: Tiled processing (Size: {tile_h} lines/batch){Colors.ENDC}")
+
+        with h5py.File(output_path, 'w') as dst:
+            proj_ds = dst.create_dataset('projection', data=np.uint8(0))
+            if gt_out:
+                proj_ds.attrs['GeoTransform'] = gt_out
+            if proj_wkt is not None:
+                proj_ds.attrs['spatial_ref'] = proj_wkt
+                
+            grp = dst.create_group('reflectance')
+            
+            # Pre-allocate the output dataset chunked for efficient writing
+            dst_cube = grp.create_dataset(
+                'reflectance', 
+                shape=(b_new, out_h, out_w),
+                dtype=np.float32,
+                chunks=(b_new, min(64, out_h), min(64, out_w)),
+                compression='gzip',
+                compression_opts=4
+            )
+            
+            grp.create_dataset('wavelength', data=wavelengths.astype(np.float32))
+            grp.create_dataset('fwhm', data=fwhm.astype(np.float32))
+
+            # Process in tiles along Y axis
+            print(f"  {Colors.OKCYAN}[⏳] Processing tiles (Total Height: {h_new})...{Colors.ENDC}")
+            with tqdm(total=h_new, unit='lines', desc="Processing", leave=False) as pbar:
+                for y in range(0, h_new, tile_h):
+                    y_end = min(y + tile_h, h_new)
+                    
+                    # Read chunk (only Good Indices)
+                    cube_chunk = src_cube[GOOD_INDICES, y:y_end, :w_new]
+                    
+                    if factor > 1:
+                        # Downsample current chunk
+                        chunk_h = y_end - y
+                        cube_chunk = cube_chunk.reshape(b_new, chunk_h // factor, factor, w_new // factor, factor)
+                        cube_chunk = cube_chunk.mean(axis=(2, 4))
+                    
+                    # Write to output
+                    out_y = y // factor
+                    out_y_end = out_y + cube_chunk.shape[1]
+                    dst_cube[:, out_y:out_y_end, :] = cube_chunk.astype(np.float32)
+                    
+                    pbar.update(y_end - y)
+                    
+                    # Memory management
+                    del cube_chunk
+                    gc.collect()
 
 
 def sync(args):
@@ -110,9 +204,11 @@ def sync(args):
     with open(config_path, 'r') as f:
         cfg = yaml.safe_load(f)
 
+    tile_size = cfg['data'].get('tile_size', 1000)
+
     inventory_path = os.path.join(PROJECT_ROOT, args.inventory)
     if not os.path.exists(inventory_path):
-        print(f"[!] Inventory not found: {inventory_path}")
+        print(f"{Colors.FAIL}[!] Inventory not found: {inventory_path}{Colors.ENDC}")
         return
 
     # Downloads go to the SSL-only directory (NOT the existing labeled data dir)
@@ -123,8 +219,16 @@ def sync(args):
     tmp_dir = os.path.join(PROJECT_ROOT, "tmp")
     os.makedirs(tmp_dir, exist_ok=True)
 
-    print(f"[*] Downloads go to: {output_dir}")
-    print(f"    (existing labeled data in {labeled_dir} is NOT modified)")
+    print(f"{Colors.HEADER}===================================================={Colors.ENDC}")
+    print(f"{Colors.HEADER}  AVIRIS-NG Native Pipeline Sync Tool{Colors.ENDC}")
+    print(f"{Colors.HEADER}===================================================={Colors.ENDC}")
+    
+    # Pre-flight cleanup
+    cleanup_tmp(tmp_dir)
+
+    print(f"\n{Colors.OKBLUE}[*] Directories:{Colors.ENDC}")
+    print(f"    - Output Folder:  {Colors.BOLD}{output_dir}{Colors.ENDC}")
+    print(f"    - Labeled Folder: {labeled_dir} (Read-only)")
 
     # Auth
     if EARTHDATA_USERNAME and EARTHDATA_PASSWORD:
@@ -147,18 +251,21 @@ def sync(args):
     normalize = lambda nid: nid.replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "")
     new_ids = [nid for nid in target_ids if normalize(nid) not in existing]
 
-    print(f"[*] Inventory: {len(target_ids)} total, {len(existing)} already downloaded "
-          f"(across both dirs), {len(new_ids)} remaining")
+    print(f"\n{Colors.OKBLUE}[*] Synchronization Queue:{Colors.ENDC}")
+    print(f"    - Total Inventory:    {len(target_ids)}")
+    print(f"    - Already Downloaded: {len(existing)} (combined dirs)")
+    print(f"    - Remaining to Sync:  {Colors.BOLD}{len(new_ids)}{Colors.ENDC}")
 
     if args.limit:
         new_ids = new_ids[:args.limit]
+        print(f"    - Limit Applied:      {Colors.WARNING}{len(new_ids)}{Colors.ENDC}")
 
     if not new_ids:
-        print("[OK] All granules already synced.")
+        print(f"\n{Colors.OKGREEN}[OK] All granules already synced!{Colors.ENDC}")
         return
 
     # Discover on NASA CMR
-    print(f"[*] Discovering {len(new_ids)} granules on NASA CMR...")
+    print(f"\n{Colors.OKBLUE}[*] Discovering {len(new_ids)} granules on NASA CMR...{Colors.ENDC}")
     granules = []
     for i in range(0, len(new_ids), 50):
         chunk = new_ids[i:i + 50]
@@ -167,13 +274,15 @@ def sync(args):
             granule_ur=chunk
         )
         granules.extend(results)
-    print(f"[OK] Found {len(granules)} granules.")
+    print(f"{Colors.OKGREEN}[OK] Found and authenticated {len(granules)} actionable granules.{Colors.ENDC}")
 
     # Download and process
     session = earthaccess.get_requests_https_session()
     total_bytes = 0
     start = time.time()
 
+    print(f"\n{Colors.HEADER}--- Starting Batch Processing ---{Colors.ENDC}")
+    
     for i, g in enumerate(granules):
         url = g.data_links()[0]
         filename = os.path.basename(url)
@@ -181,14 +290,15 @@ def sync(args):
         temp_file = os.path.join(tmp_dir, f"temp_{uid}_{filename}")
         processed_file = os.path.join(tmp_dir, f"proc_{uid}_{filename}")
 
-        print(f"\n[{i+1}/{len(granules)}] {filename}")
+        print(f"\n{Colors.BOLD}[{i+1}/{len(granules)}] {filename}{Colors.ENDC}")
 
         try:
             with session.get(url, stream=True, timeout=60) as r:
                 r.raise_for_status()
                 total_size = int(r.headers.get('content-length', 0))
                 with tqdm(total=total_size, unit='B', unit_scale=True,
-                         desc="Download", leave=False) as pbar:
+                         desc=f"  {Colors.OKCYAN}[↓] Downloading{Colors.ENDC}", leave=False, 
+                         bar_format='{l_bar}{bar:20}{r_bar}') as pbar:
                     with open(temp_file, 'wb') as dest:
                         for chunk in r.iter_content(chunk_size=1024*1024):
                             if chunk:
@@ -196,15 +306,17 @@ def sync(args):
                                 pbar.update(len(chunk))
                                 total_bytes += len(chunk)
 
-            downsample_netcdf(temp_file, processed_file, args.res)
+            # Tiled Processing execution
+            downsample_netcdf(temp_file, processed_file, args.res, tile_size)
+            
             target = os.path.join(output_dir, filename)
             if os.path.exists(target):
                 os.remove(target)
             os.replace(processed_file, target)
-            print(f"  [OK] Saved to {output_dir}")
+            print(f"  {Colors.OKGREEN}[✓] Successfully deployed to core directories.{Colors.ENDC}")
 
         except Exception as e:
-            print(f"  [!] Error: {e}")
+            print(f"  {Colors.FAIL}[!] Critical Error encountered over granule: {e}{Colors.ENDC}")
         finally:
             for f in [temp_file, processed_file]:
                 if os.path.exists(f):
@@ -214,7 +326,11 @@ def sync(args):
                         pass
 
     elapsed = time.time() - start
-    print(f"\n[OK] Sync complete. {total_bytes/1024**2:.0f} MB in {elapsed:.0f}s")
+    print(f"\n{Colors.HEADER}===================================================={Colors.ENDC}")
+    print(f"{Colors.OKGREEN}[OK] Routine Completed.{Colors.ENDC}")
+    print(f"     Total Data Transferred: {total_bytes/1024**3:.2f} GB")
+    print(f"     Total Time Elapsed:     {elapsed/60:.1f} minutes")
+    print(f"{Colors.HEADER}===================================================={Colors.ENDC}")
 
 
 if __name__ == "__main__":
