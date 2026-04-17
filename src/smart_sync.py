@@ -21,10 +21,10 @@ S3CMD_PATH = r"C:\Users\silve\AppData\Roaming\Python\Python312\Scripts\s3cmd"
 CONFIG_PATH = r"C:\Users\silve\AppData\Roaming\s3cmd.ini"
 
 # --- ANSI COLORS ---
-GREEN = "\033[32m"
-PURPLE = "\033[35m"
-CYAN = "\033[36m"
-RED = "\033[31m"
+GREEN = "\033[92m"
+PURPLE = "\033[95m"
+CYAN = "\033[96m"
+RED = "\033[91m"
 RESET = "\033[0m"
 BOLD = "\033[1m"
 
