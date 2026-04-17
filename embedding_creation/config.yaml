@@ -39,12 +39,12 @@ pretrain:
   mask_ratio: 0.6             # fraction of tokens to mask
   mask_block_size: 4          # spatial block size for blockwise masking (4 = 4x4 pixel blocks)
   epochs: 200
-  batch_size: 24               # Optimized for NVIDIA A100 (80GB)
-  lr: 3.0e-4                   # Scaled for larger batch size
+  batch_size: 48               # Max Performance for NVIDIA A100 (80GB)
+  lr: 5.0e-4                   # Scaled for larger batch size
   weight_decay: 0.05
   warmup_epochs: 10
   fp16: true
-  num_workers: 8              # Enabling multi-process loading for A100
+  num_workers: 16             # Increased to resolve GPU starvation
   patches_per_granule: 25    # Reduced from 50 to speed up epoch completion
   checkpoint_every: 20        # save checkpoint every N epochs
   checkpoint_dir: "embedding_creation/checkpoints"
