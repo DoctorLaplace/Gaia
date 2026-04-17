@@ -315,13 +315,13 @@ def sync(args):
     existing = set()
     for d in [output_dir, labeled_dir]:
         if os.path.isdir(d):
-            existing.update(f for f in os.listdir(d) if f.endswith('.nc'))
+            existing.update(f.replace('.nc', '') for f in os.listdir(d) if f.endswith('.nc'))
 
     # Load targets
     with open(inventory_path, 'r') as f:
         target_ids = [l.strip() for l in f if l.strip()]
 
-    normalize = lambda nid: nid.replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "")
+    normalize = lambda nid: nid.replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "").replace(".nc", "")
     new_ids = [nid for nid in target_ids if normalize(nid) not in existing]
 
     print(f"\n{Colors.OKBLUE}[*] Synchronization Queue:{Colors.ENDC}")
@@ -329,7 +329,7 @@ def sync(args):
     print(f"    - Already Downloaded: {len(existing)} (combined dirs)")
     print(f"    - Remaining to Sync:  {Colors.BOLD}{len(new_ids)}{Colors.ENDC}")
 
-    if args.limit:
+    if args.limit is not None:
         new_ids = new_ids[:args.limit]
         print(f"    - Limit Applied:      {Colors.WARNING}{len(new_ids)}{Colors.ENDC}")
 

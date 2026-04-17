@@ -308,7 +308,7 @@ def smart_sync(inventory_path, limit=None, s3_upload=True, local_dir=None, res=3
     new_ids = [nid for nid in target_ids if normalize(nid) not in existing]
     
     safe_print(f"{GREEN}[OK] Loaded {len(target_ids)} target granules. {len(new_ids)} are remaining.{RESET}")
-    if limit: new_ids = new_ids[:limit]
+    if limit is not None: new_ids = new_ids[:limit]
     if not new_ids:
         safe_print(f"{BOLD}{GREEN}All targeted granules are already in sync!{RESET}")
         return
