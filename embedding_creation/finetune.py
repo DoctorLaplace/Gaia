@@ -80,9 +80,12 @@ class GaiaAvirisModel(nn.Module):
             emb_dropout=emb_dropout,
         )
 
-        # Replace classification head with regression head
+        # Replace classification head with 3-layer regression head
         self.encoder.mlp_head = nn.Sequential(
             nn.LayerNorm(dim),
+            nn.Linear(dim, dim),
+            nn.GELU(),
+            nn.Dropout(dropout),
             nn.Linear(dim, dim // 2),
             nn.GELU(),
             nn.Dropout(dropout),
@@ -277,7 +280,7 @@ def finetune(args):
             ], weight_decay=cfg['finetune']['weight_decay'])
             scheduler = optim.lr_scheduler.OneCycleLR(
                 optimizer, max_lr=lr, epochs=epochs - epoch + 1,
-                steps_per_epoch=len(train_loader), pct_start=0.05
+                steps_per_epoch=len(train_loader), pct_start=0.20
             )
 
         model.train()
