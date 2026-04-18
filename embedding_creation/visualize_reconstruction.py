@@ -137,50 +137,51 @@ def visualize():
     loader = DataLoader(dataset, batch_size=args.samples, shuffle=True)
     batch = next(iter(loader)).to(device)
 
+    p0 = model.spectral_patch_size
+    p1 = model.spatial_patch_size
+    p2 = model.spatial_patch_size
+    C = cfg['data']['num_bands']
+    H = cfg['data']['patch_size']
+    W = cfg['data']['patch_size']
+    h_grid = H // p1
+    w_grid = W // p2
+    c_grid = C // p0
+
     with torch.no_grad():
-        reconstructed_flat, mask, targets_flat = model(batch)
+        pred_pixels, target_pixels, num_masked, mask_bool = model(batch)
+        # pred_pixels:  (B, num_masked, pixels_per_patch) - predicted raw pixels for masked tokens
+        # mask_bool:    (B, N) - which tokens were masked
 
-        B, N, _ = reconstructed_flat.shape
-        p0 = model.spectral_patch_size
-        p1 = model.spatial_patch_size
-        p2 = model.spatial_patch_size
-        C = cfg['data']['num_bands']
-        H = cfg['data']['patch_size']
-        W = cfg['data']['patch_size']
-        h_grid = H // p1
-        w_grid = W // p2
-        c_grid = C // p0
+    B = batch.shape[0]
 
-        reconstructed = rearrange(
-            reconstructed_flat,
-            'b (c h w) (p0 p1 p2) -> b (c p0) (h p1) (w p2)',
-            c=c_grid, h=h_grid, w=w_grid, p0=p0, p1=p1, p2=p2
-        )
+    # Get ALL raw patches for the full image
+    raw_patches = model.encoder.to_patch_embedding.to_patch(batch)
+    raw_patches = rearrange(raw_patches, 'b g n d -> b (g n) d')  # (B, N, ppp)
 
-    # Denormalize
-    band_mean = dataset.band_mean.to(device)
-    band_std = dataset.band_std.to(device)
+    # Build full reconstruction: start with original patches, overlay predictions
+    full_recon = raw_patches.clone()  # (B, N, pixels_per_patch)
+    batch_range = torch.arange(B, device=batch.device)[:, None]
+    masked_indices = mask_bool.nonzero(as_tuple=False)[:, 1].reshape(B, num_masked)
+    full_recon[batch_range, masked_indices] = pred_pixels
 
-    def denorm(x):
-        return (x * band_std + band_mean).cpu().numpy()
+    # Reshape to image cubes
+    orig_cube = rearrange(
+        raw_patches, 'b (c h w) (p0 p1 p2) -> b (c p0) (h p1) (w p2)',
+        c=c_grid, h=h_grid, w=w_grid, p0=p0, p1=p1, p2=p2
+    ).cpu().numpy()
 
-    orig_np = denorm(batch)
-    pred_np = denorm(reconstructed)
+    recon_cube = rearrange(
+        full_recon, 'b (c h w) (p0 p1 p2) -> b (c p0) (h p1) (w p2)',
+        c=c_grid, h=h_grid, w=w_grid, p0=p0, p1=p1, p2=p2
+    ).cpu().numpy()
 
     # Build the spatial mask at pixel level: (B, H, W)
     spatial_mask_pixel = []
     for i in range(B):
-        # mask shape: (B, N) where N = c_grid * h_grid * w_grid
-        # All spectral groups share the same spatial mask, so just take the first group
-        sm = rearrange(mask[i], '(c h w) -> c h w', c=c_grid, h=h_grid, w=w_grid)[0]
+        sm = rearrange(mask_bool[i], '(c h w) -> c h w', c=c_grid, h=h_grid, w=w_grid)[0]
         sm_up = sm.repeat_interleave(p1, dim=0).repeat_interleave(p2, dim=1).cpu().numpy()
         spatial_mask_pixel.append(sm_up)
 
-    # Build COMPOSITE: original where visible, reconstruction where masked
-    composite_np = np.copy(orig_np)
-    for i in range(B):
-        mask_3d = spatial_mask_pixel[i][None, :, :]  # (1, H, W)
-        composite_np[i] = orig_np[i] * (1 - mask_3d) + pred_np[i] * mask_3d
 
     # ── Output 1: Static Comparison ──
     fig, axes = plt.subplots(args.samples, 3, figsize=(12, 4 * args.samples))
@@ -189,18 +190,18 @@ def visualize():
 
     for i in range(args.samples):
         # Column 1: Original
-        axes[i][0].imshow(get_rgb(orig_np[i]))
+        axes[i][0].imshow(get_rgb(orig_cube[i]))
         axes[i][0].set_title("Original RGB")
         axes[i][0].axis('off')
 
         # Column 2: Masked Input (what the model actually sees)
-        masked_view = get_rgb(orig_np[i]) * (1 - spatial_mask_pixel[i][:, :, None])
+        masked_view = get_rgb(orig_cube[i]) * (1 - spatial_mask_pixel[i][:, :, None])
         axes[i][1].imshow(masked_view)
         axes[i][1].set_title("Masked Input (60%)")
         axes[i][1].axis('off')
 
         # Column 3: Composite (original unmasked + reconstructed masked)
-        axes[i][2].imshow(get_rgb(composite_np[i]))
+        axes[i][2].imshow(get_rgb(recon_cube[i]))
         axes[i][2].set_title("Reconstructed (Composite)")
         axes[i][2].axis('off')
 
@@ -222,8 +223,8 @@ def visualize():
         else:
             py, px = H // 2, W // 2
 
-        orig_spec = orig_np[i, :, py, px]
-        pred_spec = pred_np[i, :, py, px]
+        orig_spec = orig_cube[i, :, py, px]
+        pred_spec = recon_cube[i, :, py, px]
 
         plt.plot(orig_spec, label=f"Original (Sample {i}, px [{py},{px}])", alpha=0.7, linestyle='--')
         plt.plot(pred_spec, label=f"Reconstructed (Sample {i})", alpha=0.8)
@@ -242,8 +243,8 @@ def visualize():
     frames = []
     sample_idx = 0
     for b in range(0, C, 10):
-        f_orig = orig_np[sample_idx, b]
-        f_comp = composite_np[sample_idx, b]
+        f_orig = orig_cube[sample_idx, b]
+        f_comp = recon_cube[sample_idx, b]
 
         # Shared normalization so both sides use the same scale
         lo = min(f_orig.min(), f_comp.min())

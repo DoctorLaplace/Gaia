@@ -19,6 +19,7 @@ import yaml
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torch.cuda.amp import GradScaler, autocast
 from tqdm import tqdm
@@ -118,31 +119,62 @@ class MaskedSST(nn.Module):
 
     def forward(self, x):
         B = x.shape[0]
-        tokens = self.encoder.to_patch_embedding(x)
+        device = x.device
+        batch_range = torch.arange(B, device=device)[:, None]
+
+        # 1. Get raw patches BEFORE embedding (these are our reconstruction targets)
+        raw_patches = self.encoder.to_patch_embedding.to_patch(x)
+        # raw_patches shape: (B, num_spectral_groups, num_spatial_patches, pixels_per_patch)
+        raw_patches = rearrange(raw_patches, 'b g n d -> b (g n) d')
+        # raw_patches shape: (B, N, pixels_per_patch)
+
+        # 2. Embed patches into tokens
+        tokens = self.encoder.to_patch_embedding(x)  # (B, N, D)
+        num_patches = tokens.shape[1]
+
+        # 3. Add positional encoding
         if self.encoder.spectral_pos_embed:
             pos_embed = self.encoder.get_pos_embeddings()
         else:
-            pos_embed = self.encoder.pos_embedding[:, :tokens.shape[1]]
+            pos_embed = self.encoder.pos_embedding[:, :num_patches]
         tokens = tokens + pos_embed
+
+        # 4. Generate mask and get masked indices
+        mask_bool = self._generate_spatial_block_mask(B, device)  # (B, N) float
+        num_masked = int(mask_bool[0].sum().item())
+
+        # Convert bool mask to indices (for indexing like the paper)
+        masked_indices = mask_bool.nonzero(as_tuple=False)
+        # Reshape to (B, num_masked)
+        masked_indices = masked_indices[:, 1].reshape(B, num_masked)
+
+        # 5. Prepare mask tokens with positional encoding (as the paper does)
+        mask_tokens = self.mask_token.expand(B, num_patches, -1) + pos_embed
+
+        # 6. Replace masked tokens
+        mask_expanded = mask_bool.unsqueeze(-1).bool()  # (B, N, 1)
+        tokens = torch.where(mask_expanded, mask_tokens, tokens)
+
         tokens = self.encoder.dropout(tokens)
 
-        mask = self._generate_spatial_block_mask(B, x.device)
-        mask_expanded = mask.unsqueeze(-1)
-        tokens = tokens * (1 - mask_expanded) + self.mask_token * mask_expanded
+        # 7. Run through the factored spatial-spectral transformer
+        encoded = self.encoder.spatial_spectral_transformer(tokens)  # (B, N, D)
 
-        tokens = self.encoder.spatial_spectral_transformer(tokens)
-        reconstructed = self.decoder(tokens)
-        targets = rearrange(
-            x, 'b (c p0) (h p1) (w p2) -> b (c h w) (p0 p1 p2)',
-            p0=self.spectral_patch_size, p1=self.spatial_patch_size, p2=self.spatial_patch_size,
-        )
-        return reconstructed, mask, targets
+        # 8. Extract ONLY the masked token representations (like the paper)
+        encoded_mask_tokens = encoded[batch_range, masked_indices]  # (B, num_masked, D)
 
-    def compute_loss(self, reconstructed, mask, targets):
-        loss = (reconstructed - targets).abs()
-        loss = loss.mean(dim=-1)
-        loss = (loss * mask).sum() / (mask.sum() + 1e-8)
-        return loss
+        # 9. Decode ONLY masked tokens to pixel values
+        pred_pixel_values = self.decoder(encoded_mask_tokens)  # (B, num_masked, pixels_per_patch)
+
+        # 10. Get the raw pixel targets for ONLY the masked patches
+        masked_patches = raw_patches[batch_range, masked_indices]  # (B, num_masked, pixels_per_patch)
+
+        return pred_pixel_values, masked_patches, num_masked, mask_bool
+
+    def compute_loss(self, pred_pixel_values, masked_patches, num_masked):
+        """L1 loss on masked tokens only, matching the paper exactly."""
+        return F.l1_loss(pred_pixel_values, masked_patches) / num_masked
+
 
 # ──────────────────────────────────────────────────────────
 # Training Loop
@@ -261,8 +293,8 @@ def pretrain(args):
             batch = batch.to(device)
             optimizer.zero_grad()
             with autocast(enabled=fp16):
-                reconstructed, mask, targets = model(batch)
-                loss = model.compute_loss(reconstructed, mask, targets)
+                pred_pixels, target_pixels, num_masked, mask_bool = model(batch)
+                loss = model.compute_loss(pred_pixels, target_pixels, num_masked)
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
