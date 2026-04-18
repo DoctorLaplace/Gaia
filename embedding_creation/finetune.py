@@ -145,7 +145,7 @@ def finetune(args):
     lr = cfg['finetune']['lr']
     fp16 = cfg['finetune']['fp16']
     freeze_encoder = cfg['finetune']['freeze_encoder'] and not args.no_freeze
-    unfreeze_epoch = cfg['finetune']['unfreeze_epoch']
+    unfreeze_epoch = args.unfreeze_epoch or cfg['finetune']['unfreeze_epoch']
     patience = cfg['finetune']['patience']
     ckpt_dir = os.path.join(PROJECT_ROOT, cfg['finetune']['checkpoint_dir'])
     os.makedirs(ckpt_dir, exist_ok=True)
@@ -354,5 +354,7 @@ if __name__ == "__main__":
     parser.add_argument("--res", type=int, help="Resolution in meters (default: from config, 30)")
     parser.add_argument("--no-freeze", action="store_true",
                         help="Fine-tune all parameters (not just head)")
+    parser.add_argument("--unfreeze-epoch", type=int,
+                        help="Epoch at which to unfreeze the encoder (overrides config)")
     args = parser.parse_args()
     finetune(args)
