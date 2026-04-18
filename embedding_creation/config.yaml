@@ -32,7 +32,7 @@ model:
   heads: 8
   mlp_dim: 384                # 3x dim (standard ViT ratio)
   spectral_patch_size: 10     # bands per spectral token
-  spatial_patch_size: 1       # pixels per spatial token side (1 = pixelwise)
+  spatial_patch_size: 2       # pixels per spatial token side (2 = 2x2 neighborhood)
   dropout: 0.1
   emb_dropout: 0.1
 
