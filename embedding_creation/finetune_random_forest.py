@@ -42,9 +42,13 @@ def extract_embeddings(model, loader, device):
             
             with torch.amp.autocast('cuda', enabled=True):
                 # Run feature extraction
-                # forward_features returns (latent, spatial_latent, spectral_latent)
-                # We use the combined latent representation.
-                x, _, _ = model.encoder.forward_features(patches.to(device))
+                # Some versions return (latent, spatial_latent, spectral_latent)
+                # Others might return additional attention maps. We take the first.
+                features = model.encoder.forward_features(patches.to(device))
+                if isinstance(features, (tuple, list)):
+                    x = features[0]
+                else:
+                    x = features
                 
                 # Global pooling (same as used for the head input)
                 if model.encoder.pool == "mean":
