@@ -395,10 +395,20 @@ class AvirisRichnessDataset(Dataset):
         else:
             cube = f['reflectance']
 
-        patch = cube[:self.num_bands, y_idx-p:y_idx+p, x_idx-p:x_idx+p]
+        # Extract patch: (bands, patch_size, patch_size)
+        available_bands = min(cube.shape[0], self.num_bands)
+        patch = cube[:available_bands, y_idx-p:y_idx+p, x_idx-p:x_idx+p]
         patch = np.array(patch, dtype=np.float32)
         patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
-        patch = torch.from_numpy(patch)
+
+        # Handle band mismatch (zero-pad if cube has fewer bands than num_bands)
+        if patch.shape[0] < self.num_bands:
+            full_patch = torch.zeros(self.num_bands, self.patch_size, self.patch_size)
+            full_patch[:patch.shape[0]] = torch.from_numpy(patch)
+            patch = full_patch
+        else:
+            patch = torch.from_numpy(patch)
+
 
         # Ensure correct spatial size (edge cases)
         if patch.shape[1] != self.patch_size or patch.shape[2] != self.patch_size:
