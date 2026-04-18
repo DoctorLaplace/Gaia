@@ -88,8 +88,12 @@ def visualize():
     # 3. Load Model
     model = MaskedSST(
         num_channels=cfg['data']['num_bands'],
-        dim=256, depth=6, heads=8, mlp_dim=512,
-        spectral_patch_size=10, spatial_patch_size=4,
+        dim=cfg['model']['dim'],
+        depth=cfg['model']['depth'],
+        heads=cfg['model']['heads'],
+        mlp_dim=cfg['model']['mlp_dim'],
+        spectral_patch_size=cfg['model']['spectral_patch_size'],
+        spatial_patch_size=cfg['model']['spatial_patch_size'],
         image_size=cfg['data']['patch_size']
     ).to(device)
 
