@@ -22,7 +22,7 @@ data:
   # 370 / spectral_patch_size(10) = 37 clean spectral groups.
   num_bands: 370
   bands_to_trim: 3            # drop last N bands from 373
-  patch_size: 16              # spatial patch size in pixels
+  patch_size: 32              # spatial crop size in pixels
   tile_size: 1000             # lines to process at a time (larger for high RAM)
   nodata_threshold: -9000     # values below this are ignored (AVIRIS-NG NoData is -10000)
 
@@ -32,7 +32,7 @@ model:
   heads: 8
   mlp_dim: 384                # 3x dim (standard ViT ratio)
   spectral_patch_size: 10     # bands per spectral token
-  spatial_patch_size: 2       # pixels per spatial token side (2 = 2x2 neighborhood)
+  spatial_patch_size: 4       # pixels per spatial token side (4 = 4x4 neighborhood)
   dropout: 0.1
   emb_dropout: 0.1
 
