@@ -127,9 +127,23 @@ class AvirisSSLDataset(Dataset):
                     y = np.random.randint(0, h - p + 1)
                     x = np.random.randint(0, w - p + 1)
                     
-                    # Quick check: is the center of the patch valid data?
-                    # AVIRIS-NG NoData is usually -10000 or -9999.
-                    if cube[0, y+p//2, x+p//2] > self.nodata_threshold:
+                    # Strict Check: Are the center and all 4 corners valid data?
+                    # This ensures the patch isn't hanging off the edge of the flightline.
+                    coords = [
+                        (y+p//2, x+p//2), # Center
+                        (y, x),           # Top-Left
+                        (y, x+p-1),       # Top-Right
+                        (y+p-1, x),       # Bottom-Left
+                        (y+p-1, x+p-1)    # Bottom-Right
+                    ]
+                    
+                    is_valid = True
+                    for cy, cx in coords:
+                        if cube[0, cy, cx] <= self.nodata_threshold:
+                            is_valid = False
+                            break
+                    
+                    if is_valid:
                         self.index.append((len(self.granule_meta) - 1, y, x))
                         patches_found += 1
                     attempts += 1
