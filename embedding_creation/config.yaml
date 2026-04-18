@@ -24,6 +24,7 @@ data:
   bands_to_trim: 3            # drop last N bands from 373
   patch_size: 16              # spatial patch size in pixels
   tile_size: 1000             # lines to process at a time (larger for high RAM)
+  nodata_threshold: -9000     # values below this are ignored (AVIRIS-NG NoData is -10000)
 
 model:
   dim: 96

@@ -26,7 +26,7 @@ class AvirisSSLDataset(Dataset):
     """
     def __init__(self, nc_dirs, patch_size=16, num_bands=370, bands_to_trim=3,
                  patches_per_granule=200, max_granules=None, augment=True,
-                 band_mean=None, band_std=None):
+                 band_mean=None, band_std=None, nodata_threshold=-9000):
         self.patch_size = patch_size
         self.num_bands = num_bands
         self.bands_to_trim = bands_to_trim
@@ -34,6 +34,7 @@ class AvirisSSLDataset(Dataset):
         self.augment = augment
         self.band_mean = band_mean   # (num_bands, 1, 1) or None
         self.band_std = band_std
+        self.nodata_threshold = nodata_threshold
 
         # Accept a single string or a list of directories
         if isinstance(nc_dirs, str):
@@ -98,10 +99,30 @@ class AvirisSSLDataset(Dataset):
             })
 
             # Generate random patch origins for this granule
-            for _ in range(self.patches_per_granule):
-                y = np.random.randint(0, h - p + 1)
-                x = np.random.randint(0, w - p + 1)
-                self.index.append((len(self.granule_meta) - 1, y, x))
+            # NEW: Filter for valid data on the flightline
+            with h5py.File(path, 'r') as f:
+                if 'reflectance/reflectance' in f:
+                    cube = f['reflectance/reflectance']
+                else:
+                    cube = f['reflectance']
+                
+                attempts = 0
+                patches_found = 0
+                max_attempts = self.patches_per_granule * 10
+                
+                while patches_found < self.patches_per_granule and attempts < max_attempts:
+                    y = np.random.randint(0, h - p + 1)
+                    x = np.random.randint(0, w - p + 1)
+                    
+                    # Quick check: is the center of the patch valid data?
+                    # AVIRIS-NG NoData is usually -10000 or -9999.
+                    if cube[0, y+p//2, x+p//2] > self.nodata_threshold:
+                        self.index.append((len(self.granule_meta) - 1, y, x))
+                        patches_found += 1
+                    attempts += 1
+                
+                if patches_found < self.patches_per_granule and not self.nodata_threshold == -999999:
+                    print(f"  [warn] {os.path.basename(path)}: only found {patches_found}/{self.patches_per_granule} valid patches")
 
     def _get_file(self, path):
         """Thread-safe cached file handle."""
@@ -130,9 +151,19 @@ class AvirisSSLDataset(Dataset):
         available_bands = min(cube.shape[0], self.num_bands)
         patch = cube[:available_bands, y:y+p, x:x+p]
         patch = np.array(patch, dtype=np.float32)
-
-        # Replace NaN/Inf with 0
-        patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
+        
+        # Replace NaN/Inf AND NoData (-10000) with 0.0
+        # Reflectance should be positive. Anything below threshold is zeroed.
+        mask = (patch <= self.nodata_threshold) | np.isnan(patch) | np.isinf(patch)
+        patch[mask] = 0.0
+        
+        # Also clip high values (specular reflections/noise) to a sane max (e.g. 1.5 reflectance)
+        # Note: Some AVIRIS data is scaled by 10000. We'll handle that in normalization.
+        # But we'll clip to 15000 if it looks like scaled data, or 1.5 if raw.
+        if patch.max() > 20: 
+            patch = np.clip(patch, 0, 15000)
+        else:
+            patch = np.clip(patch, 0, 1.5)
 
         # Zero-pad if fewer bands than expected
         if available_bands < self.num_bands:
@@ -157,31 +188,38 @@ class AvirisSSLDataset(Dataset):
     def compute_band_stats(self, max_samples=2000):
         """Compute per-band mean/std across random patches for normalization."""
         print(f"[*] Computing band statistics from {min(max_samples, len(self))} patches...")
+        print(f"    (Ignoring NoData values <= {self.nodata_threshold})")
+        
         running_sum = torch.zeros(self.num_bands)
         running_sq = torch.zeros(self.num_bands)
-        n_pixels = 0
+        n_pixels_per_band = torch.zeros(self.num_bands)
 
         indices = np.random.choice(len(self), min(max_samples, len(self)), replace=False)
         for i, idx in enumerate(indices):
             # Temporarily disable augmentation + normalization
             old_aug, old_mean = self.augment, self.band_mean
             self.augment, self.band_mean = False, None
-            patch = self[idx]
+            patch = self[idx] # (C, H, W)
             self.augment, self.band_mean = old_aug, old_mean
 
-            running_sum += patch.sum(dim=(1, 2))
-            running_sq += (patch ** 2).sum(dim=(1, 2))
-            n_pixels += patch.shape[1] * patch.shape[2]
+            # Only count non-zero pixels (since we zeroed the nodata)
+            valid_mask = (patch > 0).float()
+            
+            running_sum += (patch * valid_mask).sum(dim=(1, 2))
+            running_sq += ((patch ** 2) * valid_mask).sum(dim=(1, 2))
+            n_pixels_per_band += valid_mask.sum(dim=(1, 2))
 
             if (i + 1) % 500 == 0:
                 print(f"  [{i+1}/{len(indices)}] scanned")
 
-        mean = running_sum / n_pixels
-        std = ((running_sq / n_pixels) - mean ** 2).clamp(min=0).sqrt().clamp(min=1e-6)
+        # Avoid div by zero
+        n_pixels_per_band = n_pixels_per_band.clamp(min=1)
+        mean = running_sum / n_pixels_per_band
+        std = ((running_sq / n_pixels_per_band) - mean ** 2).clamp(min=0).sqrt().clamp(min=1e-6)
 
         self.band_mean = mean.reshape(self.num_bands, 1, 1)
         self.band_std = std.reshape(self.num_bands, 1, 1)
-        print(f"[OK] Band stats computed. Mean range: [{mean.min():.1f}, {mean.max():.1f}]")
+        print(f"[OK] Band stats computed units. Mean range: [{mean.min():.1f}, {mean.max():.1f}]")
         return self.band_mean, self.band_std
 
     def close(self):
