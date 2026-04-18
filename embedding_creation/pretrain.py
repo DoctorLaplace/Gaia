@@ -268,7 +268,7 @@ def pretrain(args):
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=cfg['pretrain']['weight_decay'])
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs, eta_min=lr * 0.01)
-    scaler = GradScaler(enabled=fp16)
+    scaler = torch.amp.GradScaler('cuda', enabled=fp16)
     warmup_epochs = cfg['pretrain']['warmup_epochs']
 
     print(f"\n{Colors.HEADER}{'='*60}{Colors.ENDC}")
@@ -292,7 +292,7 @@ def pretrain(args):
         for batch in pbar:
             batch = batch.to(device)
             optimizer.zero_grad()
-            with autocast(enabled=fp16):
+            with torch.amp.autocast('cuda', enabled=fp16):
                 pred_pixels, target_pixels, num_masked, mask_bool = model(batch)
                 loss = model.compute_loss(pred_pixels, target_pixels, num_masked)
             scaler.scale(loss).backward()

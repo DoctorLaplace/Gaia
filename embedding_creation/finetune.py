@@ -252,7 +252,7 @@ def finetune(args):
         optimizer, max_lr=lr, epochs=epochs,
         steps_per_epoch=len(train_loader), pct_start=0.1
     )
-    scaler = GradScaler(enabled=fp16)
+    scaler = torch.amp.GradScaler('cuda', enabled=fp16)
 
     # ── Training ──
     print(f"\n{Colors.HEADER}{'='*60}{Colors.ENDC}")
@@ -289,7 +289,7 @@ def finetune(args):
             labels_norm = ((labels - richness_mean) / richness_std).to(device)
 
             optimizer.zero_grad()
-            with autocast(enabled=fp16):
+            with torch.amp.autocast('cuda', enabled=fp16):
                 preds = model(patches)
                 loss = criterion(preds, labels_norm)
 
@@ -308,7 +308,7 @@ def finetune(args):
         val_preds, val_targets = [], []
         with torch.no_grad():
             for patches, labels in val_loader:
-                with autocast(enabled=fp16):
+                with torch.amp.autocast('cuda', enabled=fp16):
                     preds_norm = model(patches.to(device))
                 preds_real = preds_norm.cpu().numpy().flatten() * richness_std + richness_mean
                 val_preds.extend(preds_real)
