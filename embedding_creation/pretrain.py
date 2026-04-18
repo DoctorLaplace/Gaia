@@ -172,8 +172,8 @@ class MaskedSST(nn.Module):
         return pred_pixel_values, masked_patches, num_masked, mask_bool
 
     def compute_loss(self, pred_pixel_values, masked_patches, num_masked):
-        """L1 loss on masked tokens only, matching the paper exactly."""
-        return F.l1_loss(pred_pixel_values, masked_patches) / num_masked
+        """L1 loss on masked tokens only (mean absolute error per pixel)."""
+        return F.l1_loss(pred_pixel_values, masked_patches)
 
 
 # ──────────────────────────────────────────────────────────
