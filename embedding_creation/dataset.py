@@ -72,7 +72,9 @@ class AvirisSSLDataset(Dataset):
         self.index = []   # list of (granule_idx, y_start, x_start) for each valid patch slot
         self.granule_meta = []
 
-        for g_idx, path in enumerate(self.nc_files):
+        from tqdm import tqdm
+        print(f"{Colors.OKBLUE}[*] Scanning {len(self.nc_files)} granules for valid flightline patches...{Colors.ENDC}")
+        for g_idx, path in enumerate(tqdm(self.nc_files, desc="Scanning Granules")):
             try:
                 with h5py.File(path, 'r') as f:
                     if 'reflectance/reflectance' in f:
