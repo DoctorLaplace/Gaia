@@ -207,7 +207,7 @@ def visualize():
         
         frames.append(frame_canvas)
     
-    imageio.mimsave("reconstruction_sweep.gif", frames, fps=5)
+    imageio.mimsave("reconstruction_sweep.gif", frames, fps=5, loop=0)
     print(f"{Colors.OKGREEN}[OK] Saved reconstruction_sweep.gif{Colors.ENDC}")
 
 if __name__ == "__main__":
