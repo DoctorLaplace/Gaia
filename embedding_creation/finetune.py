@@ -80,16 +80,10 @@ class GaiaAvirisModel(nn.Module):
             emb_dropout=emb_dropout,
         )
 
-        # Replace classification head with 3-layer regression head
+        # Replace classification head with 1-layer regression head (Linear Probing)
         self.encoder.mlp_head = nn.Sequential(
             nn.LayerNorm(dim),
-            nn.Linear(dim, dim),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(dim, dim // 2),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(dim // 2, num_targets),
+            nn.Linear(dim, num_targets),
         )
 
     def load_pretrained(self, checkpoint_path, device):
