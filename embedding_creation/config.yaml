@@ -27,10 +27,10 @@ data:
   nodata_threshold: -9000     # values below this are ignored (AVIRIS-NG NoData is -10000)
 
 model:
-  dim: 96
+  dim: 128
   depth: 4                    # number of transformer layers (applied twice: spatial + spectral)
   heads: 8
-  mlp_dim: 192                # 2x dim
+  mlp_dim: 384                # 3x dim (standard ViT ratio)
   spectral_patch_size: 10     # bands per spectral token
   spatial_patch_size: 1       # pixels per spatial token side (1 = pixelwise)
   dropout: 0.1
