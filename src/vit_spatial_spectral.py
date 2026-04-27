@@ -350,10 +350,14 @@ class ViTSpatialSpectral(nn.Module):
         # )
 
         if self.spectral_pos_embed:
-            channel_embed_dim = (
-                dim // 3
-            )  # allot 1/3 of the positional embedding vector to the channel position embedding
+            # Ensure channel_embed_dim is even and pos_embed_dim is a multiple of 4
+            channel_embed_dim = (dim // 3)
+            if channel_embed_dim % 2 != 0:
+                channel_embed_dim += 1
             pos_embed_dim = dim - channel_embed_dim
+            while pos_embed_dim % 4 != 0:
+                pos_embed_dim -= 2
+                channel_embed_dim += 2
 
             # spatial positional embedding
             self.pos_embed = nn.Parameter(

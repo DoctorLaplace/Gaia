@@ -78,14 +78,40 @@ class AvirisSSLDataset(Dataset):
         self._cache = {}
         self._cache_lock = threading.Lock()
 
-    def _scan_granules(self):
-        """Scan granule dimensions to build the patch index."""
-        self.index = []   # list of (granule_idx, y_start, x_start) for each valid patch slot
+    def _scan_granules(self, cache_path=None):
+        """Scan granule dimensions to build the patch index with caching and parallelism."""
+        if cache_path is None:
+            cache_path = os.path.join("embedding_creation", "checkpoints", "dataset_index_cache.pth")
+            os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+        
+        # 1. Try to load cache
+        if os.path.exists(cache_path):
+            print(f"{Colors.OKGREEN}[OK] Loading patch index from cache: {cache_path}{Colors.ENDC}")
+            try:
+                # Use weights_only=False because we trust this internal pth file
+                cache = torch.load(cache_path)
+                # Verify cache is for the SAME set of files and patches_per_granule setting
+                if cache.get('nc_files') == self.nc_files and cache.get('patches_per_granule') == self.patches_per_granule:
+                    self.index = cache['index']
+                    self.granule_meta = cache['granule_meta']
+                    print(f"  {Colors.OKCYAN}[OK] Found {len(self.index)} cached patches across {len(self.granule_meta)} granules.{Colors.ENDC}")
+                    return
+                else:
+                    print(f"  {Colors.WARNING}[!] Cache mismatch (files or params changed). Re-scanning...{Colors.ENDC}")
+            except Exception as e:
+                print(f"  {Colors.WARNING}[!] Failed to load cache: {e}. Re-scanning...{Colors.ENDC}")
+
+        self.index = []
         self.granule_meta = []
 
+        # 2. Parallel Scan
         from tqdm import tqdm
-        print(f"{Colors.OKBLUE}[*] Scanning {len(self.nc_files)} granules for valid flightline patches...{Colors.ENDC}")
-        for g_idx, path in enumerate(tqdm(self.nc_files, desc="Scanning Granules")):
+        from concurrent.futures import ThreadPoolExecutor
+        import threading
+        
+        index_lock = threading.Lock()
+        
+        def scan_single_granule(path):
             try:
                 with h5py.File(path, 'r') as f:
                     if 'reflectance/reflectance' in f:
@@ -94,25 +120,22 @@ class AvirisSSLDataset(Dataset):
                         shape = f['reflectance'].shape
                 total_bands, h, w = shape
             except Exception:
-                continue
+                return None
 
             usable_bands = total_bands - self.bands_to_trim
-            # Accept files with fewer bands -- we'll zero-pad in __getitem__
-            min_required = self.num_bands // 2  # at least half the bands
+            min_required = self.num_bands // 2
             if usable_bands < min_required:
-                print(f"  [skip] {os.path.basename(path)}: only {usable_bands} bands")
-                continue
+                return None
 
             p = self.patch_size
             if h < p or w < p:
-                continue
+                return None
 
-            self.granule_meta.append({
-                'path': path, 'h': h, 'w': w, 'bands': total_bands
-            })
-
-            # Generate random patch origins for this granule
-            # NEW: Filter for valid data on the flightline
+            # Local meta for this granule
+            meta = {'path': path, 'h': h, 'w': w, 'bands': total_bands}
+            
+            # Find patches
+            local_patches = []
             with h5py.File(path, 'r') as f:
                 if 'reflectance/reflectance' in f:
                     cube = f['reflectance/reflectance']
@@ -127,14 +150,9 @@ class AvirisSSLDataset(Dataset):
                     y = np.random.randint(0, h - p + 1)
                     x = np.random.randint(0, w - p + 1)
                     
-                    # Strict Check: Are the center and all 4 corners valid data?
-                    # This ensures the patch isn't hanging off the edge of the flightline.
                     coords = [
-                        (y+p//2, x+p//2), # Center
-                        (y, x),           # Top-Left
-                        (y, x+p-1),       # Top-Right
-                        (y+p-1, x),       # Bottom-Left
-                        (y+p-1, x+p-1)    # Bottom-Right
+                        (y+p//2, x+p//2), (y, x), (y, x+p-1), 
+                        (y+p-1, x), (y+p-1, x+p-1)
                     ]
                     
                     is_valid = True
@@ -144,12 +162,38 @@ class AvirisSSLDataset(Dataset):
                             break
                     
                     if is_valid:
-                        self.index.append((len(self.granule_meta) - 1, y, x))
+                        local_patches.append((y, x))
                         patches_found += 1
                     attempts += 1
-                
-                if patches_found < self.patches_per_granule and not self.nodata_threshold == -999999:
-                    print(f"  [warn] {os.path.basename(path)}: only found {patches_found}/{self.patches_per_granule} valid patches")
+            
+            return meta, local_patches
+
+        print(f"{Colors.OKBLUE}[*] Parallel Scanning {len(self.nc_files)} granules (using 8 threads)...{Colors.ENDC}")
+        
+        # Use 8 threads to match nproc and avoid OS contention
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            # Map the scan function across files
+            results = list(tqdm(executor.map(scan_single_granule, self.nc_files), 
+                               total=len(self.nc_files), desc="Scanning Granules"))
+
+        # 3. Assemble Results
+        for res in results:
+            if res is not None:
+                meta, patches = res
+                self.granule_meta.append(meta)
+                g_idx = len(self.granule_meta) - 1
+                for y, x in patches:
+                    self.index.append((g_idx, y, x))
+
+        # 4. Save Cache
+        print(f"{Colors.OKBLUE}[*] Saving patch index to cache...{Colors.ENDC}")
+        torch.save({
+            'nc_files': self.nc_files,
+            'patches_per_granule': self.patches_per_granule,
+            'index': self.index,
+            'granule_meta': self.granule_meta
+        }, cache_path)
+        print(f"{Colors.OKGREEN}[OK] {len(self.index)} valid patches cached.{Colors.ENDC}")
 
     def _get_file(self, path):
         """Thread-safe cached file handle."""
