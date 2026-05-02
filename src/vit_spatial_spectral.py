@@ -68,12 +68,18 @@ class Attention(nn.Module):
         qkv = self.to_qkv(x).chunk(3, dim=-1)
         q, k, v = map(lambda t: rearrange(t, "b n (h d) -> b h n d", h=self.heads), qkv)
 
-        dots = torch.matmul(q, k.transpose(-1, -2)) * self.scale
+        # dots = torch.matmul(q, k.transpose(-1, -2)) * self.scale
 
-        attn = self.attend(dots)
-        attn = self.dropout(attn)
+        # attn = self.attend(dots)
+        # attn = self.dropout(attn)
 
-        out = torch.matmul(attn, v)
+        #out = torch.matmul(attn, v)
+        # PyTorch 2.0+ Memory-Efficient Flash Attention
+        dropout_p = self.dropout.p if self.training else 0.0
+        out = torch.nn.functional.scaled_dot_product_attention(
+            q, k, v, dropout_p=dropout_p
+        )
+
         out = rearrange(out, "b h n d -> b n (h d)")
         return self.to_out(out)
 
