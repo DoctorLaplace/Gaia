@@ -18,13 +18,15 @@ class BioScapeNetCDFDataset(Dataset):
     Dataset to handle NASA BioSCape AVIRIS-NG Level 2B (NetCDF) flightlines.
     Handles the spectral resampling from ~430 bands to the 200 foundation bands lazily (per-patch).
     """
-    def __init__(self, nc_path, richness_csv, patch_size=16, augment=False, quiet=False, use_cache=True):
+    def __init__(self, nc_path, richness_csv, patch_size=16, augment=False, 
+                 quiet=False, use_cache=True, mask_water_vapor=True):
         self.nc_path = nc_path
         self.patch_size = patch_size
         self.augment = augment
         self.quiet = quiet
         self.richness_csv = richness_csv
         self.use_cache = use_cache
+        self.mask_water_vapor = mask_water_vapor
         
         # Lazy initialization for worker safety
         self.f_obj = None
@@ -79,30 +81,48 @@ class BioScapeNetCDFDataset(Dataset):
             cube = f['reflectance']
             
         # Extract spatial metadata from GeoTransform
+        gt_str = None
         if 'projection' in f and 'GeoTransform' in f['projection'].attrs:
-            gt = f['projection'].attrs['GeoTransform']
-            if isinstance(gt, bytes): gt = gt.decode()
-            if isinstance(gt, str): gt = [float(x) for x in gt.split()]
+            gt_str = f['projection'].attrs['GeoTransform']
+        elif 'reflectance' in f and 'GeoTransform' in f['reflectance'].attrs:
+            gt_str = f['reflectance'].attrs['GeoTransform']
+        elif 'GeoTransform' in f.attrs:
+            gt_str = f.attrs['GeoTransform']
+
+        if gt_str is not None:
+            if isinstance(gt_str, bytes): gt_str = gt_str.decode()
+            if isinstance(gt_str, str): gt = [float(x) for x in gt_str.split()]
+            else: gt = list(gt_str)
             
             self.origin_x, self.pixel_w = gt[0], gt[1]
             self.origin_y, self.pixel_h = gt[3], gt[5]
-        elif 'reflectance' in f and 'GeoTransform' in f['reflectance'].attrs:
-            # Some NetCDFs store GT in the variable attrs
-            gt = f['reflectance'].attrs['GeoTransform']
-            if isinstance(gt, bytes): gt = gt.decode()
-            if isinstance(gt, str): gt = [float(x) for x in gt.split()]
-            self.origin_x, self.pixel_w = gt[0], gt[1]
-            self.origin_y, self.pixel_h = gt[3], gt[5]
         else:
-            self.origin_x, self.pixel_w = 0, 1
-            self.origin_y, self.pixel_h = 0, 1
+            # Fallback for Level 3 Mosaics which use easting/northing arrays
+            if 'easting' in f and 'northing' in f:
+                self.origin_x = f['easting'][0]
+                self.origin_y = f['northing'][0]
+                self.pixel_w = f['easting'][1] - f['easting'][0]
+                self.pixel_h = f['northing'][1] - f['northing'][0]
+            else:
+                self.origin_x, self.pixel_w = 0, 1
+                self.origin_y, self.pixel_h = 0, 1
 
         # Access the hyperspectral cube metadata
         self.bands, self.height, self.width = cube.shape
         
-        # CRS Transformer
-        self.transformer = Transformer.from_crs("epsg:4326", "epsg:32734", always_xy=True)
-        self.inverse_transformer = Transformer.from_crs("epsg:32734", "epsg:4326", always_xy=True)
+        # CRS Transformer (Standard BioSCape is EPSG:32734)
+        target_crs = "epsg:32734"
+        if 'projection' in f and 'spatial_ref' in f['projection'].attrs:
+            # Try to extract CRS from file if available (for Level 3)
+            try:
+                import pyproj
+                wkt = f['projection'].attrs['spatial_ref']
+                if isinstance(wkt, bytes): wkt = wkt.decode()
+                target_crs = pyproj.CRS.from_wkt(wkt)
+            except: pass
+
+        self.transformer = Transformer.from_crs("epsg:4326", target_crs, always_xy=True)
+        self.inverse_transformer = Transformer.from_crs(target_crs, "epsg:4326", always_xy=True)
         
         # If we weren't open before, close now to save resources
         if not was_open:
@@ -122,25 +142,29 @@ class BioScapeNetCDFDataset(Dataset):
         
         return min(lon1, lon2), min(lat1, lat2), max(lon1, lon2), max(lat1, lat2)
 
-    def resample_to_foundation(self, patch_raw, current_wavs):
-        """Resample spectral bands to match the 200-band EnMAP foundation model.
-        Masks wavelengths that fall in known atmospheric absorption gaps."""
-        target_wavs = np.linspace(400, 2450, 200)
+    def mask_patch(self, patch, wavelengths):
+        """Zero out water vapor bands (Atmospheric Cleaning)."""
+        # Known atmospheric absorption regions (BBL gaps)
+        BAD_RANGES = [(1340, 1480), (1780, 1970)]
         
-        # Known atmospheric absorption regions (BBL gaps) to mask
-        BAD_RANGES = [(1340, 1480), (1780, 1970)]  # Water vapor bands
+        for lo, hi in BAD_RANGES:
+            mask = (wavelengths >= lo) & (wavelengths <= hi)
+            patch[mask, :, :] = 0.0
+        return patch
+
+    def resample_to_foundation(self, patch_raw, current_wavs):
+        """Resample spectral bands to match the 200-band EnMAP foundation model."""
+        target_wavs = np.linspace(400, 2450, 200)
         
         patch_hwc = np.transpose(patch_raw, (1, 2, 0))
         f = interp1d(current_wavs, patch_hwc, axis=-1, kind='linear',
                      fill_value=0.0, bounds_error=False)
         resampled_hwc = f(target_wavs)
-        
-        # Zero out bands that fall inside atmospheric gaps
-        for lo, hi in BAD_RANGES:
-            mask = (target_wavs >= lo) & (target_wavs <= hi)
-            resampled_hwc[:, :, mask] = 0.0
-        
         patch_tensor = torch.from_numpy(np.transpose(resampled_hwc, (2, 0, 1))).float()
+        
+        if self.mask_water_vapor:
+            patch_tensor = self.mask_patch(patch_tensor, target_wavs)
+            
         return patch_tensor
 
     def get_patch_at_latlon(self, lat, lon):

@@ -82,7 +82,8 @@ class GaiaTransferModel(nn.Module):
         return out.mean(dim=(1, 2))
 
 class MultiFlightBioScapeDataset(Dataset):
-    def __init__(self, nc_paths, richness_csv, patch_size=16, augment=False, cache_path=None):
+    def __init__(self, nc_paths, richness_csv, patch_size=16, augment=False, 
+                 cache_path=None, mask_water_vapor=True):
         self.patch_size = patch_size
         self.augment = augment
         self.nc_paths = nc_paths
@@ -90,6 +91,7 @@ class MultiFlightBioScapeDataset(Dataset):
         self.mappings = []
         self.dataset_cache = {}
         self.cache_lock = threading.Lock()
+        self.mask_water_vapor = mask_water_vapor
         # Global per-band normalization stats (set after construction)
         self.band_mean = None  # shape: (200, 1, 1)
         self.band_std = None   # shape: (200, 1, 1)
@@ -127,7 +129,8 @@ class MultiFlightBioScapeDataset(Dataset):
         def process_one(nc):
             local_mappings = []
             try:
-                ds = BioScapeNetCDFDataset(nc, richness_csv=None, patch_size=patch_size, quiet=True, use_cache=False)
+                ds = BioScapeNetCDFDataset(nc, richness_csv=None, patch_size=patch_size, 
+                                          quiet=True, use_cache=False, mask_water_vapor=self.mask_water_vapor)
                 # Fast spatial filter using bounding box
                 min_lon, min_lat, max_lon, max_lat = ds.get_bounds()
                 mask = (self.richness_df['lat'] >= min_lat) & (self.richness_df['lat'] <= max_lat) & \
@@ -240,7 +243,10 @@ class MultiFlightBioScapeDataset(Dataset):
         
         with self.cache_lock:
             if nc_path not in self.dataset_cache:
-                self.dataset_cache[nc_path] = BioScapeNetCDFDataset(nc_path, richness_csv=None, patch_size=self.patch_size, quiet=True)
+                self.dataset_cache[nc_path] = BioScapeNetCDFDataset(
+                    nc_path, richness_csv=None, patch_size=self.patch_size, 
+                    quiet=True, mask_water_vapor=self.mask_water_vapor
+                )
             ds = self.dataset_cache[nc_path]
         
         patch, bounds = ds.get_patch_at_latlon(lat, lon)
@@ -257,7 +263,8 @@ class MultiFlightBioScapeDataset(Dataset):
         return patch, torch.tensor([float(richness)])
 
 def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=None, 
-                     test_run=False, freeze_encoder=True, unfreeze_epoch=None):
+                     test_run=False, freeze_encoder=True, unfreeze_epoch=None,
+                     use_mosaic=False, mask_water_vapor=True):
     # Load config
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     with open(os.path.join(project_root, "configs", "config.yaml"), 'r') as f:
@@ -269,6 +276,10 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     epochs = epochs or b_cfg['epochs']
     batch_size = batch_size or b_cfg['batch_size']
     patch_size = b_cfg.get('patch_size', 16)
+    
+    if use_mosaic:
+        nc_dir = nc_dir or f"data/bioscape/{patch_size}m_v2"
+        print(f"{Colors.WARNING}[*] MOSAIC MODE: Using Level 3 Tiles from {nc_dir}{Colors.ENDC}")
     
     device = torch.device(config.get('device', 'cuda') if torch.cuda.is_available() else "cpu")
     print(f"{Colors.HEADER}===================================================={Colors.ENDC}\n{Colors.HEADER}Gaia Fine-Tuning ({'S3' if nc_dir.startswith('s3') else 'Local'}) on {device}{Colors.ENDC}")
@@ -284,6 +295,17 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     else:
         nc_paths = [os.path.join(nc_dir, f) for f in os.listdir(nc_dir) if f.endswith('.nc')]
         
+    if use_mosaic and not nc_dir.startswith("s3"):
+        # Filter by tile_names.json if in mosaic mode
+        tile_path = os.path.join(project_root, "tile_names.json")
+        if os.path.exists(tile_path):
+            import json
+            with open(tile_path, 'r') as f:
+                tiles = {t['tile'] for t in json.load(f)['tiles']}
+            
+            nc_paths = [p for p in nc_paths if any(t in p for t in tiles)]
+            print(f"{Colors.OKBLUE}[*] Filtered to {len(nc_paths)} tiles from tile_names.json{Colors.ENDC}")
+        
     if not nc_paths:
         print(f"{Colors.FAIL}[!] No NetCDF files found in {nc_dir}{Colors.ENDC}")
         return
@@ -292,10 +314,14 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
         nc_paths = nc_paths[:2]
         
     cache_suffix = f"_p{patch_size}.json"
+    if use_mosaic: cache_suffix = "_mosaic" + cache_suffix
     cache_name = ("s3_mapping" if nc_dir.startswith("s3") else "local_mapping") + cache_suffix
     mapping_cache = os.path.join(project_root, "data", "bioscape", cache_name)
     
-    full_dataset = MultiFlightBioScapeDataset(nc_paths, richness_csv, patch_size=patch_size, augment=True, cache_path=mapping_cache)
+    full_dataset = MultiFlightBioScapeDataset(
+        nc_paths, richness_csv, patch_size=patch_size, 
+        augment=True, cache_path=mapping_cache, mask_water_vapor=mask_water_vapor
+    )
     if len(full_dataset) == 0:
         print(f"{Colors.FAIL}[!] No training samples found. Stopping.{Colors.ENDC}")
         return
@@ -468,7 +494,12 @@ if __name__ == "__main__":
                         help="Fine-tune all parameters (for supercomputer with more data)")
     parser.add_argument("--unfreeze-epoch", type=int, default=None,
                         help="Unfreeze encoder at this epoch for progressive fine-tuning")
+    parser.add_argument("--mosaic", action="store_true", help="Use Level 3 Mosaic tiles")
+    parser.add_argument("--no-mask", dest="mask", action="store_false", help="Disable water vapor masking")
+    parser.set_defaults(mask=True)
+    
     args = parser.parse_args()
     train_production(args.nc_dir, args.richness_csv, epochs=args.epochs, 
                      test_run=args.test_run, freeze_encoder=args.freeze,
-                     unfreeze_epoch=args.unfreeze_epoch)
+                     unfreeze_epoch=args.unfreeze_epoch, use_mosaic=args.mosaic,
+                     mask_water_vapor=args.mask)

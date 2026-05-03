@@ -71,9 +71,34 @@ def run_fold(fold_idx, k, train_idx, val_idx, full_dataset,
     print(f"{Colors.OKBLUE}[*] Fold {fold_idx+1} Richness: "
           f"mean={richness_mean:.1f}, std={richness_std:.1f}{Colors.ENDC}")
 
+def run_fold(fold_idx, k, train_idx, val_idx, full_dataset,
+             config, device, args):
+    """Train and evaluate a single fold. Returns a metrics dict."""
+    b_cfg = config['bioscape']
+    batch_size = args.batch_size or b_cfg['batch_size']
+    epochs = args.epochs or b_cfg['epochs']
+    lr = b_cfg['learning_rate']
+    patch_size = b_cfg.get('patch_size', 16)
+
+    print(f"\n{Colors.HEADER}{'='*60}{Colors.ENDC}")
+    print(f"{Colors.HEADER}  FOLD {fold_idx+1} / {k}  "
+          f"(Train: {len(train_idx)} | Val: {len(val_idx)}){Colors.ENDC}")
+    print(f"{Colors.HEADER}{'='*60}{Colors.ENDC}")
+
+    # -- Target normalization (train-only to prevent leakage) --
+    train_richness = np.array([full_dataset.mappings[i][3] for i in train_idx])
+    richness_mean = float(train_richness.mean())
+    richness_std = float(train_richness.std()) + 1e-6
+    print(f"{Colors.OKBLUE}[*] Fold {fold_idx+1} Richness: "
+          f"mean={richness_mean:.1f}, std={richness_std:.1f}{Colors.ENDC}")
+
     # -- DataLoaders --
     num_workers = b_cfg.get('num_workers', 4)
     nc_dir = args.nc_dir or (b_cfg['nc_dir_s3'] if b_cfg['use_s3'] else b_cfg['nc_dir_local'])
+    
+    if args.mosaic:
+        nc_dir = args.nc_dir or f"data/bioscape/{patch_size}m_v2"
+
     if os.name == 'nt' and not nc_dir.startswith("s3"):
         num_workers = 0
 
@@ -225,6 +250,9 @@ def main():
                         help="Fine-tune all parameters")
     parser.add_argument("--unfreeze-epoch", type=int, default=None,
                         help="Unfreeze encoder at this epoch")
+    parser.add_argument("--mosaic", action="store_true", help="Use Level 3 Mosaic tiles")
+    parser.add_argument("--no-mask", dest="mask", action="store_false", help="Disable water vapor masking")
+    parser.set_defaults(mask=True)
     parser.add_argument("--test-run", action="store_true",
                         help="Quick smoke test (2 folds, 2 epochs, 2 granules)")
     args = parser.parse_args()
@@ -269,15 +297,27 @@ def main():
     if args.test_run:
         nc_paths = nc_paths[:2]
 
+    if args.mosaic and not nc_dir.startswith("s3"):
+        # Filter by tile_names.json if in mosaic mode
+        tile_path = os.path.join(project_root, "tile_names.json")
+        if os.path.exists(tile_path):
+            import json
+            with open(tile_path, 'r') as f:
+                tiles = {t['tile'] for t in json.load(f)['tiles']}
+            
+            nc_paths = [p for p in nc_paths if any(t in p for t in tiles)]
+            print(f"{Colors.OKBLUE}[*] Filtered to {len(nc_paths)} tiles from tile_names.json{Colors.ENDC}")
+
     # -- Build Dataset --
     cache_suffix = f"_p{patch_size}.json"
+    if args.mosaic: cache_suffix = "_mosaic" + cache_suffix
     cache_name = ("s3_mapping" if nc_dir.startswith("s3")
                   else "local_mapping") + cache_suffix
     mapping_cache = os.path.join(project_root, "data", "bioscape", cache_name)
 
     full_dataset = MultiFlightBioScapeDataset(
         nc_paths, richness_csv, patch_size=patch_size,
-        augment=True, cache_path=mapping_cache
+        augment=True, cache_path=mapping_cache, mask_water_vapor=args.mask
     )
     if len(full_dataset) == 0:
         print(f"{Colors.FAIL}[!] No training samples found. Stopping.{Colors.ENDC}")
