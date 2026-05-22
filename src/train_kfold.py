@@ -38,8 +38,14 @@ def run_fold(fold_idx, train_idx, val_idx, full_dataset, config, device, args):
     # Create loaders
     # Note: Using num_workers=0 for local Windows to avoid H5PY pickling issues
     num_workers = 0 if os.name == 'nt' and (not args.nc_dir or not args.nc_dir.startswith("s3")) else 4
-    train_loader = DataLoader(Subset(full_dataset, train_idx), batch_size=batch_size, shuffle=True, num_workers=num_workers)
-    val_loader = DataLoader(Subset(full_dataset, val_idx), batch_size=batch_size, shuffle=False, num_workers=num_workers)
+    train_loader = DataLoader(Subset(full_dataset, train_idx), batch_size=batch_size, shuffle=True, 
+                              num_workers=num_workers, pin_memory=True, 
+                              prefetch_factor=4 if num_workers > 0 else None, 
+                              persistent_workers=True if num_workers > 0 else False)
+    val_loader = DataLoader(Subset(full_dataset, val_idx), batch_size=batch_size, shuffle=False, 
+                            num_workers=num_workers, pin_memory=True, 
+                            prefetch_factor=4 if num_workers > 0 else None, 
+                            persistent_workers=True if num_workers > 0 else False)
     
     # Initialize Model
     model = GaiaTransferModel(num_targets=1, patch_size=patch_size).to(device)

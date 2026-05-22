@@ -41,6 +41,7 @@ def compute_metrics(targets, preds):
     mae = mean_absolute_error(targets, preds)
     return {'R2': r2, 'RMSE': rmse, 'MAE': mae, 'count': len(targets)}
 
+
 def evaluate(nc_dir=None):
     print("\n" + "═"*60)
     print("  GAIA MODEL EVALUATION (PREMIUM VIZ)")
@@ -66,7 +67,8 @@ def evaluate(nc_dir=None):
     richness_std = ckpt.get('richness_std', 6.72)
     state_dict = ckpt.get('model_state_dict', ckpt)
     
-    model = GaiaTransferModel(num_targets=1).to(device)
+    patch_size = b_cfg.get('patch_size', 16)
+    model = GaiaTransferModel(num_targets=1, patch_size=patch_size).to(device)
     model.load_state_dict(state_dict)
     model.eval()
     print(f"[*] Loaded Model (Richness Target: Mean={richness_mean:.2f}, Std={richness_std:.2f})")
@@ -79,9 +81,10 @@ def evaluate(nc_dir=None):
     else:
         nc_paths = [os.path.join(nc_dir, f) for f in os.listdir(nc_dir) if f.endswith('.nc')]
     
+    cache_suffix = f"_p{patch_size}.json"
     mapping_cache = os.path.join(project_root, "data", "bioscape", 
-                                "s3_mapping.json" if nc_dir.startswith("s3") else "local_mapping.json")
-    dataset = MultiFlightBioScapeDataset(nc_paths, richness_csv, augment=False, cache_path=mapping_cache)
+                                ("s3_mapping" if nc_dir.startswith("s3") else "local_mapping") + cache_suffix)
+    dataset = MultiFlightBioScapeDataset(nc_paths, richness_csv, patch_size=patch_size, augment=False, cache_path=mapping_cache)
     
     # Set stats for band norm
     if 'band_mean' in ckpt:
@@ -92,8 +95,16 @@ def evaluate(nc_dir=None):
     val_split = b_cfg.get('val_split', 0.2)
     train_idx, val_idx = train_test_split(indices, test_size=val_split, random_state=42)
     
-    train_loader = DataLoader(Subset(dataset, train_idx), batch_size=16, shuffle=False)
-    val_loader = DataLoader(Subset(dataset, val_idx), batch_size=16, shuffle=False)
+    num_workers = b_cfg.get('num_workers', 4) if os.name != 'nt' or nc_dir.startswith("s3") else 0
+    eval_batch_size = b_cfg.get('eval_batch_size', b_cfg.get('batch_size', 16))
+    train_loader = DataLoader(Subset(dataset, train_idx), batch_size=eval_batch_size, shuffle=False,
+                              num_workers=num_workers, pin_memory=True, 
+                              prefetch_factor=4 if num_workers > 0 else None, 
+                              persistent_workers=True if num_workers > 0 else False)
+    val_loader = DataLoader(Subset(dataset, val_idx), batch_size=eval_batch_size, shuffle=False,
+                            num_workers=num_workers, pin_memory=True, 
+                            prefetch_factor=4 if num_workers > 0 else None, 
+                            persistent_workers=True if num_workers > 0 else False)
     
     # 3. Inference
     train_preds, train_targets = run_inference(model, train_loader, richness_mean, richness_std, device)
@@ -208,27 +219,62 @@ def evaluate(nc_dir=None):
     plot_path = os.path.join(report_dir, "gaia_performance_dashboard.png")
     plt.savefig(plot_path, dpi=180, bbox_inches='tight')
     print(f"\n[✔] Performance Dashboard saved to: {plot_path}")
-    print(f"[*] Per-site CSV results updated in: {os.path.join(report_dir, 'evaluation_results.csv')}")
+    # Update CSV with baseline comparison and merge metadata
+    original_df = pd.read_csv(richness_csv)
+    original_df = original_df.rename(columns={'Latitude': 'lat', 'Longitude': 'lon'})
     
-    # Update CSV with baseline comparison
     results_df = pd.DataFrame({
         'split': ['train']*len(train_targets) + ['val']*len(val_targets),
         'actual': np.concatenate([train_targets, val_targets]),
         'predicted': np.concatenate([train_preds, val_preds]),
         'error': np.concatenate([train_preds - train_targets, val_preds - val_targets]),
-        'baseline_guess': np.mean(train_targets)
+        'abs_error': np.abs(np.concatenate([train_preds - train_targets, val_preds - val_targets])),
+        'baseline_guess': np.mean(train_targets),
+        'lat': [dataset.mappings[i][1] for i in train_idx] + [dataset.mappings[i][1] for i in val_idx],
+        'lon': [dataset.mappings[i][2] for i in train_idx] + [dataset.mappings[i][2] for i in val_idx],
+        'nc_path': [os.path.basename(dataset.mappings[i][0]) for i in train_idx] + [os.path.basename(dataset.mappings[i][0]) for i in val_idx]
     })
-    results_df.to_csv(os.path.join(report_dir, "evaluation_results.csv"), index=False)
+    
+    # Merge on rounded coordinates
+    results_df['lat_round'] = results_df['lat'].round(5)
+    results_df['lon_round'] = results_df['lon'].round(5)
+    original_df['lat_round'] = original_df['lat'].round(5)
+    original_df['lon_round'] = original_df['lon'].round(5)
+    
+    results_df = pd.merge(results_df, original_df.drop(columns=['lat', 'lon']), on=['lat_round', 'lon_round'], how='left')
+    results_df = results_df.drop(columns=['lat_round', 'lon_round'])
+
+    results_csv_path = os.path.join(report_dir, "evaluation_results.csv")
+    results_df.to_csv(results_csv_path, index=False)
+    print(f"[*] Per-site CSV results (with extended metadata) updated in: {results_csv_path}")
+
+    # Analyze Worst Performers
+    val_results = results_df[results_df['split'] == 'val'].copy()
+    worst_n = 10
+    worst_sites = val_results.nlargest(worst_n, 'abs_error')
+    
+    print(f"\n" + "!"*60)
+    print(f"  TOP {worst_n} WORST PERFORMING SITES (Validation Set)")
+    print("!"*60)
+    cols_to_print = ['SiteID', 'actual', 'predicted', 'error', 'LandCoverC', 'FireClass']
+    available_cols = [c for c in cols_to_print if c in worst_sites.columns]
+    print(worst_sites[available_cols].to_string(index=False))
+
+    print("\n[*] Shared Features among Worst Performers:")
+    found_pattern = False
+    for col in ['LandCoverC', 'FireClass', 'Campaign', 'WetlandTyp']:
+        if col in worst_sites.columns:
+            counts = worst_sites[col].value_counts()
+            if not counts.empty:
+                top_val, top_count = counts.index[0], counts.iloc[0]
+                if top_count >= worst_n / 2 and top_val not in ['NA', 'Not available', 'None']:
+                    print(f"    --> {top_count}/{worst_n} worst sites share {col}: {top_val}")
+                    found_pattern = True
+    if not found_pattern:
+        print("    (No dominant shared features found among the worst performers)")
     
     plt.close()
     print("═"*60 + "\n")
-
-if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--nc_dir", type=str, help="Override data directory")
-    args = parser.parse_args()
-    evaluate(args.nc_dir)
 
 if __name__ == "__main__":
     import argparse

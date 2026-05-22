@@ -211,6 +211,17 @@
                 </div>
                 <input type="range" id="band-slider" min="0" max="199" value="0">
             </div>
+
+            <div class="slider-container" style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                <div class="slider-header" style="justify-content: flex-start; gap: 10px;">
+                    <span>Highlight Worst Performers</span>
+                    <span style="color: #ef4444; font-weight: bold;">Top <span id="worst-count">0</span></span>
+                </div>
+                <input type="range" id="worst-slider" min="0" max="20" value="0">
+                <div id="worst-analysis" style="font-size: 0.75rem; opacity: 0.8; margin-top: 0.5rem; display: none;">
+                    <span style="color: #fca5a5;">Pattern Found:</span> <span id="worst-pattern"></span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -334,11 +345,27 @@
                     fillOpacity: 0.9
                 }).addTo(map);
 
+                let metaDetails = [];
+                for (let k in site) {
+                    if (!['lat', 'lon', 'bounds', 'nc', 'richness', 'pixel_x', 'pixel_y'].includes(k)) {
+                        let v = site[k];
+                        if (typeof v === 'number') v = v.toFixed(2);
+                        metaDetails.push(`<tr><td style="color:#a1a1aa; padding-right:10px">${k}</td><td>${v}</td></tr>`);
+                    }
+                }
+                
                 const popupHtml = `
                     <div style="color: white; min-width: 140px;">
-                        <b style="font-size: 0.8rem; opacity: 0.6;">SITE ${i+1}</b><br>
-                        <b style="color: ${color}; font-size: 1rem;">${richness.toFixed(1)} Richness</b><br>
-                        <small style="opacity: 0.5;">${site.lat.toFixed(4)}, ${site.lon.toFixed(4)}</small>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <b style="font-size: 0.8rem; opacity: 0.6;">SITE ${i+1}</b>
+                            <span style="font-size: 0.7rem; opacity:0.5">${site.SiteID || ''}</span>
+                        </div>
+                        <b style="color: ${color}; font-size: 1.2rem;">${richness.toFixed(1)} Richness</b><br>
+                        <small style="opacity: 0.5; display:block; margin-bottom:8px;">${site.lat.toFixed(4)}, ${site.lon.toFixed(4)}</small>
+                        
+                        <table style="font-size:0.75rem; width:100%; border-top:1px solid rgba(255,255,255,0.1); padding-top:5px;">
+                            ${metaDetails.join('')}
+                        </table>
                     </div>
                 `;
 
@@ -376,6 +403,73 @@
                     }
                     ctx.putImageData(imgData, 0, 0);
                     el.overlay.setUrl(el.canvas.toDataURL());
+                });
+            };
+
+            const worstSlider = document.getElementById('worst-slider');
+            const worstCountDisp = document.getElementById('worst-count');
+            const worstAnalysisInfo = document.getElementById('worst-analysis');
+            const worstPatternText = document.getElementById('worst-pattern');
+
+            // Find valid sites with error metrics
+            const evaluableSites = metadata.sites
+                .map((s, idx) => ({ ...s, originalIndex: idx }))
+                .filter(s => s.abs_error !== undefined)
+                .sort((a, b) => b.abs_error - a.abs_error);
+                
+            if (evaluableSites.length < 20) worstSlider.max = evaluableSites.length;
+
+            worstSlider.oninput = (e) => {
+                const n = parseInt(e.target.value);
+                worstCountDisp.innerText = n;
+                
+                if (n === 0) {
+                    worstAnalysisInfo.style.display = 'none';
+                    siteElements.forEach((el, idx) => {
+                        const ratio = (metadata.sites[idx].richness || 0) / Math.max(...metadata.sites.map(s => s.richness || 1), 1);
+                        el.marker.setStyle({ fillColor: `hsl(${(1 - ratio) * 120}, 100%, 50%)`, opacity: 1, fillOpacity: 0.9, color: '#fff', weight: 1 });
+                        el.overlay.setOpacity(1.0);
+                    });
+                    return;
+                }
+
+                const worst = evaluableSites.slice(0, n);
+                const worstIndices = new Set(worst.map(s => s.originalIndex));
+
+                // Discover Shared Features
+                let dominantFeature = null;
+                for (let feature of ['LandCoverC', 'FireClass', 'Campaign', 'WetlandTyp']) {
+                    let counts = {};
+                    worst.forEach(s => {
+                        let v = s[feature];
+                        if (v && v !== 'NA' && v !== 'None' && v !== 'Not available') counts[v] = (counts[v] || 0) + 1;
+                    });
+                    for (let [k, count] of Object.entries(counts)) {
+                        if (count >= n / 2 && count > 1) { // more than half
+                            dominantFeature = `${feature}: ${k} (${count}/${n} sites)`;
+                            break;
+                        }
+                    }
+                    if (dominantFeature) break;
+                }
+
+                if (dominantFeature) {
+                    worstAnalysisInfo.style.display = 'block';
+                    worstPatternText.innerText = dominantFeature;
+                } else {
+                    worstAnalysisInfo.style.display = 'none';
+                }
+
+                siteElements.forEach((el, idx) => {
+                    if (worstIndices.has(idx)) {
+                        el.marker.setStyle({ fillColor: '#ef4444', color: '#ff0000', opacity: 1, fillOpacity: 1, weight: 3, radius: 6 });
+                        el.marker.bringToFront();
+                        el.overlay.setOpacity(1.0);
+                    } else {
+                        const ratio = (metadata.sites[idx].richness || 0) / Math.max(...metadata.sites.map(s => s.richness || 1), 1);
+                        el.marker.setStyle({ fillColor: `hsl(${(1 - ratio) * 120}, 100%, 50%)`, opacity: 0.2, fillOpacity: 0.2, color: '#ffffff22', weight: 1, radius: 4 });
+                        el.overlay.setOpacity(0.3);
+                    }
                 });
             };
 

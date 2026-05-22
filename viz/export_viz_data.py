@@ -41,6 +41,16 @@ def export_viz_data(nc_dir=None, mapping_json=None, output_dir=None):
     all_patches = []
     metadata = []
     
+    # Preload evaluation results and extra metadata if available
+    eval_csv_path = os.path.join(project_root, "reports", "evaluation_results.csv")
+    eval_data = {}
+    if os.path.exists(eval_csv_path):
+        print(f"[*] Found evaluation results at {eval_csv_path}, merging additional metadata...")
+        eval_df = pd.read_csv(eval_csv_path)
+        for _, row in eval_df.iterrows():
+            k = (round(row['lat'], 5), round(row['lon'], 5))
+            eval_data[k] = row.to_dict()
+    
     datasets = {}
     
     for nc_path, lat, lon, richness in tqdm(mappings, desc="Fetching Patches"):
@@ -78,13 +88,28 @@ def export_viz_data(nc_dir=None, mapping_json=None, output_dir=None):
             uint8_patch = np.stack(uint8_patch_list) # [200, 16, 16]
             
             all_patches.append(uint8_patch)
-            metadata.append({
+            lat_round = round(float(lat), 5)
+            lon_round = round(float(lon), 5)
+            
+            site_meta = {
                 "lat": float(lat),
                 "lon": float(lon),
                 "richness": float(richness),
                 "bounds": bounds,
                 "nc": os.path.basename(full_nc_path)
-            })
+            }
+            
+            # Merge extended metadata
+            if (lat_round, lon_round) in eval_data:
+                ed = eval_data[(lat_round, lon_round)]
+                for k, v in ed.items():
+                    if k not in ['lat', 'lon', 'actual', 'nc_path']:
+                        # handle NaNs gracefully
+                        if pd.isna(v): v = None
+                        elif isinstance(v, float) and np.isnan(v): v = None
+                        site_meta[k] = v
+                        
+            metadata.append(site_meta)
             
     if not all_patches:
         print("[!] No valid patches were collected. Check if data files are zero-filled.")

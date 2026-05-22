@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaia Parameter Tuning Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --glass-bg: rgba(18, 19, 24, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-primary: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --accent-secondary: #8b5cf6;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --success-color: #10b981;
+            --font-family: 'Outfit', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-weight: 300;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .glass-panel:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        h2::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-secondary);
+            box-shadow: 0 0 10px var(--accent-secondary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .stat-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .stat-value {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--success-color);
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Table Styles */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-weight: 300;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(255,255,255,0.02);
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-badge.COMPLETE { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .status-badge.FAIL { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+        .status-badge.PRUNED { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+        .status-badge.RUNNING { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        #loading {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            animation: pulse 1.5s infinite;
+            margin-top: 3rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <h1>Gaia Optimization Tracker</h1>
+            <div class="subtitle">Autonomous hyperparameter tuning & parameter exploration</div>
+        </div>
+    </header>
+
+    <div id="loading">Connecting to Optuna Local Database...</div>
+
+    <div id="dashboard-content" style="display: none;">
+        <div class="dashboard-grid">
+            <div class="glass-panel stat-card">
+                <h2>Best Global Validated R² Score</h2>
+                <div class="stat-value" id="best-acc">0.000</div>
+                <div style="color: var(--text-secondary)" id="best-params">Awaiting best trial...</div>
+            </div>
+
+            <div class="glass-panel">
+                <h2>Learning Rate vs. R² Score</h2>
+                <div class="chart-container">
+                    <canvas id="scatterChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-panel">
+            <h2>Detailed Sweep Progression</h2>
+            <div class="table-responsive">
+                <table id="trials-table">
+                    <thead>
+                        <tr>
+                            <th>Trial</th>
+                            <th>Status</th>
+                            <th>Learning Rate</th>
+                            <th>Weight Decay</th>
+                            <th>Max Epochs</th>
+                            <th>Unfreeze Epoch</th>
+                            <th>R² Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let runData = [];
+        let chartInstance = null;
+
+        async function fetchRuns() {
+            try {
+                const response = await fetch('http://localhost:8080/api/runs');
+                const data = await response.json();
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard-content').style.display = 'block';
+
+                if (data.error) {
+                    console.error("API Error: ", data.error);
+                    document.getElementById('loading').innerHTML = `Error: Cannot load Database. Is the sweeps database created yet?`;
+                    document.getElementById('loading').style.display = 'block';
+                    document.getElementById('dashboard-content').style.display = 'none';
+                    return;
+                }
+
+                runData = data.trials;
+                
+                // Set Best Value
+                const bestValue = data.best_value ? (data.best_value).toFixed(4) : 'N/A';
+                document.getElementById('best-acc').innerText = bestValue;
+                
+                const bestTrial = runData.find(t => t.value === data.best_value);
+                if (bestTrial) {
+                    document.getElementById('best-params').innerText = `Best LR: ${bestTrial.params.lr?.toExponential(2)} | Max Epochs: ${bestTrial.params.max_epochs || 'N/A'}`;
+                }
+
+                renderTable(runData);
+                renderChart(runData);
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loading').innerText = "Disconnected. Make sure `python src/serve_dashboard.py` is running.";
+                document.getElementById('loading').style.color = "#f87171";
+            }
+        }
+
+        function renderTable(trials) {
+            const tbody = document.querySelector('#trials-table tbody');
+            tbody.innerHTML = '';
+            
+            // Sort by Trial Number descending
+            const sortedTrials = [...trials].sort((a,b) => b.number - a.number);
+
+            sortedTrials.forEach(t => {
+                const tr = document.createElement('tr');
+                const accVal = t.value ? (t.value).toFixed(4) : '-';
+                
+                tr.innerHTML = `
+                    <td><strong>#${t.number}</strong></td>
+                    <td><span class="status-badge ${t.state}">${t.state}</span></td>
+                    <td>${t.params.lr ? t.params.lr.toExponential(3) : '-'}</td>
+                    <td>${t.params.weight_decay ? t.params.weight_decay.toExponential(3) : '-'}</td>
+                    <td>${t.params.max_epochs ? t.params.max_epochs : '-'}</td>
+                    <td>${t.params.unfreeze_epoch ? t.params.unfreeze_epoch : '-'}</td>
+                    <td style="font-weight: 600; color: ${t.value > 0.4 ? 'var(--success-color)' : 'white'}">${accVal}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderChart(trials) {
+            // Process data for Chart.js scatter plot
+            // X-axis: Learning Rate (log scale), Y-axis: R2 Score
+            const validTrials = trials.filter(t => t.value != null && t.params.lr != null);
+            
+            const scatterData = validTrials.map(t => ({
+                x: t.params.lr,
+                y: t.value,
+                trialId: t.number
+            }));
+
+            const ctx = document.getElementById('scatterChart').getContext('2d');
+            
+            if (chartInstance) { chartInstance.destroy(); }
+
+            chartInstance = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Trials',
+                        data: scatterData,
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                        borderColor: 'rgba(96, 165, 250, 1)',
+                        pointRadius: 6,
+                        pointHoverRadius: 6, // Removed expanding point animation
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    animation: false, // Do not make dots move
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { family: 'Outfit', size: 14 },
+                            bodyFont: { family: 'Outfit', size: 13 },
+                            padding: 12,
+                            callbacks: {
+                                label: (ctx) => `LR: ${ctx.raw.x.toExponential(2)} | R²: ${ctx.raw.y.toFixed(4)} (Trial #${ctx.raw.trialId})`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'logarithmic',
+                            title: { display: true, text: 'Learning Rate (Log Scale)', color: '#94a3b8' },
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        y: {
+                            title: { display: true, text: 'R² Score', color: '#94a3b8' },
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Poll every 5 seconds for live updates
+        fetchRuns();
+        setInterval(fetchRuns, 5000);
+    </script>
+</body>
+</html>

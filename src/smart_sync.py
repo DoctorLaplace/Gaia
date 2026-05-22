@@ -221,14 +221,16 @@ def smart_sync(inventory_path, limit=None, s3_upload=True, local_dir=None, res=3
     if s3_upload:
         existing = get_existing_s3_files(res=res)
     elif local_dir and os.path.isdir(local_dir):
-        existing = {f.replace('.nc', '').split('_L2B_')[0] for f in os.listdir(local_dir) if f.endswith('.nc')}
+        existing = {f for f in os.listdir(local_dir) if f.endswith('.nc')}
     else:
         existing = set()
     
     with open(inventory_path, 'r') as f:
         target_ids = [l.strip() for l in f if l.strip()]
     
-    normalize = lambda nid: nid.replace("BioSCape_AVNG_L2B_BRDF_GCFR.", "")
+    def normalize(nid):
+        return os.path.basename(nid.replace("BioSCape_AVNG_L2B_BRDF_GCFR.", ""))
+    
     new_ids = [nid for nid in target_ids if normalize(nid) not in existing]
     
     safe_print(f"{GREEN}[OK] Loaded {len(target_ids)} target granules. {len(new_ids)} are remaining.{RESET}")
