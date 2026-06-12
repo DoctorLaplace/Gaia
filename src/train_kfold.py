@@ -50,26 +50,7 @@ class Colors:
 # ─────────────────────────────────────────────────────────────
 #  Single Fold
 # ─────────────────────────────────────────────────────────────
-def run_fold(fold_idx, k, train_idx, val_idx, full_dataset,
-             config, device, args):
-    """Train and evaluate a single fold. Returns a metrics dict."""
-    b_cfg = config['bioscape']
-    batch_size = args.batch_size or b_cfg['batch_size']
-    epochs = args.epochs or b_cfg['epochs']
-    lr = b_cfg['learning_rate']
-    patch_size = b_cfg.get('patch_size', 16)
 
-    print(f"\n{Colors.HEADER}{'='*60}{Colors.ENDC}")
-    print(f"{Colors.HEADER}  FOLD {fold_idx+1} / {k}  "
-          f"(Train: {len(train_idx)} | Val: {len(val_idx)}){Colors.ENDC}")
-    print(f"{Colors.HEADER}{'='*60}{Colors.ENDC}")
-
-    # -- Target normalization (train-only to prevent leakage) --
-    train_richness = np.array([full_dataset.mappings[i][3] for i in train_idx])
-    richness_mean = float(train_richness.mean())
-    richness_std = float(train_richness.std()) + 1e-6
-    print(f"{Colors.OKBLUE}[*] Fold {fold_idx+1} Richness: "
-          f"mean={richness_mean:.1f}, std={richness_std:.1f}{Colors.ENDC}")
 
 def run_fold(fold_idx, k, train_idx, val_idx, full_dataset,
              config, device, args):
@@ -366,7 +347,7 @@ def main():
     print(f"{Colors.HEADER}  {args.k}-FOLD CROSS-VALIDATION RESULTS{Colors.ENDC}")
     print(f"{Colors.HEADER}{'='*60}{Colors.ENDC}")
     print(df.to_string(index=False))
-    print(f"{Colors.OKCYAN}{'─'*60}{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}{'-'*60}{Colors.ENDC}")
     print(f"{Colors.OKGREEN}  Mean R2:   {mean_r2:.4f} +/- {std_r2:.4f}{Colors.ENDC}")
     print(f"{Colors.OKGREEN}  Mean RMSE: {mean_rmse:.2f} +/- {std_rmse:.2f}{Colors.ENDC}")
     print(f"{Colors.OKGREEN}  Mean MAE:  {mean_mae:.2f} +/- {std_mae:.2f}{Colors.ENDC}")

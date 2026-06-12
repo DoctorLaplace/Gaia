@@ -102,7 +102,7 @@ class MultiFlightBioScapeDataset(Dataset):
             print(f"{Colors.OKBLUE}[*] Loading mapping from cache: {cache_path}{Colors.ENDC}")
             with open(cache_path, 'r') as f:
                 self.mappings = json.load(f)
-            print(f"{Colors.OKGREEN}[✔] Loaded {len(self.mappings)} sites from cache.{Colors.ENDC}")
+            print(f"{Colors.OKGREEN}[OK] Loaded {len(self.mappings)} sites from cache.{Colors.ENDC}")
             return
 
         self._initialize_mapping(richness_csv, nc_paths, patch_size, cache_path)
@@ -143,7 +143,13 @@ class MultiFlightBioScapeDataset(Dataset):
                         x_idx, y_idx = int((easting-ds.origin_x)/ds.pixel_w), int((northing-ds.origin_y)/ds.pixel_h)
                         p = ds.patch_size // 2
                         if y_idx >= p and y_idx < ds.height-p and x_idx >= p and x_idx < ds.width-p:
-                            local_mappings.append((nc, float(row['lat']), float(row['lon']), float(row['richness'])))
+                            # Verify if the patch is valid (not mostly no-data)
+                            ds._ensure_open()
+                            cube = ds.h5_file['reflectance/reflectance'] if 'reflectance/reflectance' in ds.h5_file else ds.h5_file['reflectance']
+                            patch_band = cube[50, y_idx-p : y_idx+p, x_idx-p : x_idx+p]
+                            nodata_ratio = (patch_band < 0.0).mean()
+                            if nodata_ratio < 0.5:
+                                local_mappings.append((nc, float(row['lat']), float(row['lon']), float(row['richness'])))
                 ds.close()
             except Exception as e: 
                 # print(f"Error processing {nc}: {e}")
@@ -167,9 +173,9 @@ class MultiFlightBioScapeDataset(Dataset):
             os.makedirs(os.path.dirname(cache_path), exist_ok=True)
             with open(cache_path, 'w') as f:
                 json.dump(self.mappings, f)
-            print(f"{Colors.OKGREEN}[✔] Mapping cached to {cache_path}{Colors.ENDC}")
+            print(f"{Colors.OKGREEN}[OK] Mapping cached to {cache_path}{Colors.ENDC}")
                     
-        print(f"{Colors.OKGREEN}[✔] Dataset Ready: {len(self.mappings)} unique sites.{Colors.ENDC}")
+        print(f"{Colors.OKGREEN}[OK] Dataset Ready: {len(self.mappings)} unique sites.{Colors.ENDC}")
 
     def compute_band_stats(self, cache_path=None):
         """Compute global per-band mean/std across ALL patches. Results are cached to disk."""
@@ -230,7 +236,7 @@ class MultiFlightBioScapeDataset(Dataset):
             os.makedirs(os.path.dirname(cache_path), exist_ok=True)
             with open(cache_path, 'w') as f:
                 json.dump({'mean': global_mean.tolist(), 'std': global_std.tolist()}, f)
-            print(f"{Colors.OKGREEN}[✔] Band stats cached to {cache_path}{Colors.ENDC}")
+            print(f"{Colors.OKGREEN}[OK] Band stats cached to {cache_path}{Colors.ENDC}")
     
     def set_band_stats(self, band_mean, band_std):
         """Set global band stats from checkpoint (for evaluation)."""

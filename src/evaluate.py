@@ -207,7 +207,7 @@ def evaluate(nc_dir=None):
     plt.tight_layout()
     plot_path = os.path.join(report_dir, "gaia_performance_dashboard.png")
     plt.savefig(plot_path, dpi=180, bbox_inches='tight')
-    print(f"\n[✔] Performance Dashboard saved to: {plot_path}")
+    print(f"\n[OK] Performance Dashboard saved to: {plot_path}")
     print(f"[*] Per-site CSV results updated in: {os.path.join(report_dir, 'evaluation_results.csv')}")
     
     # Update CSV with baseline comparison

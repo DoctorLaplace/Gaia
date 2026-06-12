@@ -107,13 +107,13 @@ class BioScapeNetCDFDataset(Dataset):
                 self.origin_x, self.pixel_w = 0, 1
                 self.origin_y, self.pixel_h = 0, 1
 
+        
         # Access the hyperspectral cube metadata
         self.bands, self.height, self.width = cube.shape
         
         # CRS Transformer (Standard BioSCape is EPSG:32734)
         target_crs = "epsg:32734"
         if 'projection' in f and 'spatial_ref' in f['projection'].attrs:
-            # Try to extract CRS from file if available (for Level 3)
             try:
                 import pyproj
                 wkt = f['projection'].attrs['spatial_ref']
@@ -121,8 +121,10 @@ class BioScapeNetCDFDataset(Dataset):
                 target_crs = pyproj.CRS.from_wkt(wkt)
             except: pass
 
+        from pyproj import Transformer
         self.transformer = Transformer.from_crs("epsg:4326", target_crs, always_xy=True)
         self.inverse_transformer = Transformer.from_crs(target_crs, "epsg:4326", always_xy=True)
+        
         
         # If we weren't open before, close now to save resources
         if not was_open:
@@ -130,15 +132,12 @@ class BioScapeNetCDFDataset(Dataset):
 
     def get_bounds(self):
         """Returns the geographic bounding box (min_lon, min_lat, max_lon, max_lat)."""
-        # Transform corners from UTM back to WGS84
-        rev_transformer = Transformer.from_crs("epsg:32734", "epsg:4326", always_xy=True)
-        
-        # corners in UTM
+        # Transform corners from file CRS back to WGS84
         c1_x, c1_y = self.origin_x, self.origin_y
         c2_x, c2_y = self.origin_x + self.width * self.pixel_w, self.origin_y + self.height * self.pixel_h
         
-        lon1, lat1 = rev_transformer.transform(c1_x, c1_y)
-        lon2, lat2 = rev_transformer.transform(c2_x, c2_y)
+        lon1, lat1 = self.inverse_transformer.transform(c1_x, c1_y)
+        lon2, lat2 = self.inverse_transformer.transform(c2_x, c2_y)
         
         return min(lon1, lon2), min(lat1, lat2), max(lon1, lon2), max(lat1, lat2)
 
@@ -155,6 +154,9 @@ class BioScapeNetCDFDataset(Dataset):
     def resample_to_foundation(self, patch_raw, current_wavs):
         """Resample spectral bands to match the 200-band EnMAP foundation model."""
         target_wavs = np.linspace(400, 2450, 200)
+        
+        # Replace NoData fill values and negative boundary/noise values with 0.0 before interpolation
+        patch_raw = np.where(patch_raw < 0.0, 0.0, patch_raw)
         
         patch_hwc = np.transpose(patch_raw, (1, 2, 0))
         f = interp1d(current_wavs, patch_hwc, axis=-1, kind='linear',
