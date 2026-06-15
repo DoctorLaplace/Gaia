@@ -277,15 +277,16 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
         config = yaml.safe_load(f)
     
     b_cfg = config['bioscape']
-    nc_dir = nc_dir or (b_cfg['nc_dir_s3'] if b_cfg['use_s3'] else b_cfg['nc_dir_local'])
+    if use_mosaic:
+        nc_dir = nc_dir or (b_cfg['nc_dir_s3'] if b_cfg['use_s3'] else "data/bioscape/30m_v2")
+        print(f"{Colors.WARNING}[*] MOSAIC MODE: Using Level 3 Tiles from {nc_dir}{Colors.ENDC}")
+    else:
+        nc_dir = nc_dir or (b_cfg['nc_dir_s3'] if b_cfg['use_s3'] else b_cfg['nc_dir_local'])
+    
     richness_csv = richness_csv or os.path.join(project_root, b_cfg['richness_csv'])
     epochs = epochs or b_cfg['epochs']
     batch_size = batch_size or b_cfg['batch_size']
     patch_size = b_cfg.get('patch_size', 16)
-    
-    if use_mosaic:
-        nc_dir = nc_dir or f"data/bioscape/{patch_size}m_v2"
-        print(f"{Colors.WARNING}[*] MOSAIC MODE: Using Level 3 Tiles from {nc_dir}{Colors.ENDC}")
     
     device = torch.device(config.get('device', 'cuda') if torch.cuda.is_available() else "cpu")
     print(f"{Colors.HEADER}===================================================={Colors.ENDC}\n{Colors.HEADER}Gaia Fine-Tuning ({'S3' if nc_dir.startswith('s3') else 'Local'}) on {device}{Colors.ENDC}")

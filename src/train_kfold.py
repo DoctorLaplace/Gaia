@@ -75,10 +75,10 @@ def run_fold(fold_idx, k, train_idx, val_idx, full_dataset,
 
     # -- DataLoaders --
     num_workers = b_cfg.get('num_workers', 4)
-    nc_dir = args.nc_dir or (b_cfg['nc_dir_s3'] if b_cfg['use_s3'] else b_cfg['nc_dir_local'])
-    
     if args.mosaic:
-        nc_dir = args.nc_dir or f"data/bioscape/{patch_size}m_v2"
+        nc_dir = args.nc_dir or (b_cfg['nc_dir_s3'] if b_cfg['use_s3'] else "data/bioscape/30m_v2")
+    else:
+        nc_dir = args.nc_dir or (b_cfg['nc_dir_s3'] if b_cfg['use_s3'] else b_cfg['nc_dir_local'])
 
     if os.name == 'nt' and not nc_dir.startswith("s3"):
         num_workers = 0
