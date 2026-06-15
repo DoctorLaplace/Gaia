@@ -5,10 +5,11 @@ data/*
 checkpoints/*
 tmp/*
 
-# Except for .gitkeep files to ensure directories are tracked
+# Except for .gitkeep files and CSV metadata to ensure directories and metadata are tracked
 !data/.gitkeep
 !checkpoints/.gitkeep
 !tmp/.gitkeep
+!data/bioscape/*.csv
 
 # PRIVATE CREDENTIALS (EXTREMELY IMPORTANT)
 src/credentials.py
