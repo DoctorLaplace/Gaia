@@ -283,8 +283,12 @@ def main():
         tile_path = os.path.join(project_root, "tile_names.json")
         if os.path.exists(tile_path):
             import json
-            with open(tile_path, 'r') as f:
-                tiles = {t['tile'] for t in json.load(f)['tiles']}
+            try:
+                with open(tile_path, 'r', encoding='utf-8') as f:
+                    tiles = {t['tile'] for t in json.load(f)['tiles']}
+            except (UnicodeDecodeError, json.JSONDecodeError):
+                with open(tile_path, 'r', encoding='utf-16') as f:
+                    tiles = {t['tile'] for t in json.load(f)['tiles']}
             
             nc_paths = [p for p in nc_paths if any(t in p for t in tiles)]
             print(f"{Colors.OKBLUE}[*] Filtered to {len(nc_paths)} tiles from tile_names.json{Colors.ENDC}")

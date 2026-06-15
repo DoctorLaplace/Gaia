@@ -8,7 +8,6 @@ from torch.utils.data import DataLoader, Subset, Dataset
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 import fsspec
 import yaml
@@ -24,8 +23,6 @@ class Colors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-
-from concurrent.futures import ThreadPoolExecutor
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -78,7 +75,6 @@ class GaiaTransferModel(nn.Module):
         # 1. Feature extraction: returns (B, 16, 16, num_targets)
         out = self.encoder(x)
         # 2. Spatial Average Pooling (averaging predicted richness across 16x16 patch)
-        # matches the robust backup version
         return out.mean(dim=(1, 2))
 
 class MultiFlightBioScapeDataset(Dataset):
@@ -121,6 +117,17 @@ class MultiFlightBioScapeDataset(Dataset):
         self.richness_df = pd.read_csv(richness_csv)
         self.richness_df = self.richness_df.rename(columns={'Latitude': 'lat', 'Longitude': 'lon', 'richness': 'richness', 'Richness': 'richness'})
         
+        # Load metadata to merge CLUSTER_ID
+        metadata_csv = os.path.join(os.path.dirname(richness_csv), "biosoundscape_site_metadata.csv")
+        if os.path.exists(metadata_csv):
+            print(f"{Colors.OKBLUE}[*] Loading metadata cluster mappings from {metadata_csv}...{Colors.ENDC}")
+            meta_df = pd.read_csv(metadata_csv)[['SiteID', 'CLUSTER_ID']]
+            self.richness_df = self.richness_df.merge(meta_df, on='SiteID', how='left')
+            self.richness_df['CLUSTER_ID'] = self.richness_df['CLUSTER_ID'].fillna(-1).astype(int)
+        else:
+            print(f"{Colors.WARNING}[!] Metadata file not found at {metadata_csv}. Defaulting all CLUSTER_ID to -1.{Colors.ENDC}")
+            self.richness_df['CLUSTER_ID'] = -1
+            
         print(f"{Colors.OKBLUE}[*] Mapping {len(self.richness_df)} potential sites across {len(nc_paths)} flightlines...{Colors.ENDC}")
         
         # Parallel mapping with spatial filtering
@@ -149,10 +156,15 @@ class MultiFlightBioScapeDataset(Dataset):
                             patch_band = cube[50, y_idx-p : y_idx+p, x_idx-p : x_idx+p]
                             nodata_ratio = (patch_band < 0.0).mean()
                             if nodata_ratio < 0.5:
-                                local_mappings.append((nc, float(row['lat']), float(row['lon']), float(row['richness'])))
+                                local_mappings.append((
+                                    nc, 
+                                    float(row['lat']), 
+                                    float(row['lon']), 
+                                    float(row['richness']),
+                                    int(row.get('CLUSTER_ID', -1))
+                                ))
                 ds.close()
             except Exception as e: 
-                # print(f"Error processing {nc}: {e}")
                 pass
             return local_mappings
 
@@ -195,7 +207,7 @@ class MultiFlightBioScapeDataset(Dataset):
         n_pixels = 0
         
         def process_patch(i):
-            nc_path, lat, lon, _ = self.mappings[i]
+            nc_path, lat, lon, _, _ = self.mappings[i]
             with self.cache_lock:
                 if nc_path not in self.dataset_cache:
                     self.dataset_cache[nc_path] = BioScapeNetCDFDataset(nc_path, richness_csv=None, patch_size=self.patch_size, quiet=True)
@@ -239,13 +251,13 @@ class MultiFlightBioScapeDataset(Dataset):
             print(f"{Colors.OKGREEN}[OK] Band stats cached to {cache_path}{Colors.ENDC}")
     
     def set_band_stats(self, band_mean, band_std):
-        """Set global band stats from checkpoint (for evaluation)."""
         self.band_mean = torch.tensor(band_mean).reshape(200, 1, 1) if not isinstance(band_mean, torch.Tensor) else band_mean.reshape(200, 1, 1)
         self.band_std = torch.tensor(band_std).reshape(200, 1, 1) if not isinstance(band_std, torch.Tensor) else band_std.reshape(200, 1, 1)
 
     def __len__(self): return len(self.mappings)
+    
     def __getitem__(self, idx):
-        nc_path, lat, lon, richness = self.mappings[idx]
+        nc_path, lat, lon, richness, cluster_id = self.mappings[idx]
         
         with self.cache_lock:
             if nc_path not in self.dataset_cache:
@@ -258,10 +270,6 @@ class MultiFlightBioScapeDataset(Dataset):
         patch, bounds = ds.get_patch_at_latlon(lat, lon)
         if patch is None:
             patch = torch.zeros(200, self.patch_size, self.patch_size)
-        
-        # Disabled per-band normalization (Domain Shift check)
-        # if self.band_mean is not None and self.band_std is not None:
-        #     patch = (patch - self.band_mean) / self.band_std
             
         if self.augment:
             patch = torch.rot90(patch, k=np.random.randint(0, 4), dims=(1, 2))
@@ -270,7 +278,7 @@ class MultiFlightBioScapeDataset(Dataset):
 
 def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=None, 
                      test_run=False, freeze_encoder=True, unfreeze_epoch=None,
-                     use_mosaic=False, mask_water_vapor=True):
+                     use_mosaic=False, mask_water_vapor=True, leave_out=15, seed=42):
     # Load config
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     with open(os.path.join(project_root, "configs", "config.yaml"), 'r') as f:
@@ -288,11 +296,12 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
         print(f"{Colors.WARNING}[*] MOSAIC MODE: Using Level 3 Tiles from {nc_dir}{Colors.ENDC}")
     
     device = torch.device(config.get('device', 'cuda') if torch.cuda.is_available() else "cpu")
-    print(f"{Colors.HEADER}===================================================={Colors.ENDC}\n{Colors.HEADER}Gaia Fine-Tuning ({'S3' if nc_dir.startswith('s3') else 'Local'}) on {device}{Colors.ENDC}")
+    print(f"{Colors.HEADER}===================================================={Colors.ENDC}\n{Colors.HEADER}Gaia Fine-Tuning (Cluster-Stratified) on {device}{Colors.ENDC}")
     
     if test_run:
-        print(f"{Colors.FAIL}[!] TEST RUN ENABLED: Using only 2 granules and 1 epoch.{Colors.ENDC}")
+        print(f"{Colors.FAIL}[!] TEST RUN ENABLED: Using only 2 granules, 1 epoch, leaving out {min(leave_out, 3)} clusters.{Colors.ENDC}")
         epochs = 1
+        leave_out = min(leave_out, 3)
     
     # Use fsspec for S3 directory listing
     if nc_dir.startswith("s3://"):
@@ -323,7 +332,7 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     if test_run:
         nc_paths = nc_paths[:2]
         
-    cache_suffix = f"_p{patch_size}.json"
+    cache_suffix = f"_p{patch_size}_strata.json"
     if use_mosaic: cache_suffix = "_mosaic" + cache_suffix
     cache_name = ("s3_mapping" if nc_dir.startswith("s3") else "local_mapping") + cache_suffix
     mapping_cache = os.path.join(project_root, "data", "bioscape", cache_name)
@@ -341,9 +350,7 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     band_stats_cache = os.path.join(project_root, "data", "bioscape", band_stats_name)
     full_dataset.compute_band_stats(cache_path=band_stats_cache)
     
-    # --- Fix 4: Clear cache before DataLoader (Windows Multiprocessing) ---
-    # h5py objects cannot be pickled. By clearing the cache here, we ensure
-    # the DataLoader workers start with fresh, empty caches and open files lazily.
+    # Clear cache before DataLoader (Windows Multiprocessing)
     for ds in full_dataset.dataset_cache.values():
         ds.close()
     full_dataset.dataset_cache.clear()
@@ -354,11 +361,30 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     richness_std = float(all_richness.std()) + 1e-6
     print(f"{Colors.OKBLUE}[*] Richness Stats: mean={richness_mean:.1f}, std={richness_std:.1f}, min={all_richness.min():.0f}, max={all_richness.max():.0f}{Colors.ENDC}")
         
-    indices = np.arange(len(full_dataset))
-    val_split = b_cfg.get('val_split', 0.2)
-    train_idx, val_idx = train_test_split(indices, test_size=val_split, random_state=42)
+    # --- Cluster-Stratified Train/Validation Split ---
+    mappings = full_dataset.mappings
+    sample_clusters = np.array([m[4] for m in mappings])
+    unique_clusters = np.unique(sample_clusters)
     
-    # Increase num_workers for parallel S3 data loading
+    # Exclude noise (-1) from validation split options (will always stay in training)
+    val_candidates = unique_clusters[unique_clusters != -1]
+    
+    if leave_out >= len(val_candidates):
+        print(f"{Colors.WARNING}[!] Warning: Requested leaving out {leave_out} clusters, but only {len(val_candidates)} candidates exist. Leaving out {len(val_candidates)-1} instead.{Colors.ENDC}")
+        leave_out = len(val_candidates) - 1
+        
+    # Set seed for random selection (but randomizes if seed is changed)
+    np.random.seed(seed)
+    val_clusters = np.random.choice(val_candidates, size=leave_out, replace=False)
+    
+    train_idx = np.where(~np.isin(sample_clusters, val_clusters))[0]
+    val_idx = np.where(np.isin(sample_clusters, val_clusters))[0]
+    
+    print(f"\n{Colors.OKGREEN}[OK] Cluster-Stratified Split completed (using seed {seed}):")
+    print(f"    - Held out {len(val_clusters)} clusters for validation: {sorted(list(val_clusters))}")
+    print(f"    - Training set: {len(train_idx)} samples from {len(unique_clusters) - len(val_clusters)} clusters")
+    print(f"    - Validation set: {len(val_idx)} samples from {len(val_clusters)} clusters{Colors.ENDC}\n")
+    
     # Load num_workers from config
     try:
         with open(os.path.join(project_root, "configs", "config.yaml"), 'r') as f:
@@ -380,11 +406,10 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     if os.path.exists(foundation_ckpt):
         model.load_foundation_weights(foundation_ckpt, device)
     
-    # --- Freeze encoder (Fix 1): only train the regression head + regressor ---
+    # Freeze encoder
     if freeze_encoder:
         for param in model.encoder.parameters():
             param.requires_grad = False
-        # Head should always be trainable
         for param in model.encoder.mlp_head.parameters():
             param.requires_grad = True
         trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -397,9 +422,8 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     criterion = nn.MSELoss()
     optimizer = optim.AdamW(
         filter(lambda p: p.requires_grad, model.parameters()),
-        lr=lr, weight_decay=0.05  # Increased weight decay for regularization
+        lr=lr, weight_decay=0.05
     )
-    # OneCycleLR: proper warmup + annealing, steps per batch
     scheduler = optim.lr_scheduler.OneCycleLR(
         optimizer, max_lr=lr, epochs=epochs,
         steps_per_epoch=len(train_loader), pct_start=0.1
@@ -407,15 +431,14 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     
     best_r2 = -float('inf')
     patience_counter = 0
-    patience = 25  # Fix 4: Early stopping
+    patience = 25
     
     for epoch in range(1, epochs + 1):
-        # --- Progressive unfreezing ---
+        # Progressive unfreezing
         if freeze_encoder and unfreeze_epoch and epoch == unfreeze_epoch:
             print(f"\n{Colors.WARNING}[*] Epoch {epoch}: UNFREEZING encoder for fine-tuning{Colors.ENDC}")
             for param in model.encoder.parameters():
                 param.requires_grad = True
-            # Reset optimizer with lower LR for encoder layers
             optimizer = optim.AdamW([
                 {'params': model.encoder.mlp_head.parameters(), 'lr': lr},
                 {'params': [p for n, p in model.encoder.named_parameters() if 'mlp_head' not in n], 'lr': lr * 0.3},
@@ -438,7 +461,6 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
             preds = model(images)
             loss = criterion(preds, labels_norm)
             loss.backward()
-            # --- Fix 3: Gradient clipping ---
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
             train_loss += loss.item()
@@ -446,7 +468,7 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
             # Update Instrumentation
             now = time.time()
             dt = now - last_s3_time
-            if dt >= 2.0: # Update every 2 seconds to avoid flickering
+            if dt >= 2.0:
                 curr_s3_bytes = get_s3_bytes_pulled()
                 speed_mb = (curr_s3_bytes - last_s3_bytes) / (1024 * 1024 * dt)
                 last_s3_bytes = curr_s3_bytes
@@ -457,7 +479,7 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
                 pbar.set_description(f"Epoch {epoch} [{speed_mb:.1f} MB/s] [{status_str}]")
 
             pbar.set_postfix({'loss': f"{loss.item():.4f}"})
-            scheduler.step()  # OneCycleLR steps per batch
+            scheduler.step()
             
         model.eval(); val_preds, val_targets = [], []
         with torch.no_grad():
@@ -480,8 +502,9 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
                 'richness_std': richness_std,
                 'band_mean': full_dataset.band_mean.flatten().tolist(),
                 'band_std': full_dataset.band_std.flatten().tolist(),
+                'val_clusters': val_clusters.tolist()
             }
-            torch.save(ckpt_data, os.path.join(project_root, "checkpoints", "gaia_bioscape_best.pth"))
+            torch.save(ckpt_data, os.path.join(project_root, "checkpoints", "gaia_bioscape_strata_best.pth"))
             print(f"{Colors.OKGREEN}[OK] New Best Model Saved (R²: {best_r2:.4f}){Colors.ENDC}")
         else:
             patience_counter += 1
@@ -501,15 +524,17 @@ if __name__ == "__main__":
     parser.add_argument("--freeze", action="store_true", default=True,
                         help="Freeze encoder, train only head (default)")
     parser.add_argument("--no-freeze", dest="freeze", action="store_false",
-                        help="Fine-tune all parameters (for supercomputer with more data)")
+                        help="Fine-tune all parameters")
     parser.add_argument("--unfreeze-epoch", type=int, default=None,
                         help="Unfreeze encoder at this epoch for progressive fine-tuning")
     parser.add_argument("--mosaic", action="store_true", help="Use Level 3 Mosaic tiles")
     parser.add_argument("--no-mask", dest="mask", action="store_false", help="Disable water vapor masking")
     parser.set_defaults(mask=True)
+    parser.add_argument("--leave-out", type=int, default=15, help="Number of clusters to hold out for validation")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for cluster split")
     
     args = parser.parse_args()
     train_production(args.nc_dir, args.richness_csv, epochs=args.epochs, 
                      test_run=args.test_run, freeze_encoder=args.freeze,
                      unfreeze_epoch=args.unfreeze_epoch, use_mosaic=args.mosaic,
-                     mask_water_vapor=args.mask)
+                     mask_water_vapor=args.mask, leave_out=args.leave_out, seed=args.seed)
