@@ -187,9 +187,18 @@ class MultiFlightEagleDataset(Dataset):
             'richness': 'richness', 'Richness': 'richness'
         })
         
+        # Load metadata to merge CLUSTER_ID
+        metadata_csv = os.path.join(os.path.dirname(richness_csv), "biosoundscape_site_metadata.csv")
+        if os.path.exists(metadata_csv):
+            print(f"[*] Loading metadata cluster mappings from {metadata_csv}...")
+            meta_df = pd.read_csv(metadata_csv)[['SiteID', 'CLUSTER_ID']]
+            self.richness_df = self.richness_df.merge(meta_df, on='SiteID', how='left')
+            self.richness_df['CLUSTER_ID'] = self.richness_df['CLUSTER_ID'].fillna(-1).astype(int)
+        else:
+            print(f"[!] Metadata file not found at {metadata_csv}. Defaulting all CLUSTER_ID to -1.")
+            self.richness_df['CLUSTER_ID'] = -1
+            
         print(f"[*] Mapping {len(self.richness_df)} potential richness sites across {len(tif_paths)} EAGLE tiles...")
-        
-        from concurrent.futures import ThreadPoolExecutor
         
         def process_one(tif_path):
             local_mappings = []
@@ -206,7 +215,13 @@ class MultiFlightEagleDataset(Dataset):
                     for _, row in relevant_sites.iterrows():
                         patch = ds.get_patch_at_latlon(float(row['lat']), float(row['lon']))
                         if patch is not None:
-                            local_mappings.append((tif_path, float(row['lat']), float(row['lon']), float(row['richness'])))
+                            local_mappings.append((
+                                tif_path, 
+                                float(row['lat']), 
+                                float(row['lon']), 
+                                float(row['richness']),
+                                int(row.get('CLUSTER_ID', -1))
+                            ))
                 ds.close()
             except Exception as e:
                 # print(f"Error mapping {tif_path}: {e}")
@@ -252,7 +267,7 @@ class MultiFlightEagleDataset(Dataset):
         n_pixels = 0
         
         def process_patch(i):
-            tif_path, lat, lon, _ = self.mappings[i]
+            tif_path, lat, lon, _, *rest = self.mappings[i]
             with self.cache_lock:
                 if tif_path not in self.dataset_cache:
                     self.dataset_cache[tif_path] = SingleEagleTiffDataset(tif_path, patch_size=self.patch_size)
@@ -298,7 +313,7 @@ class MultiFlightEagleDataset(Dataset):
         return len(self.mappings)
 
     def __getitem__(self, idx):
-        tif_path, lat, lon, richness = self.mappings[idx]
+        tif_path, lat, lon, richness, *rest = self.mappings[idx]
         
         with self.cache_lock:
             if tif_path not in self.dataset_cache:
