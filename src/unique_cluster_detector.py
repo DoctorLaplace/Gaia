@@ -342,25 +342,20 @@ def main():
     df_runs.to_csv(runs_path, index=False)
     df_stats.to_csv(stats_path, index=False)
 
-    print(f"\n{Colors.HEADER}{'='*60}{Colors.ENDC}")
+    print(f"\n{Colors.HEADER}{'='*80}{Colors.ENDC}")
     print(f"{Colors.HEADER}  CLUSTER INFLUENCE DIAGNOSTIC REPORT{Colors.ENDC}")
-    print(f"{Colors.HEADER}{'='*60}{Colors.ENDC}")
+    print(f"{Colors.HEADER}{'='*80}{Colors.ENDC}")
     
-    # 1. Hardest Clusters to Predict (Lowest R2 when in Validation)
-    print(f"\n{Colors.WARNING}  Top 5 Hardest Clusters to Predict (Lowest R2 when held-out in Validation):{Colors.ENDC}")
-    hardest = df_stats.dropna(subset=['mean_r2_when_val']).sort_values('mean_r2_when_val').head(5)
-    print(hardest[['cluster_id', 'times_in_val', 'mean_r2_when_val']].to_string(index=False))
+    # Sort from hardest to predict (lowest validation R2) to easiest (highest validation R2)
+    print(f"\n{Colors.WARNING}  Cluster Influence Rankings (Sorted from Hardest to Easiest to Predict / Ascending Val R²):{Colors.ENDC}")
+    sorted_stats = df_stats.sort_values('mean_r2_when_val', ascending=True, na_position='last')
+    print(sorted_stats[['cluster_id', 'times_in_val', 'times_in_train', 'mean_r2_when_val', 'mean_r2_when_train', 'influence_diff']].to_string(index=False))
 
-    # 2. Most Critical Clusters for Training (Highest R2 when in Training)
-    print(f"\n{Colors.OKGREEN}  Top 5 Most Critical Clusters for Training (Highest overall R2 when in Training set):{Colors.ENDC}")
-    critical = df_stats.dropna(subset=['mean_r2_when_train']).sort_values('mean_r2_when_train', ascending=False).head(5)
-    print(critical[['cluster_id', 'times_in_train', 'mean_r2_when_train']].to_string(index=False))
-
-    # 3. Overall Diagnostic Stats
-    print(f"\n{Colors.OKCYAN}{'-'*60}{Colors.ENDC}")
+    # Overall Diagnostic Stats
+    print(f"\n{Colors.OKCYAN}{'-'*80}{Colors.ENDC}")
     print(f"  All runs log saved to: {runs_path}")
     print(f"  Cluster influence stats saved to: {stats_path}")
-    print(f"{Colors.HEADER}{'='*60}{Colors.ENDC}")
+    print(f"{Colors.HEADER}{'='*80}{Colors.ENDC}")
 
 if __name__ == "__main__":
     main()
