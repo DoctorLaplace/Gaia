@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaia Generalization Difficulty Map</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --bg: #030303;
+            --sidebar-bg: rgba(13, 17, 23, 0.75);
+            --card-bg: rgba(22, 27, 34, 0.5);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-glow: rgba(88, 166, 255, 0.35);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            height: 100%;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Sidebar Glassmorphic Panel */
+        .sidebar {
+            width: 380px;
+            height: 100%;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-header h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, var(--accent-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .sidebar-header p {
+            margin: 0.25rem 0 0 0;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Search Controls */
+        .search-container {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.875rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        /* Cluster Rankings List */
+        .cluster-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        /* Custom Scrollbar */
+        .cluster-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .cluster-list::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .cluster-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        .cluster-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .cluster-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .cluster-item:hover, .cluster-item.active {
+            border-color: var(--accent-blue);
+            background: rgba(88, 166, 255, 0.08);
+            transform: translateX(4px);
+        }
+
+        .cluster-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cluster-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .cluster-metric {
+            font-family: monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .performance-bar-bg {
+            height: 4px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .performance-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+        }
+
+        .cluster-details {
+            padding: 1rem 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid var(--border);
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            opacity: 0.8;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            font-family: monospace;
+        }
+
+        /* Map Canvas */
+        #map {
+            flex-grow: 1;
+            height: 100%;
+            background: #000;
+            z-index: 1;
+        }
+
+        /* Leaflet custom overrides */
+        .leaflet-popup-content-wrapper {
+            background: var(--sidebar-bg) !important;
+            color: var(--text-primary) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .leaflet-popup-tip {
+            background: rgba(13, 17, 23, 0.85) !important;
+        }
+
+        .leaflet-tooltip {
+            background: rgba(13, 17, 23, 0.9) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 6px !important;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Pulsing Glow Animation */
+        @keyframes pulse-glow {
+            0% {
+                stroke-width: 2px;
+                stroke-opacity: 0.8;
+            }
+            50% {
+                stroke-width: 8px;
+                stroke-opacity: 0.4;
+            }
+            100% {
+                stroke-width: 2px;
+                stroke-opacity: 0.8;
+            }
+        }
+
+        .glow-marker {
+            animation: pulse-glow 1.5s infinite ease-in-out;
+        }
+
+        /* Floating Legend */
+        .legend {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            z-index: 1000;
+            font-size: 0.75rem;
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .legend-title {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+
+        .legend-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, rgb(239, 68, 68), rgb(245, 158, 11), rgb(34, 197, 94));
+        }
+
+        .legend-labels {
+            display: flex;
+            justify-content: space-between;
+            opacity: 0.6;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>Gaia Diagnostic Explorer</h1>
+                <p>Interactive Cluster Generalization Difficulty Map</p>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="search" class="search-input" placeholder="Search by Cluster ID...">
+            </div>
+            
+            <div id="cluster-list" class="cluster-list">
+                <!-- Javascript will render sorted cluster items here -->
+            </div>
+            
+            <div id="details-panel" class="cluster-details" style="display: none;">
+                <div style="font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-blue);">Cluster Details</div>
+                <div class="detail-row">
+                    <span>Cluster ID:</span>
+                    <span id="detail-id" class="detail-value">-</span>
+                </div>
+                <div class="detail-row">
+                    <span>Validation R²:</span>
+                    <span id="detail-r2" class="detail-value">-</span>
+                </div>
+                <div class="detail-row">
+                    <span>Influence Delta:</span>
+                    <span id="detail-diff" class="detail-value">-</span>
+                </div>
+                <div class="detail-row">
+                    <span>Times in Val / Train:</span>
+                    <span id="detail-times" class="detail-value">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Map Canvas -->
+        <div id="map"></div>
+
+        <!-- Floating Legend -->
+        <div class="legend">
+            <div class="legend-title">Validation R² (Difficulty)</div>
+            <div class="legend-bar"></div>
+            <div class="legend-labels">
+                <span id="min-r2">-0.20</span>
+                <span id="max-r2">0.50</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let map;
+        let dataset = { sites: [], clusters: [] };
+        let siteMarkers = [];
+        let clusterLayerGroups = {};
+        let activeClusterId = null;
+
+        // Color interpolation from Red -> Yellow -> Green
+        function getDifficultyColor(val) {
+            // Normalize val between 0 (hardest) and 1 (easiest)
+            // Hardest cluster R2 is around 0.01, easiest is around 0.50
+            const minR2 = 0.01;
+            const maxR2 = 0.50;
+            let norm = (val - minR2) / (maxR2 - minR2);
+            norm = Math.max(0, Math.min(1, norm)); // clamp 0-1
+            
+            let r, g, b;
+            if (norm < 0.5) {
+                // Red to Yellow
+                r = 239;
+                g = Math.round(68 + (158 - 68) * (norm * 2));
+                b = Math.round(68 + (11 - 68) * (norm * 2));
+            } else {
+                // Yellow to Green
+                r = Math.round(245 + (34 - 245) * ((norm - 0.5) * 2));
+                g = Math.round(158 + (197 - 158) * ((norm - 0.5) * 2));
+                b = Math.round(11 + (94 - 11) * ((norm - 0.5) * 2));
+            }
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch('data/difficulty_data.json');
+                dataset = await res.json();
+                
+                // Update Legend Labels based on actual ranges
+                const r2s = dataset.clusters.map(c => c.mean_r2_when_val).filter(v => v !== null);
+                const minVal = Math.min(...r2s);
+                const maxVal = Math.max(...r2s);
+                document.getElementById('min-r2').innerText = minVal.toFixed(3);
+                document.getElementById('max-r2').innerText = maxVal.toFixed(3);
+
+                renderClusterList(dataset.clusters);
+                setupMap();
+                setupSearch();
+            } catch (err) {
+                console.error("[!] Error loading data:", err);
+            }
+        }
+
+        function renderClusterList(clustersList) {
+            const container = document.getElementById('cluster-list');
+            container.innerHTML = '';
+            
+            clustersList.forEach(cluster => {
+                const item = document.createElement('div');
+                item.className = 'cluster-item';
+                item.dataset.clusterId = cluster.cluster_id;
+                
+                const color = getDifficultyColor(cluster.mean_r2_when_val);
+                const r2Formatted = cluster.mean_r2_when_val !== null ? cluster.mean_r2_when_val.toFixed(4) : 'N/A';
+                
+                // Width ratio for performance fill
+                const minR2 = 0.01;
+                const maxR2 = 0.50;
+                let ratio = (cluster.mean_r2_when_val - minR2) / (maxR2 - minR2);
+                ratio = Math.max(0.05, Math.min(1.0, ratio)) * 100;
+
+                item.innerHTML = `
+                    <div class="cluster-item-header">
+                        <span class="cluster-title">Cluster ${cluster.cluster_id}</span>
+                        <span class="cluster-metric" style="color: ${color}">R²: ${r2Formatted}</span>
+                    </div>
+                    <div class="performance-bar-bg">
+                        <div class="performance-bar-fill" style="width: ${ratio}%; background-color: ${color}"></div>
+                    </div>
+                `;
+                
+                // Sidebar Interactions
+                item.addEventListener('mouseenter', () => highlightCluster(cluster.cluster_id));
+                item.addEventListener('mouseleave', () => resetHighlights());
+                item.addEventListener('click', () => selectCluster(cluster.cluster_id));
+                
+                container.appendChild(item);
+            });
+        }
+
+        function setupMap() {
+            map = L.map('map', {
+                zoomControl: false,
+                attributionControl: false
+            }).setView([-33.9, 21.0], 8);
+
+            // Dark Basemap Layer
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+            // Initialize marker group dictionary
+            dataset.clusters.forEach(c => {
+                clusterLayerGroups[c.cluster_id] = [];
+            });
+
+            // Map markers
+            dataset.sites.forEach(site => {
+                const color = getDifficultyColor(site.mean_r2_when_val);
+                
+                const marker = L.circleMarker([site.lat, site.lon], {
+                    radius: 5,
+                    fillColor: color,
+                    color: '#ffffff',
+                    weight: 0.5,
+                    opacity: 0.9,
+                    fillOpacity: 0.8
+                });
+
+                // Tooltip displays coordinates, richness, cluster id and generalizability R2
+                const tooltipHtml = `
+                    <div style="font-family: Outfit, sans-serif; font-size: 0.75rem;">
+                        <b>Site ID:</b> ${site.site_id}<br>
+                        <b>Cluster ID:</b> ${site.cluster_id}<br>
+                        <b>Validation R²:</b> ${site.mean_r2_when_val.toFixed(4)}<br>
+                        <b>Richness:</b> ${site.richness}
+                    </div>
+                `;
+                marker.bindTooltip(tooltipHtml, { sticky: true, offset: [10, 0] });
+
+                // Marker Interactions
+                marker.on('mouseover', () => {
+                    highlightCluster(site.cluster_id);
+                    highlightSidebarItem(site.cluster_id);
+                });
+                marker.on('mouseout', () => {
+                    resetHighlights();
+                    resetSidebarItems();
+                });
+                marker.on('click', () => {
+                    selectCluster(site.cluster_id);
+                });
+
+                marker.addTo(map);
+                siteMarkers.push({ marker, site });
+                
+                if (clusterLayerGroups[site.cluster_id]) {
+                    clusterLayerGroups[site.cluster_id].push(marker);
+                }
+            });
+        }
+
+        function highlightCluster(clusterId) {
+            resetHighlights();
+            
+            const markers = clusterLayerGroups[clusterId];
+            if (!markers) return;
+
+            markers.forEach(m => {
+                const color = m.options.fillColor;
+                m.setStyle({
+                    radius: 10,
+                    weight: 3,
+                    color: '#ffffff',
+                    fillOpacity: 1.0
+                });
+                // Add class for CSS pulsing glow
+                if (m._path) {
+                    m._path.classList.add('glow-marker');
+                }
+            });
+        }
+
+        function resetHighlights() {
+            siteMarkers.forEach(({ marker, site }) => {
+                const color = getDifficultyColor(site.mean_r2_when_val);
+                marker.setStyle({
+                    radius: 5,
+                    weight: 0.5,
+                    color: '#ffffff',
+                    fillOpacity: 0.8
+                });
+                if (marker._path) {
+                    marker._path.classList.remove('glow-marker');
+                }
+            });
+        }
+
+        function highlightSidebarItem(clusterId) {
+            resetSidebarItems();
+            const el = document.querySelector(`.cluster-item[data-cluster-id="${clusterId}"]`);
+            if (el) {
+                el.classList.add('active');
+                el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function resetSidebarItems() {
+            document.querySelectorAll('.cluster-item').forEach(el => {
+                el.classList.remove('active');
+            });
+        }
+
+        function selectCluster(clusterId) {
+            activeClusterId = clusterId;
+            highlightCluster(clusterId);
+            highlightSidebarItem(clusterId);
+            
+            // Pan and zoom map to bounds of cluster markers
+            const markers = clusterLayerGroups[clusterId];
+            if (markers && markers.length > 0) {
+                const latLons = markers.map(m => m.getLatLng());
+                const bounds = L.latLngBounds(latLons);
+                map.flyToBounds(bounds, { padding: [80, 80], maxZoom: 11, duration: 1.2 });
+            }
+            
+            // Show cluster details in the details panel
+            const cluster = dataset.clusters.find(c => c.cluster_id === clusterId);
+            if (cluster) {
+                document.getElementById('detail-id').innerText = cluster.cluster_id;
+                document.getElementById('detail-r2').innerText = cluster.mean_r2_when_val !== null ? cluster.mean_r2_when_val.toFixed(4) : 'N/A';
+                document.getElementById('detail-diff').innerText = cluster.influence_diff !== null ? cluster.influence_diff.toFixed(4) : 'N/A';
+                document.getElementById('detail-times').innerText = `${cluster.times_in_val} / ${cluster.times_in_train}`;
+                
+                const panel = document.getElementById('details-panel');
+                panel.style.display = 'flex';
+            }
+        }
+
+        function setupSearch() {
+            const search = document.getElementById('search');
+            search.addEventListener('input', (e) => {
+                const query = e.target.value.trim().toLowerCase();
+                const filtered = dataset.clusters.filter(c => {
+                    return c.cluster_id.toString().includes(query);
+                });
+                renderClusterList(filtered);
+            });
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

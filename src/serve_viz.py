@@ -16,10 +16,12 @@ class QuietHandler(http.server.SimpleHTTPRequestHandler):
         pass
 
 print(f"\n{'='*60}")
-print(f"  GAIA GEOSPATIAL EXPLORER")
+print(f"  GAIA GEOSPATIAL EXPLORER & DIAGNOSTICS")
 print(f"{'='*60}")
 print(f"[*] Server initialized at port {PORT}")
-print(f"[*] CLICKABLE LINK: http://localhost:{PORT}/viz/index.html")
+print(f"[*] CLICKABLE LINKS:")
+print(f"    - Interactive Difficulty Map: http://localhost:{PORT}/viz/difficulty_map.html")
+print(f"    - Tile Wavelength Explorer:   http://localhost:{PORT}/viz/index.html")
 print(f"{'='*60}\n")
 
 # Try to open browser automatically

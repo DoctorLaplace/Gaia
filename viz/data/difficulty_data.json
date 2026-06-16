@@ -1,0 +1,5534 @@
+{
+  "sites": [
+    {
+      "site_id": "s2lam108_230822",
+      "lat": -33.647884368896484,
+      "lon": 21.63821792602539,
+      "cluster_id": 69,
+      "richness": 4.0,
+      "mean_r2_when_val": 0.0496,
+      "mean_r2_when_train": 0.215
+    },
+    {
+      "site_id": "s2lam137_230802",
+      "lat": -33.50640106201172,
+      "lon": 20.68099975585937,
+      "cluster_id": 10,
+      "richness": 5.0,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655
+    },
+    {
+      "site_id": "s2lam098_230811",
+      "lat": -33.932448,
+      "lon": 21.07169914245605,
+      "cluster_id": 106,
+      "richness": 6.0,
+      "mean_r2_when_val": 0.1756,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam101_230811",
+      "lat": -33.93813705444336,
+      "lon": 21.052600860595703,
+      "cluster_id": 106,
+      "richness": 6.0,
+      "mean_r2_when_val": 0.1756,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam137_231026",
+      "lat": -33.50481033325195,
+      "lon": 20.666133,
+      "cluster_id": 10,
+      "richness": 7.0,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655
+    },
+    {
+      "site_id": "s2lam144_231026",
+      "lat": -33.518933,
+      "lon": 20.544805,
+      "cluster_id": 97,
+      "richness": 7.0,
+      "mean_r2_when_val": 0.2626,
+      "mean_r2_when_train": 0.195
+    },
+    {
+      "site_id": "s2lam163_230712",
+      "lat": -33.97380065917969,
+      "lon": 20.836200714111328,
+      "cluster_id": 40,
+      "richness": 7.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam039_231013",
+      "lat": -33.325148,
+      "lon": 22.037875,
+      "cluster_id": 49,
+      "richness": 8.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam039_230613",
+      "lat": -33.676039,
+      "lon": 22.666200637817383,
+      "cluster_id": 73,
+      "richness": 8.0,
+      "mean_r2_when_val": 0.2763,
+      "mean_r2_when_train": 0.1944
+    },
+    {
+      "site_id": "s2lam039_230712",
+      "lat": -33.675899505615234,
+      "lon": 22.758075,
+      "cluster_id": 24,
+      "richness": 8.0,
+      "mean_r2_when_val": 0.1575,
+      "mean_r2_when_train": 0.2073
+    },
+    {
+      "site_id": "s2lam135_231026",
+      "lat": -33.494363,
+      "lon": 20.704745,
+      "cluster_id": 10,
+      "richness": 9.0,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655
+    },
+    {
+      "site_id": "s2lam144_231013",
+      "lat": -33.354563,
+      "lon": 22.051887,
+      "cluster_id": 49,
+      "richness": 9.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam128_231026",
+      "lat": -33.507188,
+      "lon": 20.643463134765625,
+      "cluster_id": 10,
+      "richness": 9.0,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655
+    },
+    {
+      "site_id": "s2lam158_231026",
+      "lat": -33.507152,
+      "lon": 20.6337833404541,
+      "cluster_id": 10,
+      "richness": 9.0,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655
+    },
+    {
+      "site_id": "s2lam151_231026",
+      "lat": -33.500992,
+      "lon": 20.715478,
+      "cluster_id": 10,
+      "richness": 9.0,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655
+    },
+    {
+      "site_id": "s2lam098_231029",
+      "lat": -34.635096,
+      "lon": 19.583362579345703,
+      "cluster_id": 14,
+      "richness": 9.0,
+      "mean_r2_when_val": 0.196,
+      "mean_r2_when_train": 0.2026
+    },
+    {
+      "site_id": "s2lam049_231026",
+      "lat": -33.495978,
+      "lon": 20.71784210205078,
+      "cluster_id": 10,
+      "richness": 9.0,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655
+    },
+    {
+      "site_id": "s2lam160_231026",
+      "lat": -33.508079528808594,
+      "lon": 20.65074348449707,
+      "cluster_id": 10,
+      "richness": 11.0,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655
+    },
+    {
+      "site_id": "s2lam049_230712",
+      "lat": -33.67179870605469,
+      "lon": 22.753400802612305,
+      "cluster_id": 24,
+      "richness": 11.0,
+      "mean_r2_when_val": 0.1575,
+      "mean_r2_when_train": 0.2073
+    },
+    {
+      "site_id": "s2lam059_230826",
+      "lat": -33.00199890136719,
+      "lon": 19.06165885925293,
+      "cluster_id": 95,
+      "richness": 11.0,
+      "mean_r2_when_val": 0.204,
+      "mean_r2_when_train": 0.2016
+    },
+    {
+      "site_id": "s2lam076_230613",
+      "lat": -33.67430114746094,
+      "lon": 22.66080093383789,
+      "cluster_id": 73,
+      "richness": 11.0,
+      "mean_r2_when_val": 0.2763,
+      "mean_r2_when_train": 0.1944
+    },
+    {
+      "site_id": "s2lam076_230712",
+      "lat": -33.6702995300293,
+      "lon": 22.754100799560547,
+      "cluster_id": 24,
+      "richness": 11.0,
+      "mean_r2_when_val": 0.1575,
+      "mean_r2_when_train": 0.2073
+    },
+    {
+      "site_id": "s2lam125_231026",
+      "lat": -33.49982452392578,
+      "lon": 20.707033157348636,
+      "cluster_id": 10,
+      "richness": 12.0,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655
+    },
+    {
+      "site_id": "s2lam015_231118",
+      "lat": -33.996339,
+      "lon": 18.392637252807617,
+      "cluster_id": 83,
+      "richness": 12.0,
+      "mean_r2_when_val": 0.0767,
+      "mean_r2_when_train": 0.2188
+    },
+    {
+      "site_id": "s2lam180_231124",
+      "lat": -34.081756,
+      "lon": 18.400527,
+      "cluster_id": 30,
+      "richness": 12.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam144_231005",
+      "lat": -33.350492,
+      "lon": 21.964744567871094,
+      "cluster_id": 49,
+      "richness": 12.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam131_231026",
+      "lat": -33.509753,
+      "lon": 20.621743,
+      "cluster_id": 10,
+      "richness": 12.0,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655
+    },
+    {
+      "site_id": "s2lam101_231110",
+      "lat": -34.405165,
+      "lon": 20.561561584472656,
+      "cluster_id": 80,
+      "richness": 12.0,
+      "mean_r2_when_val": 0.2572,
+      "mean_r2_when_train": 0.197
+    },
+    {
+      "site_id": "s2lam119_231026",
+      "lat": -33.515512,
+      "lon": 20.57543182373047,
+      "cluster_id": 37,
+      "richness": 12.0,
+      "mean_r2_when_val": 0.1803,
+      "mean_r2_when_train": 0.2027
+    },
+    {
+      "site_id": "s2lam187_231123",
+      "lat": -33.922845,
+      "lon": 19.158364,
+      "cluster_id": 63,
+      "richness": 13.0,
+      "mean_r2_when_val": 0.1706,
+      "mean_r2_when_train": 0.2069
+    },
+    {
+      "site_id": "s2lam067_231014",
+      "lat": -33.6231689453125,
+      "lon": 23.450227,
+      "cluster_id": 16,
+      "richness": 13.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam060_231013",
+      "lat": -33.36309051513672,
+      "lon": 22.09115982055664,
+      "cluster_id": 49,
+      "richness": 13.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam151_231122",
+      "lat": -33.627924,
+      "lon": 22.91939353942871,
+      "cluster_id": 13,
+      "richness": 13.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2074
+    },
+    {
+      "site_id": "s2lam188_231124",
+      "lat": -34.103066,
+      "lon": 18.437318801879883,
+      "cluster_id": 30,
+      "richness": 13.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam080_231118",
+      "lat": -34.000992,
+      "lon": 18.391309,
+      "cluster_id": 83,
+      "richness": 13.0,
+      "mean_r2_when_val": 0.0767,
+      "mean_r2_when_train": 0.2188
+    },
+    {
+      "site_id": "s2lam056_230705",
+      "lat": -33.952022552490234,
+      "lon": 19.175500869750977,
+      "cluster_id": 76,
+      "richness": 13.0,
+      "mean_r2_when_val": 0.2257,
+      "mean_r2_when_train": 0.1979
+    },
+    {
+      "site_id": "s2lam115_231114",
+      "lat": -33.647321,
+      "lon": 21.638003,
+      "cluster_id": 69,
+      "richness": 13.0,
+      "mean_r2_when_val": 0.0496,
+      "mean_r2_when_train": 0.215
+    },
+    {
+      "site_id": "s2lam165_231109",
+      "lat": -33.927008,
+      "lon": 22.451564,
+      "cluster_id": 100,
+      "richness": 14.0,
+      "mean_r2_when_val": 0.0967,
+      "mean_r2_when_train": 0.2122
+    },
+    {
+      "site_id": "s2lam029_231106",
+      "lat": -33.682252,
+      "lon": 21.5567569732666,
+      "cluster_id": 27,
+      "richness": 14.0,
+      "mean_r2_when_val": 0.2615,
+      "mean_r2_when_train": 0.1959
+    },
+    {
+      "site_id": "s2lam190_231124",
+      "lat": -34.095748,
+      "lon": 18.432477951049805,
+      "cluster_id": 30,
+      "richness": 14.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam131_231014",
+      "lat": -33.621608,
+      "lon": 23.44802665710449,
+      "cluster_id": 16,
+      "richness": 14.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam032_231010",
+      "lat": -33.697195,
+      "lon": 21.921010971069336,
+      "cluster_id": 21,
+      "richness": 14.0,
+      "mean_r2_when_val": 0.2729,
+      "mean_r2_when_train": 0.1947
+    },
+    {
+      "site_id": "s2lam142_231026",
+      "lat": -33.501192,
+      "lon": 20.694667,
+      "cluster_id": 10,
+      "richness": 14.0,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655
+    },
+    {
+      "site_id": "s2lam138_231026",
+      "lat": -33.505782,
+      "lon": 20.61334991455078,
+      "cluster_id": 10,
+      "richness": 14.0,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655
+    },
+    {
+      "site_id": "s2lam101_231028",
+      "lat": -34.74154281616211,
+      "lon": 19.658924102783203,
+      "cluster_id": 54,
+      "richness": 14.0,
+      "mean_r2_when_val": 0.1456,
+      "mean_r2_when_train": 0.2094
+    },
+    {
+      "site_id": "s2lam143_231025",
+      "lat": -33.44217300415039,
+      "lon": 20.763160705566406,
+      "cluster_id": 23,
+      "richness": 14.0,
+      "mean_r2_when_val": 0.2653,
+      "mean_r2_when_train": 0.1939
+    },
+    {
+      "site_id": "s2lam137_231122",
+      "lat": -33.628208,
+      "lon": 22.934659957885746,
+      "cluster_id": 13,
+      "richness": 14.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2074
+    },
+    {
+      "site_id": "s2lam061_231113",
+      "lat": -33.893397,
+      "lon": 22.422273635864254,
+      "cluster_id": 3,
+      "richness": 14.0,
+      "mean_r2_when_val": 0.2464,
+      "mean_r2_when_train": 0.1979
+    },
+    {
+      "site_id": "s2lam122_230726",
+      "lat": -33.638514,
+      "lon": 21.625268936157227,
+      "cluster_id": 69,
+      "richness": 14.0,
+      "mean_r2_when_val": 0.0496,
+      "mean_r2_when_train": 0.215
+    },
+    {
+      "site_id": "s2lam111_231013",
+      "lat": -33.362803,
+      "lon": 22.064350128173828,
+      "cluster_id": 49,
+      "richness": 15.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam125_231014",
+      "lat": -33.615637,
+      "lon": 23.442153,
+      "cluster_id": 16,
+      "richness": 15.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam082_231010",
+      "lat": -33.691023,
+      "lon": 21.907712936401367,
+      "cluster_id": 21,
+      "richness": 15.0,
+      "mean_r2_when_val": 0.2729,
+      "mean_r2_when_train": 0.1947
+    },
+    {
+      "site_id": "s2lam096_231118",
+      "lat": -33.99303436279297,
+      "lon": 18.390464782714844,
+      "cluster_id": 83,
+      "richness": 15.0,
+      "mean_r2_when_val": 0.0767,
+      "mean_r2_when_train": 0.2188
+    },
+    {
+      "site_id": "s2lam138_231130",
+      "lat": -34.32346725463867,
+      "lon": 18.973355,
+      "cluster_id": 105,
+      "richness": 15.0,
+      "mean_r2_when_val": 0.1832,
+      "mean_r2_when_train": 0.2034
+    },
+    {
+      "site_id": "s2lam122_231106",
+      "lat": -33.67047882080078,
+      "lon": 21.543973,
+      "cluster_id": 27,
+      "richness": 15.0,
+      "mean_r2_when_val": 0.2615,
+      "mean_r2_when_train": 0.1959
+    },
+    {
+      "site_id": "s2lam022_231106",
+      "lat": -33.66902160644531,
+      "lon": 21.540404,
+      "cluster_id": 27,
+      "richness": 15.0,
+      "mean_r2_when_val": 0.2615,
+      "mean_r2_when_train": 0.1959
+    },
+    {
+      "site_id": "s2lam085_231108",
+      "lat": -34.344118,
+      "lon": 18.86318016052246,
+      "cluster_id": 66,
+      "richness": 15.0,
+      "mean_r2_when_val": 0.0809,
+      "mean_r2_when_train": 0.2068
+    },
+    {
+      "site_id": "s2lam049_231130",
+      "lat": -34.321658,
+      "lon": 18.972487,
+      "cluster_id": 105,
+      "richness": 15.0,
+      "mean_r2_when_val": 0.1832,
+      "mean_r2_when_train": 0.2034
+    },
+    {
+      "site_id": "s2lam157_230712",
+      "lat": -33.979535,
+      "lon": 20.806900024414062,
+      "cluster_id": 40,
+      "richness": 15.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam127_231005",
+      "lat": -33.346575,
+      "lon": 21.973268,
+      "cluster_id": 49,
+      "richness": 16.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam155_231013",
+      "lat": -33.358053,
+      "lon": 22.05411529541016,
+      "cluster_id": 49,
+      "richness": 16.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam002_231115",
+      "lat": -34.111312,
+      "lon": 18.445331,
+      "cluster_id": 30,
+      "richness": 16.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam127_231013",
+      "lat": -33.351565,
+      "lon": 22.04528045654297,
+      "cluster_id": 49,
+      "richness": 16.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam165_231017",
+      "lat": -33.872427,
+      "lon": 22.03032684326172,
+      "cluster_id": 15,
+      "richness": 16.0,
+      "mean_r2_when_val": 0.0468,
+      "mean_r2_when_train": 0.2171
+    },
+    {
+      "site_id": "s2lam128_231122",
+      "lat": -33.625673,
+      "lon": 22.94490623474121,
+      "cluster_id": 13,
+      "richness": 16.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2074
+    },
+    {
+      "site_id": "s2lam138_231011",
+      "lat": -33.344107,
+      "lon": 22.021478,
+      "cluster_id": 49,
+      "richness": 16.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam119_231117",
+      "lat": -33.911468505859375,
+      "lon": 23.13608169555664,
+      "cluster_id": 61,
+      "richness": 16.0,
+      "mean_r2_when_val": 0.2758,
+      "mean_r2_when_train": 0.1945
+    },
+    {
+      "site_id": "s2lam105_231029",
+      "lat": -34.664674,
+      "lon": 19.648086,
+      "cluster_id": 72,
+      "richness": 16.0,
+      "mean_r2_when_val": 0.1841,
+      "mean_r2_when_train": 0.2033
+    },
+    {
+      "site_id": "s2lam101_231010",
+      "lat": -34.798492431640625,
+      "lon": 19.966638,
+      "cluster_id": 34,
+      "richness": 16.0,
+      "mean_r2_when_val": 0.2006,
+      "mean_r2_when_train": 0.2019
+    },
+    {
+      "site_id": "s2lam057_231011",
+      "lat": -34.293432,
+      "lon": 18.428152084350582,
+      "cluster_id": 17,
+      "richness": 16.0,
+      "mean_r2_when_val": 0.1396,
+      "mean_r2_when_train": 0.2044
+    },
+    {
+      "site_id": "s2lam161_231109",
+      "lat": -33.956487,
+      "lon": 21.22318458557129,
+      "cluster_id": 35,
+      "richness": 16.0,
+      "mean_r2_when_val": 0.1431,
+      "mean_r2_when_train": 0.2076
+    },
+    {
+      "site_id": "s2lam044_230613",
+      "lat": -33.67300033569336,
+      "lon": 22.655799865722656,
+      "cluster_id": 73,
+      "richness": 16.0,
+      "mean_r2_when_val": 0.2763,
+      "mean_r2_when_train": 0.1944
+    },
+    {
+      "site_id": "s2lam091_231113",
+      "lat": -33.883383,
+      "lon": 22.428863,
+      "cluster_id": 3,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.2464,
+      "mean_r2_when_train": 0.1979
+    },
+    {
+      "site_id": "s2lam003_231115",
+      "lat": -34.110983,
+      "lon": 18.435961,
+      "cluster_id": 30,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam158_231005",
+      "lat": -33.341935,
+      "lon": 22.00473976135254,
+      "cluster_id": 49,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam184_231124",
+      "lat": -34.101002,
+      "lon": 18.447055,
+      "cluster_id": 30,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam159_231003",
+      "lat": -33.56526184082031,
+      "lon": 23.376462936401367,
+      "cluster_id": 50,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.2372,
+      "mean_r2_when_train": 0.1969
+    },
+    {
+      "site_id": "s2lam114_231027",
+      "lat": -34.068946838378906,
+      "lon": 22.937883377075195,
+      "cluster_id": 6,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.192,
+      "mean_r2_when_train": 0.203
+    },
+    {
+      "site_id": "s2lam087_231106",
+      "lat": -33.671711,
+      "lon": 21.553224,
+      "cluster_id": 27,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.2615,
+      "mean_r2_when_train": 0.1959
+    },
+    {
+      "site_id": "s2lam005_231113",
+      "lat": -33.884555,
+      "lon": 22.439743041992188,
+      "cluster_id": 3,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.2464,
+      "mean_r2_when_train": 0.1979
+    },
+    {
+      "site_id": "s2lam038_231125",
+      "lat": -33.977212,
+      "lon": 23.571202,
+      "cluster_id": 75,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam173_231124",
+      "lat": -34.089669,
+      "lon": 18.430236,
+      "cluster_id": 30,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam162_231019",
+      "lat": -33.695388,
+      "lon": 21.640262,
+      "cluster_id": 92,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.2538,
+      "mean_r2_when_train": 0.1954
+    },
+    {
+      "site_id": "s2lam071_231115",
+      "lat": -34.107225,
+      "lon": 18.43879508972168,
+      "cluster_id": 30,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam151_230930",
+      "lat": -33.582753,
+      "lon": 23.440877,
+      "cluster_id": 16,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam010_231011",
+      "lat": -34.311841,
+      "lon": 18.429374,
+      "cluster_id": 17,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.1396,
+      "mean_r2_when_train": 0.2044
+    },
+    {
+      "site_id": "s2lam083_231025",
+      "lat": -33.015145,
+      "lon": 19.056224,
+      "cluster_id": 95,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.204,
+      "mean_r2_when_train": 0.2016
+    },
+    {
+      "site_id": "s2lam023_230712",
+      "lat": -33.97269821166992,
+      "lon": 20.82469940185547,
+      "cluster_id": 40,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam111_231122",
+      "lat": -33.626746,
+      "lon": 22.913083,
+      "cluster_id": 13,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2074
+    },
+    {
+      "site_id": "s2lam118_231013",
+      "lat": -33.318487,
+      "lon": 22.04278945922852,
+      "cluster_id": 49,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam132_231027",
+      "lat": -33.995833,
+      "lon": 18.953738,
+      "cluster_id": 94,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.2262,
+      "mean_r2_when_train": 0.1988
+    },
+    {
+      "site_id": "s2lam160_231014",
+      "lat": -33.612898,
+      "lon": 23.438863,
+      "cluster_id": 16,
+      "richness": 17.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam092_231025",
+      "lat": -32.982373,
+      "lon": 19.056155,
+      "cluster_id": 95,
+      "richness": 18.0,
+      "mean_r2_when_val": 0.204,
+      "mean_r2_when_train": 0.2016
+    },
+    {
+      "site_id": "s2lam006_231115",
+      "lat": -34.100522,
+      "lon": 18.450910568237305,
+      "cluster_id": 30,
+      "richness": 18.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam095_231017",
+      "lat": -33.890499114990234,
+      "lon": 22.023021697998047,
+      "cluster_id": 15,
+      "richness": 18.0,
+      "mean_r2_when_val": 0.0468,
+      "mean_r2_when_train": 0.2171
+    },
+    {
+      "site_id": "s2lam150_231017",
+      "lat": -33.86424255371094,
+      "lon": 22.027604,
+      "cluster_id": 15,
+      "richness": 18.0,
+      "mean_r2_when_val": 0.0468,
+      "mean_r2_when_train": 0.2171
+    },
+    {
+      "site_id": "s2lam015_231018",
+      "lat": -33.684306,
+      "lon": 19.098072052001957,
+      "cluster_id": 1,
+      "richness": 18.0,
+      "mean_r2_when_val": 0.2714,
+      "mean_r2_when_train": 0.1904
+    },
+    {
+      "site_id": "s2lam118_231025",
+      "lat": -33.43800735473633,
+      "lon": 20.776107788085938,
+      "cluster_id": 23,
+      "richness": 18.0,
+      "mean_r2_when_val": 0.2653,
+      "mean_r2_when_train": 0.1939
+    },
+    {
+      "site_id": "s2lam159_231122",
+      "lat": -33.622495,
+      "lon": 22.926729202270508,
+      "cluster_id": 13,
+      "richness": 18.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2074
+    },
+    {
+      "site_id": "s2lam003_231011",
+      "lat": -34.288709,
+      "lon": 18.44773292541504,
+      "cluster_id": 17,
+      "richness": 18.0,
+      "mean_r2_when_val": 0.1396,
+      "mean_r2_when_train": 0.2044
+    },
+    {
+      "site_id": "s2lam039_230622",
+      "lat": -33.62649917602539,
+      "lon": 22.516467,
+      "cluster_id": 81,
+      "richness": 18.0,
+      "mean_r2_when_val": 0.1223,
+      "mean_r2_when_train": 0.2078
+    },
+    {
+      "site_id": "s2lam047_230703",
+      "lat": -33.99610137939453,
+      "lon": 18.95429992675781,
+      "cluster_id": 94,
+      "richness": 18.0,
+      "mean_r2_when_val": 0.2262,
+      "mean_r2_when_train": 0.1988
+    },
+    {
+      "site_id": "s2lam049_230613",
+      "lat": -33.668701171875,
+      "lon": 22.654185,
+      "cluster_id": 73,
+      "richness": 18.0,
+      "mean_r2_when_val": 0.2763,
+      "mean_r2_when_train": 0.1944
+    },
+    {
+      "site_id": "s2lam059_230812",
+      "lat": -32.206638,
+      "lon": 19.098668,
+      "cluster_id": 20,
+      "richness": 18.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2083
+    },
+    {
+      "site_id": "s2lam181_231124",
+      "lat": -34.091369,
+      "lon": 18.42720413208008,
+      "cluster_id": 30,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam114_231117",
+      "lat": -34.047786712646484,
+      "lon": 23.210880279541016,
+      "cluster_id": 67,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.2365,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam067_231025",
+      "lat": -33.466047,
+      "lon": 20.577525,
+      "cluster_id": 55,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.2261,
+      "mean_r2_when_train": 0.1991
+    },
+    {
+      "site_id": "s2lam082_231019",
+      "lat": -33.682301,
+      "lon": 21.648161,
+      "cluster_id": 92,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.2538,
+      "mean_r2_when_train": 0.1954
+    },
+    {
+      "site_id": "s2lam101_231117",
+      "lat": -34.706504821777344,
+      "lon": 20.12708282470703,
+      "cluster_id": 26,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam002_231011",
+      "lat": -34.324586,
+      "lon": 18.44541549682617,
+      "cluster_id": 96,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.2561,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam149_231005",
+      "lat": -33.342833,
+      "lon": 21.889732360839844,
+      "cluster_id": 49,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam076_231117",
+      "lat": -33.661817,
+      "lon": 23.131625,
+      "cluster_id": 36,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.0493,
+      "mean_r2_when_train": 0.2226
+    },
+    {
+      "site_id": "s2lam169_231123",
+      "lat": -34.001182,
+      "lon": 19.190366,
+      "cluster_id": 89,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.2236,
+      "mean_r2_when_train": 0.1999
+    },
+    {
+      "site_id": "s2lam154_231013",
+      "lat": -33.33219909667969,
+      "lon": 22.03391456604004,
+      "cluster_id": 49,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam114_231103",
+      "lat": -33.917207,
+      "lon": 22.962508,
+      "cluster_id": 33,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.2271,
+      "mean_r2_when_train": 0.2002
+    },
+    {
+      "site_id": "s2lam045_231110",
+      "lat": -34.408475,
+      "lon": 20.623218,
+      "cluster_id": 90,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.1721,
+      "mean_r2_when_train": 0.2044
+    },
+    {
+      "site_id": "s2lam032_231106",
+      "lat": -33.679662,
+      "lon": 21.563235,
+      "cluster_id": 27,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.2615,
+      "mean_r2_when_train": 0.1959
+    },
+    {
+      "site_id": "s2lam001_231117",
+      "lat": -33.845890045166016,
+      "lon": 23.194688,
+      "cluster_id": 2,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.2224,
+      "mean_r2_when_train": 0.1995
+    },
+    {
+      "site_id": "s2lam037_231025",
+      "lat": -32.972966,
+      "lon": 19.052719,
+      "cluster_id": 95,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.204,
+      "mean_r2_when_train": 0.2016
+    },
+    {
+      "site_id": "s2lam060_230930",
+      "lat": -33.587947845458984,
+      "lon": 23.427943,
+      "cluster_id": 16,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam089_231106",
+      "lat": -32.52670669555664,
+      "lon": 19.348005294799805,
+      "cluster_id": 104,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.168,
+      "mean_r2_when_train": 0.2073
+    },
+    {
+      "site_id": "s2lam136_231028",
+      "lat": -34.751197,
+      "lon": 19.672204,
+      "cluster_id": 54,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.1456,
+      "mean_r2_when_train": 0.2094
+    },
+    {
+      "site_id": "s2lam174_231124",
+      "lat": -34.087589263916016,
+      "lon": 18.413293,
+      "cluster_id": 30,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam155_231005",
+      "lat": -33.346755,
+      "lon": 21.982045,
+      "cluster_id": 49,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam157_231109",
+      "lat": -33.95895767211914,
+      "lon": 21.230142,
+      "cluster_id": 35,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.1431,
+      "mean_r2_when_train": 0.2076
+    },
+    {
+      "site_id": "s2lam108_231106",
+      "lat": -33.677361,
+      "lon": 21.5517635345459,
+      "cluster_id": 27,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.2615,
+      "mean_r2_when_train": 0.1959
+    },
+    {
+      "site_id": "s2lam074_231027",
+      "lat": -34.067685,
+      "lon": 22.948984146118164,
+      "cluster_id": 6,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.192,
+      "mean_r2_when_train": 0.203
+    },
+    {
+      "site_id": "s2lam044_231130",
+      "lat": -34.322702,
+      "lon": 18.971633,
+      "cluster_id": 105,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.1832,
+      "mean_r2_when_train": 0.2034
+    },
+    {
+      "site_id": "s2lam049_230622",
+      "lat": -33.626800537109375,
+      "lon": 22.52109909057617,
+      "cluster_id": 81,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.1223,
+      "mean_r2_when_train": 0.2078
+    },
+    {
+      "site_id": "s2lam117_231025",
+      "lat": -33.469493,
+      "lon": 20.562843322753903,
+      "cluster_id": 55,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.2261,
+      "mean_r2_when_train": 0.1991
+    },
+    {
+      "site_id": "s2lam127_231122",
+      "lat": -33.640252,
+      "lon": 22.94865226745605,
+      "cluster_id": 13,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2074
+    },
+    {
+      "site_id": "s2lam129_230717",
+      "lat": -33.97959899902344,
+      "lon": 20.822900772094727,
+      "cluster_id": 40,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam130_231025",
+      "lat": -33.451892,
+      "lon": 20.853398,
+      "cluster_id": 8,
+      "richness": 19.0,
+      "mean_r2_when_val": 0.2253,
+      "mean_r2_when_train": 0.1979
+    },
+    {
+      "site_id": "s2lam151_231117",
+      "lat": -33.678003,
+      "lon": 23.14740753173828,
+      "cluster_id": 91,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.3531,
+      "mean_r2_when_train": 0.1921
+    },
+    {
+      "site_id": "s2lam055_231018",
+      "lat": -33.689759,
+      "lon": 19.093701,
+      "cluster_id": 1,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.2714,
+      "mean_r2_when_train": 0.1904
+    },
+    {
+      "site_id": "s2lam129_231029",
+      "lat": -34.67033767700195,
+      "lon": 19.630208,
+      "cluster_id": 72,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.1841,
+      "mean_r2_when_train": 0.2033
+    },
+    {
+      "site_id": "s2lam071_231103",
+      "lat": -34.08655548095703,
+      "lon": 18.420931,
+      "cluster_id": 30,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam089_231031",
+      "lat": -32.25208282470703,
+      "lon": 19.134740829467773,
+      "cluster_id": 20,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2083
+    },
+    {
+      "site_id": "s2lam172_231124",
+      "lat": -34.089618,
+      "lon": 18.428222,
+      "cluster_id": 30,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam001_231001",
+      "lat": -33.607295,
+      "lon": 23.414687,
+      "cluster_id": 16,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam020_231028",
+      "lat": -34.744433,
+      "lon": 19.678619,
+      "cluster_id": 54,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.1456,
+      "mean_r2_when_train": 0.2094
+    },
+    {
+      "site_id": "s2lam044_231026",
+      "lat": -33.485782623291016,
+      "lon": 20.696508407592773,
+      "cluster_id": 10,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655
+    },
+    {
+      "site_id": "s2lam142_231005",
+      "lat": -33.350135,
+      "lon": 21.94890785217285,
+      "cluster_id": 49,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam056_231018",
+      "lat": -33.685952,
+      "lon": 19.097787,
+      "cluster_id": 1,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.2714,
+      "mean_r2_when_train": 0.1904
+    },
+    {
+      "site_id": "s2lam130_231013",
+      "lat": -33.336917877197266,
+      "lon": 22.037721633911133,
+      "cluster_id": 49,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam017_231118",
+      "lat": -34.005139,
+      "lon": 18.39044189453125,
+      "cluster_id": 83,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.0767,
+      "mean_r2_when_train": 0.2188
+    },
+    {
+      "site_id": "s2lam136_231117",
+      "lat": -34.700958,
+      "lon": 20.090602,
+      "cluster_id": 26,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam067_231005",
+      "lat": -33.345115,
+      "lon": 21.991305,
+      "cluster_id": 49,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam046_231025",
+      "lat": -33.005776,
+      "lon": 19.053061,
+      "cluster_id": 95,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.204,
+      "mean_r2_when_train": 0.2016
+    },
+    {
+      "site_id": "s2lam092_231106",
+      "lat": -32.534947,
+      "lon": 19.331823348999023,
+      "cluster_id": 104,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.168,
+      "mean_r2_when_train": 0.2073
+    },
+    {
+      "site_id": "s2lam189_231123",
+      "lat": -33.906443,
+      "lon": 19.158374,
+      "cluster_id": 63,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.1706,
+      "mean_r2_when_train": 0.2069
+    },
+    {
+      "site_id": "s2lam041_231027",
+      "lat": -34.07358932495117,
+      "lon": 22.96515846252441,
+      "cluster_id": 6,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.192,
+      "mean_r2_when_train": 0.203
+    },
+    {
+      "site_id": "s2lam178_231123",
+      "lat": -33.942122,
+      "lon": 19.169778,
+      "cluster_id": 76,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.2257,
+      "mean_r2_when_train": 0.1979
+    },
+    {
+      "site_id": "s2lam078_231016",
+      "lat": -34.74161529541016,
+      "lon": 19.796049118041992,
+      "cluster_id": 11,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.1002,
+      "mean_r2_when_train": 0.2211
+    },
+    {
+      "site_id": "s2lam135_230930",
+      "lat": -33.585558,
+      "lon": 23.43475341796875,
+      "cluster_id": 16,
+      "richness": 20.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam076_231013",
+      "lat": -33.361693,
+      "lon": 22.077203,
+      "cluster_id": 49,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam108_231019",
+      "lat": -33.66368103027344,
+      "lon": 21.640216,
+      "cluster_id": 69,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.0496,
+      "mean_r2_when_train": 0.215
+    },
+    {
+      "site_id": "s2lam149_231013",
+      "lat": -33.270342,
+      "lon": 22.051454544067383,
+      "cluster_id": 86,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.2045,
+      "mean_r2_when_train": 0.2015
+    },
+    {
+      "site_id": "s2lam074_231110",
+      "lat": -33.960643,
+      "lon": 23.164296,
+      "cluster_id": 5,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.1691,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam041_231125",
+      "lat": -33.985965,
+      "lon": 23.546416,
+      "cluster_id": 75,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam058_231010",
+      "lat": -34.815375,
+      "lon": 19.968549728393555,
+      "cluster_id": 34,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.2006,
+      "mean_r2_when_train": 0.2019
+    },
+    {
+      "site_id": "s2lam118_231001",
+      "lat": -33.607893,
+      "lon": 23.42418670654297,
+      "cluster_id": 16,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam119_231001",
+      "lat": -33.523707,
+      "lon": 23.448001861572266,
+      "cluster_id": 70,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.2184,
+      "mean_r2_when_train": 0.1997
+    },
+    {
+      "site_id": "s2lam125_231117",
+      "lat": -33.756392,
+      "lon": 23.156405,
+      "cluster_id": 12,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.0563,
+      "mean_r2_when_train": 0.2063
+    },
+    {
+      "site_id": "s2lam122_231114",
+      "lat": -33.636617,
+      "lon": 21.652931213378903,
+      "cluster_id": 69,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.0496,
+      "mean_r2_when_train": 0.215
+    },
+    {
+      "site_id": "s2lam154_231005",
+      "lat": -33.347012,
+      "lon": 21.931378,
+      "cluster_id": 49,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam115_231010",
+      "lat": -33.73100662231445,
+      "lon": 21.938149,
+      "cluster_id": 52,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.2117,
+      "mean_r2_when_train": 0.1999
+    },
+    {
+      "site_id": "s2lam128_231014",
+      "lat": -33.619727,
+      "lon": 23.444398,
+      "cluster_id": 16,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam121_231125",
+      "lat": -34.730745,
+      "lon": 19.949485,
+      "cluster_id": 87,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.2184,
+      "mean_r2_when_train": 0.1995
+    },
+    {
+      "site_id": "s2lam074_231004",
+      "lat": -33.990618,
+      "lon": 22.726436614990234,
+      "cluster_id": 32,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.1569,
+      "mean_r2_when_train": 0.2079
+    },
+    {
+      "site_id": "s2lam114_231020",
+      "lat": -33.995121002197266,
+      "lon": 22.620576858520508,
+      "cluster_id": 46,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.2044,
+      "mean_r2_when_train": 0.2015
+    },
+    {
+      "site_id": "s2lam192_231122",
+      "lat": -32.3947639465332,
+      "lon": 19.088557,
+      "cluster_id": 71,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.1941,
+      "mean_r2_when_train": 0.2024
+    },
+    {
+      "site_id": "s2lam086_231113",
+      "lat": -33.978089,
+      "lon": 20.815244,
+      "cluster_id": 40,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam093_231027",
+      "lat": -34.07368469238281,
+      "lon": 22.954736,
+      "cluster_id": 6,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.192,
+      "mean_r2_when_train": 0.203
+    },
+    {
+      "site_id": "s2lam162_231010",
+      "lat": -33.734169,
+      "lon": 21.935163497924805,
+      "cluster_id": 52,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.2117,
+      "mean_r2_when_train": 0.1999
+    },
+    {
+      "site_id": "s2lam091_231017",
+      "lat": -33.879359,
+      "lon": 22.03035926818848,
+      "cluster_id": 15,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.0468,
+      "mean_r2_when_train": 0.2171
+    },
+    {
+      "site_id": "s2lam162_231106",
+      "lat": -33.681617,
+      "lon": 21.560129,
+      "cluster_id": 27,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.2615,
+      "mean_r2_when_train": 0.1959
+    },
+    {
+      "site_id": "s2lam058_230811",
+      "lat": -33.928537,
+      "lon": 21.068251,
+      "cluster_id": 106,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.1756,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam078_230811",
+      "lat": -33.929112,
+      "lon": 21.06909942626953,
+      "cluster_id": 106,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.1756,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam139_230813",
+      "lat": -34.7218017578125,
+      "lon": 19.94510078430176,
+      "cluster_id": 87,
+      "richness": 21.0,
+      "mean_r2_when_val": 0.2184,
+      "mean_r2_when_train": 0.1995
+    },
+    {
+      "site_id": "s2lam137_231011",
+      "lat": -33.343682,
+      "lon": 22.024062,
+      "cluster_id": 49,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam185_231123",
+      "lat": -33.919364,
+      "lon": 19.161827087402344,
+      "cluster_id": 63,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.1706,
+      "mean_r2_when_train": 0.2069
+    },
+    {
+      "site_id": "s2lam042_231106",
+      "lat": -32.431301,
+      "lon": 19.141576,
+      "cluster_id": 59,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.1055,
+      "mean_r2_when_train": 0.2125
+    },
+    {
+      "site_id": "s2lam132_231108",
+      "lat": -34.353249,
+      "lon": 18.90035057067871,
+      "cluster_id": 66,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.0809,
+      "mean_r2_when_train": 0.2068
+    },
+    {
+      "site_id": "s2lam191_231122",
+      "lat": -32.136598,
+      "lon": 18.984872817993164,
+      "cluster_id": 82,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.106,
+      "mean_r2_when_train": 0.2136
+    },
+    {
+      "site_id": "s2lam101_231016",
+      "lat": -34.753287,
+      "lon": 19.799897,
+      "cluster_id": 11,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.1002,
+      "mean_r2_when_train": 0.2211
+    },
+    {
+      "site_id": "s2lam179_231124",
+      "lat": -34.09700393676758,
+      "lon": 18.426633,
+      "cluster_id": 30,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam104_231103",
+      "lat": -33.899795,
+      "lon": 22.942235946655277,
+      "cluster_id": 33,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.2271,
+      "mean_r2_when_train": 0.2002
+    },
+    {
+      "site_id": "s2lam110_231020",
+      "lat": -33.983405,
+      "lon": 20.83293914794922,
+      "cluster_id": 40,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam159_231013",
+      "lat": -33.30973815917969,
+      "lon": 22.04607963562012,
+      "cluster_id": 49,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam026_231125",
+      "lat": -34.722877,
+      "lon": 19.95170211791992,
+      "cluster_id": 87,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.2184,
+      "mean_r2_when_train": 0.1995
+    },
+    {
+      "site_id": "s2lam114_231110",
+      "lat": -33.958771,
+      "lon": 23.13395118713379,
+      "cluster_id": 5,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.1691,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam160_231122",
+      "lat": -33.634998,
+      "lon": 22.949071,
+      "cluster_id": 13,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2074
+    },
+    {
+      "site_id": "s2lam164_231109",
+      "lat": -33.927860260009766,
+      "lon": 22.451705932617188,
+      "cluster_id": 100,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.0967,
+      "mean_r2_when_train": 0.2122
+    },
+    {
+      "site_id": "s2lam063_231029",
+      "lat": -34.657169,
+      "lon": 19.621429,
+      "cluster_id": 72,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.1841,
+      "mean_r2_when_train": 0.2033
+    },
+    {
+      "site_id": "s2lam105_231016",
+      "lat": -34.723023,
+      "lon": 19.769303,
+      "cluster_id": 11,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.1002,
+      "mean_r2_when_train": 0.2211
+    },
+    {
+      "site_id": "s2lam112_231106",
+      "lat": -32.534829,
+      "lon": 19.31228828430176,
+      "cluster_id": 104,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.168,
+      "mean_r2_when_train": 0.2073
+    },
+    {
+      "site_id": "s2lam127_231025",
+      "lat": -33.47057342529297,
+      "lon": 20.639655,
+      "cluster_id": 38,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.1313,
+      "mean_r2_when_train": 0.2079
+    },
+    {
+      "site_id": "s2lam040_231110",
+      "lat": -33.947878,
+      "lon": 23.136556,
+      "cluster_id": 5,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.1691,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam136_231016",
+      "lat": -34.740038,
+      "lon": 19.78825187683105,
+      "cluster_id": 11,
+      "richness": 22.0,
+      "mean_r2_when_val": 0.1002,
+      "mean_r2_when_train": 0.2211
+    },
+    {
+      "site_id": "s2lam076_231025",
+      "lat": -33.44383239746094,
+      "lon": 20.807767868041992,
+      "cluster_id": 51,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1696,
+      "mean_r2_when_train": 0.2046
+    },
+    {
+      "site_id": "s2lam138_230930",
+      "lat": -33.588717,
+      "lon": 23.42334747314453,
+      "cluster_id": 16,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam176_231123",
+      "lat": -32.148283,
+      "lon": 18.94051551818848,
+      "cluster_id": 41,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.2015,
+      "mean_r2_when_train": 0.2018
+    },
+    {
+      "site_id": "s2lam058_231016",
+      "lat": -34.724473,
+      "lon": 19.76510238647461,
+      "cluster_id": 11,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1002,
+      "mean_r2_when_train": 0.2211
+    },
+    {
+      "site_id": "s2lam083_231031",
+      "lat": -32.23374938964844,
+      "lon": 19.120330810546875,
+      "cluster_id": 20,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2083
+    },
+    {
+      "site_id": "s2lam076_231001",
+      "lat": -33.608082,
+      "lon": 23.42987823486328,
+      "cluster_id": 16,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam023_231010",
+      "lat": -34.806098,
+      "lon": 19.950075149536133,
+      "cluster_id": 34,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.2006,
+      "mean_r2_when_train": 0.2019
+    },
+    {
+      "site_id": "s2lam088_231117",
+      "lat": -34.068581,
+      "lon": 23.227073,
+      "cluster_id": 67,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.2365,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam089_231025",
+      "lat": -32.99655532836914,
+      "lon": 19.059401,
+      "cluster_id": 95,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.204,
+      "mean_r2_when_train": 0.2016
+    },
+    {
+      "site_id": "s2lam069_231113",
+      "lat": -33.978463,
+      "lon": 20.816199,
+      "cluster_id": 40,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam183_231123",
+      "lat": -34.00220489501953,
+      "lon": 19.189269,
+      "cluster_id": 89,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.2236,
+      "mean_r2_when_train": 0.1999
+    },
+    {
+      "site_id": "s2lam006_231011",
+      "lat": -34.320883,
+      "lon": 18.45609474182129,
+      "cluster_id": 96,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.2561,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam071_231011",
+      "lat": -34.238826,
+      "lon": 18.386401,
+      "cluster_id": 103,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.2242,
+      "mean_r2_when_train": 0.1984
+    },
+    {
+      "site_id": "s2lam111_231005",
+      "lat": -33.343473,
+      "lon": 21.90143775939941,
+      "cluster_id": 49,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam103_231106",
+      "lat": -33.682061,
+      "lon": 21.567002,
+      "cluster_id": 27,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.2615,
+      "mean_r2_when_train": 0.1959
+    },
+    {
+      "site_id": "s2lam077_231108",
+      "lat": -34.349062,
+      "lon": 18.875200271606445,
+      "cluster_id": 66,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.0809,
+      "mean_r2_when_train": 0.2068
+    },
+    {
+      "site_id": "s2lam115_231106",
+      "lat": -33.68039321899414,
+      "lon": 21.558757,
+      "cluster_id": 27,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.2615,
+      "mean_r2_when_train": 0.1959
+    },
+    {
+      "site_id": "s2lam088_231125",
+      "lat": -33.9588623046875,
+      "lon": 23.52101325988769,
+      "cluster_id": 75,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam037_231106",
+      "lat": -32.538168,
+      "lon": 19.325103,
+      "cluster_id": 104,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.168,
+      "mean_r2_when_train": 0.2073
+    },
+    {
+      "site_id": "s2lam030_231031",
+      "lat": -32.253127,
+      "lon": 19.14605140686035,
+      "cluster_id": 20,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2083
+    },
+    {
+      "site_id": "s2lam010_231103",
+      "lat": -34.086509704589844,
+      "lon": 18.416975021362305,
+      "cluster_id": 30,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam099_231115",
+      "lat": -34.109067,
+      "lon": 18.449848175048828,
+      "cluster_id": 30,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam194_231122",
+      "lat": -32.15069961547852,
+      "lon": 19.026189,
+      "cluster_id": 102,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.2182,
+      "mean_r2_when_train": 0.2004
+    },
+    {
+      "site_id": "s2lam099_231011",
+      "lat": -34.25018310546875,
+      "lon": 18.412891387939453,
+      "cluster_id": 9,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.3707,
+      "mean_r2_when_train": 0.1929
+    },
+    {
+      "site_id": "s2lam044_230930",
+      "lat": -33.582328,
+      "lon": 23.436038,
+      "cluster_id": 16,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam166_231122",
+      "lat": -32.143792,
+      "lon": 18.975290298461918,
+      "cluster_id": 82,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.106,
+      "mean_r2_when_train": 0.2136
+    },
+    {
+      "site_id": "s2lam149_231122",
+      "lat": -33.62405014038086,
+      "lon": 22.940038681030277,
+      "cluster_id": 13,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2074
+    },
+    {
+      "site_id": "s2lam027_231115",
+      "lat": -34.110852,
+      "lon": 18.463380813598636,
+      "cluster_id": 30,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam017_230622",
+      "lat": -33.98460006713867,
+      "lon": 20.822599411010746,
+      "cluster_id": 40,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam044_230622",
+      "lat": -33.62879943847656,
+      "lon": 22.51469993591309,
+      "cluster_id": 81,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1223,
+      "mean_r2_when_train": 0.2078
+    },
+    {
+      "site_id": "s2lam065_230622",
+      "lat": -33.983699798583984,
+      "lon": 20.82150077819824,
+      "cluster_id": 40,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam087_230822",
+      "lat": -33.72669982910156,
+      "lon": 21.6762809753418,
+      "cluster_id": 78,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.1821,
+      "mean_r2_when_train": 0.2042
+    },
+    {
+      "site_id": "s2lam122_231019",
+      "lat": -33.638168,
+      "lon": 21.624879,
+      "cluster_id": 69,
+      "richness": 23.0,
+      "mean_r2_when_val": 0.0496,
+      "mean_r2_when_train": 0.215
+    },
+    {
+      "site_id": "s2lam063_231011",
+      "lat": -34.609248,
+      "lon": 19.919375,
+      "cluster_id": 64,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.218,
+      "mean_r2_when_train": 0.2
+    },
+    {
+      "site_id": "s2lam127_231117",
+      "lat": -33.75792694091797,
+      "lon": 23.16158676147461,
+      "cluster_id": 12,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.0563,
+      "mean_r2_when_train": 0.2063
+    },
+    {
+      "site_id": "s2lam126_231010",
+      "lat": -34.803108,
+      "lon": 19.97553062438965,
+      "cluster_id": 34,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.2006,
+      "mean_r2_when_train": 0.2019
+    },
+    {
+      "site_id": "s2lam182_231122",
+      "lat": -32.153341,
+      "lon": 19.031245,
+      "cluster_id": 102,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.2182,
+      "mean_r2_when_train": 0.2004
+    },
+    {
+      "site_id": "s2lam047_231107",
+      "lat": -34.355985,
+      "lon": 18.858381271362305,
+      "cluster_id": 66,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.0809,
+      "mean_r2_when_train": 0.2068
+    },
+    {
+      "site_id": "s2lam027_231103",
+      "lat": -34.085742,
+      "lon": 18.420297622680664,
+      "cluster_id": 30,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam079_231117",
+      "lat": -34.057588,
+      "lon": 23.222817,
+      "cluster_id": 67,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.2365,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam147_231113",
+      "lat": -33.885992,
+      "lon": 22.423099,
+      "cluster_id": 3,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.2464,
+      "mean_r2_when_train": 0.1979
+    },
+    {
+      "site_id": "s2lam109_231113",
+      "lat": -33.978771,
+      "lon": 20.817119,
+      "cluster_id": 40,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam122_231010",
+      "lat": -33.725984,
+      "lon": 21.93819999694824,
+      "cluster_id": 52,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.2117,
+      "mean_r2_when_train": 0.1999
+    },
+    {
+      "site_id": "s2lam167_231123",
+      "lat": -34.00518035888672,
+      "lon": 19.189079,
+      "cluster_id": 89,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.2236,
+      "mean_r2_when_train": 0.1999
+    },
+    {
+      "site_id": "s2lam063_231016",
+      "lat": -34.717708587646484,
+      "lon": 19.755347,
+      "cluster_id": 11,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.1002,
+      "mean_r2_when_train": 0.2211
+    },
+    {
+      "site_id": "s2lam149_231117",
+      "lat": -33.661717,
+      "lon": 23.12986946105957,
+      "cluster_id": 36,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.0493,
+      "mean_r2_when_train": 0.2226
+    },
+    {
+      "site_id": "s2lam079_231027",
+      "lat": -34.064742,
+      "lon": 22.940053,
+      "cluster_id": 6,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.192,
+      "mean_r2_when_train": 0.203
+    },
+    {
+      "site_id": "s2lam080_231108",
+      "lat": -34.353868,
+      "lon": 18.85421371459961,
+      "cluster_id": 66,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.0809,
+      "mean_r2_when_train": 0.2068
+    },
+    {
+      "site_id": "s2lam045_231011",
+      "lat": -34.608681,
+      "lon": 19.904656,
+      "cluster_id": 64,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.218,
+      "mean_r2_when_train": 0.2
+    },
+    {
+      "site_id": "s2lam088_231110",
+      "lat": -33.957074,
+      "lon": 23.149438,
+      "cluster_id": 5,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.1691,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam074_231117",
+      "lat": -34.046231,
+      "lon": 23.204539,
+      "cluster_id": 67,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.2365,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam163_231109",
+      "lat": -33.947215,
+      "lon": 21.227392196655277,
+      "cluster_id": 35,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.1431,
+      "mean_r2_when_train": 0.2076
+    },
+    {
+      "site_id": "s2lam069_231020",
+      "lat": -33.982755,
+      "lon": 20.83418083190918,
+      "cluster_id": 40,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam017_231027",
+      "lat": -33.990013122558594,
+      "lon": 18.95558357238769,
+      "cluster_id": 94,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.2262,
+      "mean_r2_when_train": 0.1988
+    },
+    {
+      "site_id": "s2lam041_231103",
+      "lat": -33.89972686767578,
+      "lon": 22.974159240722656,
+      "cluster_id": 33,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.2271,
+      "mean_r2_when_train": 0.2002
+    },
+    {
+      "site_id": "s2lam072_231025",
+      "lat": -33.038745,
+      "lon": 19.05491065979004,
+      "cluster_id": 95,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.204,
+      "mean_r2_when_train": 0.2016
+    },
+    {
+      "site_id": "s2lam158_231014",
+      "lat": -33.610533,
+      "lon": 23.436025,
+      "cluster_id": 16,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam074_231103",
+      "lat": -33.912325,
+      "lon": 22.965745,
+      "cluster_id": 33,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.2271,
+      "mean_r2_when_train": 0.2002
+    },
+    {
+      "site_id": "s2lam123_231028",
+      "lat": -34.735711,
+      "lon": 19.664586,
+      "cluster_id": 54,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.1456,
+      "mean_r2_when_train": 0.2094
+    },
+    {
+      "site_id": "s2lam159_231025",
+      "lat": -33.47114944458008,
+      "lon": 20.61932945251465,
+      "cluster_id": 38,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.1313,
+      "mean_r2_when_train": 0.2079
+    },
+    {
+      "site_id": "s2lam112_231025",
+      "lat": -33.025866,
+      "lon": 19.049756,
+      "cluster_id": 95,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.204,
+      "mean_r2_when_train": 0.2016
+    },
+    {
+      "site_id": "s2lam103_231010",
+      "lat": -33.735528,
+      "lon": 21.93624687194824,
+      "cluster_id": 52,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.2117,
+      "mean_r2_when_train": 0.1999
+    },
+    {
+      "site_id": "s2lam041_231110",
+      "lat": -33.954832,
+      "lon": 23.154321670532227,
+      "cluster_id": 5,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.1691,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam095_231109",
+      "lat": -33.929169,
+      "lon": 22.452302,
+      "cluster_id": 100,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.0967,
+      "mean_r2_when_train": 0.2122
+    },
+    {
+      "site_id": "s2lam049_230930",
+      "lat": -33.591932,
+      "lon": 23.408689498901367,
+      "cluster_id": 16,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam123_231016",
+      "lat": -34.718977,
+      "lon": 19.767433166503903,
+      "cluster_id": 11,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.1002,
+      "mean_r2_when_train": 0.2211
+    },
+    {
+      "site_id": "s2lam111_231025",
+      "lat": -33.485557556152344,
+      "lon": 20.49702835083008,
+      "cluster_id": 25,
+      "richness": 24.0,
+      "mean_r2_when_val": 0.1562,
+      "mean_r2_when_train": 0.2057
+    },
+    {
+      "site_id": "s2lam072_231106",
+      "lat": -32.350201,
+      "lon": 19.014995,
+      "cluster_id": 62,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.0552,
+      "mean_r2_when_train": 0.2181
+    },
+    {
+      "site_id": "s2lam098_231117",
+      "lat": -34.704917,
+      "lon": 20.091020584106445,
+      "cluster_id": 26,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam082_231106",
+      "lat": -33.67354202270508,
+      "lon": 21.548362731933597,
+      "cluster_id": 27,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2615,
+      "mean_r2_when_train": 0.1959
+    },
+    {
+      "site_id": "s2lam026_231029",
+      "lat": -34.67685317993164,
+      "lon": 19.641809463500977,
+      "cluster_id": 72,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.1841,
+      "mean_r2_when_train": 0.2033
+    },
+    {
+      "site_id": "s2lam114_231011",
+      "lat": -33.986691,
+      "lon": 23.394443,
+      "cluster_id": 77,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.3448,
+      "mean_r2_when_train": 0.191
+    },
+    {
+      "site_id": "s2lam016_231011",
+      "lat": -34.001699,
+      "lon": 23.404389,
+      "cluster_id": 77,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.3448,
+      "mean_r2_when_train": 0.191
+    },
+    {
+      "site_id": "s2lam078_231028",
+      "lat": -34.73331069946289,
+      "lon": 19.678197860717773,
+      "cluster_id": 54,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.1456,
+      "mean_r2_when_train": 0.2094
+    },
+    {
+      "site_id": "s2lam074_231020",
+      "lat": -33.97890853881836,
+      "lon": 22.604537963867188,
+      "cluster_id": 46,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2044,
+      "mean_r2_when_train": 0.2015
+    },
+    {
+      "site_id": "s2lam063_231117",
+      "lat": -34.698378,
+      "lon": 20.147845,
+      "cluster_id": 26,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam058_231117",
+      "lat": -34.708955,
+      "lon": 20.124135,
+      "cluster_id": 26,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam069_231010",
+      "lat": -33.922692,
+      "lon": 19.897375106811523,
+      "cluster_id": 58,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.206,
+      "mean_r2_when_train": 0.2012
+    },
+    {
+      "site_id": "s2lam134_231027",
+      "lat": -33.990359,
+      "lon": 18.952424,
+      "cluster_id": 94,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2262,
+      "mean_r2_when_train": 0.1988
+    },
+    {
+      "site_id": "s2lam099_231103",
+      "lat": -34.079369,
+      "lon": 18.406653,
+      "cluster_id": 30,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam131_231203",
+      "lat": -33.585553,
+      "lon": 23.397605,
+      "cluster_id": 16,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam083_231106",
+      "lat": -32.434662,
+      "lon": 19.19617462158203,
+      "cluster_id": 65,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2282,
+      "mean_r2_when_train": 0.1998
+    },
+    {
+      "site_id": "s2lam021_231110",
+      "lat": -34.413330078125,
+      "lon": 20.595315,
+      "cluster_id": 80,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2572,
+      "mean_r2_when_train": 0.197
+    },
+    {
+      "site_id": "s2lam023_231028",
+      "lat": -34.743731,
+      "lon": 19.69049835205078,
+      "cluster_id": 54,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.1456,
+      "mean_r2_when_train": 0.2094
+    },
+    {
+      "site_id": "s2lam136_231010",
+      "lat": -34.808868408203125,
+      "lon": 19.961828231811523,
+      "cluster_id": 34,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2006,
+      "mean_r2_when_train": 0.2019
+    },
+    {
+      "site_id": "s2lam113_231115",
+      "lat": -34.109922,
+      "lon": 18.45576858520508,
+      "cluster_id": 30,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam093_231110",
+      "lat": -33.951098,
+      "lon": 23.160279,
+      "cluster_id": 5,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.1691,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam128_230930",
+      "lat": -33.591572,
+      "lon": 23.415447235107425,
+      "cluster_id": 16,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam039_231005",
+      "lat": -33.344662,
+      "lon": 21.916993,
+      "cluster_id": 49,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam016_231117",
+      "lat": -34.033817291259766,
+      "lon": 23.198472,
+      "cluster_id": 67,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2365,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam017_231108",
+      "lat": -34.353702,
+      "lon": 18.890794,
+      "cluster_id": 66,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.0809,
+      "mean_r2_when_train": 0.2068
+    },
+    {
+      "site_id": "s2lam056_231118",
+      "lat": -34.001124,
+      "lon": 18.389408111572266,
+      "cluster_id": 83,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.0767,
+      "mean_r2_when_train": 0.2188
+    },
+    {
+      "site_id": "s2lam129_231010",
+      "lat": -34.809642,
+      "lon": 19.953746795654297,
+      "cluster_id": 34,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2006,
+      "mean_r2_when_train": 0.2019
+    },
+    {
+      "site_id": "s2lam042_231025",
+      "lat": -33.033204,
+      "lon": 19.054828,
+      "cluster_id": 95,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.204,
+      "mean_r2_when_train": 0.2016
+    },
+    {
+      "site_id": "s2lam029_231019",
+      "lat": -33.636328,
+      "lon": 21.629526138305664,
+      "cluster_id": 69,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.0496,
+      "mean_r2_when_train": 0.215
+    },
+    {
+      "site_id": "s2lam030_231106",
+      "lat": -32.441368,
+      "lon": 19.195436477661133,
+      "cluster_id": 65,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2282,
+      "mean_r2_when_train": 0.1998
+    },
+    {
+      "site_id": "s2lam098_231125",
+      "lat": -34.716903,
+      "lon": 19.93798828125,
+      "cluster_id": 87,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2184,
+      "mean_r2_when_train": 0.1995
+    },
+    {
+      "site_id": "s2lam130_231130",
+      "lat": -34.326575,
+      "lon": 18.965803146362305,
+      "cluster_id": 105,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.1832,
+      "mean_r2_when_train": 0.2034
+    },
+    {
+      "site_id": "s2lam133_231011",
+      "lat": -34.331579,
+      "lon": 18.462966,
+      "cluster_id": 96,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2561,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam186_231122",
+      "lat": -32.138872,
+      "lon": 19.01857185363769,
+      "cluster_id": 102,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2182,
+      "mean_r2_when_train": 0.2004
+    },
+    {
+      "site_id": "s2lam001_231025",
+      "lat": -33.44633865356445,
+      "lon": 20.834556579589844,
+      "cluster_id": 8,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2253,
+      "mean_r2_when_train": 0.1979
+    },
+    {
+      "site_id": "s2lam084_230813",
+      "lat": -34.725877,
+      "lon": 19.95136260986328,
+      "cluster_id": 87,
+      "richness": 25.0,
+      "mean_r2_when_val": 0.2184,
+      "mean_r2_when_train": 0.1995
+    },
+    {
+      "site_id": "s2lam016_231027",
+      "lat": -34.053731,
+      "lon": 22.936635971069336,
+      "cluster_id": 6,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.192,
+      "mean_r2_when_train": 0.203
+    },
+    {
+      "site_id": "s2lam114_231004",
+      "lat": -33.994603,
+      "lon": 22.721433,
+      "cluster_id": 32,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.1569,
+      "mean_r2_when_train": 0.2079
+    },
+    {
+      "site_id": "s2lam056_231107",
+      "lat": -34.358271,
+      "lon": 18.852811,
+      "cluster_id": 66,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.0809,
+      "mean_r2_when_train": 0.2068
+    },
+    {
+      "site_id": "s2lam041_231011",
+      "lat": -33.986581,
+      "lon": 23.39879035949707,
+      "cluster_id": 77,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.3448,
+      "mean_r2_when_train": 0.191
+    },
+    {
+      "site_id": "s2lam125_231001",
+      "lat": -33.608497,
+      "lon": 23.432418,
+      "cluster_id": 16,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam074_231011",
+      "lat": -33.984909,
+      "lon": 23.388376235961918,
+      "cluster_id": 77,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.3448,
+      "mean_r2_when_train": 0.191
+    },
+    {
+      "site_id": "s2lam080_231027",
+      "lat": -34.0001220703125,
+      "lon": 18.956897,
+      "cluster_id": 94,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.2262,
+      "mean_r2_when_train": 0.1988
+    },
+    {
+      "site_id": "s2lam006_231103",
+      "lat": -34.077537536621094,
+      "lon": 18.406369,
+      "cluster_id": 30,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam077_231118",
+      "lat": -33.996409,
+      "lon": 18.392011,
+      "cluster_id": 83,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.0767,
+      "mean_r2_when_train": 0.2188
+    },
+    {
+      "site_id": "s2lam105_231117",
+      "lat": -34.705798,
+      "lon": 20.09223937988281,
+      "cluster_id": 26,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam084_231117",
+      "lat": -34.704332,
+      "lon": 20.08580207824707,
+      "cluster_id": 26,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam046_231031",
+      "lat": -32.27317810058594,
+      "lon": 19.162812,
+      "cluster_id": 60,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.2868,
+      "mean_r2_when_train": 0.1944
+    },
+    {
+      "site_id": "s2lam141_231020",
+      "lat": -33.982821,
+      "lon": 20.822915,
+      "cluster_id": 40,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam129_231125",
+      "lat": -34.71797180175781,
+      "lon": 19.933635,
+      "cluster_id": 87,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.2184,
+      "mean_r2_when_train": 0.1995
+    },
+    {
+      "site_id": "s2lam037_231031",
+      "lat": -32.211397,
+      "lon": 19.104774475097656,
+      "cluster_id": 20,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2083
+    },
+    {
+      "site_id": "s2lam087_231115",
+      "lat": -33.673987,
+      "lon": 21.887969,
+      "cluster_id": 21,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.2729,
+      "mean_r2_when_train": 0.1947
+    },
+    {
+      "site_id": "s2lam116_231028",
+      "lat": -34.746177,
+      "lon": 19.654136,
+      "cluster_id": 54,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.1456,
+      "mean_r2_when_train": 0.2094
+    },
+    {
+      "site_id": "s2lam154_231025",
+      "lat": -33.46946334838867,
+      "lon": 20.719155,
+      "cluster_id": 53,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.1331,
+      "mean_r2_when_train": 0.2103
+    },
+    {
+      "site_id": "s2lam072_231031",
+      "lat": -32.200103,
+      "lon": 19.080449,
+      "cluster_id": 20,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2083
+    },
+    {
+      "site_id": "s2lam073_231113",
+      "lat": -33.975782,
+      "lon": 20.83846092224121,
+      "cluster_id": 40,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam105_231022",
+      "lat": -34.433536529541016,
+      "lon": 20.419391,
+      "cluster_id": 43,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.1191,
+      "mean_r2_when_train": 0.2175
+    },
+    {
+      "site_id": "s2lam080_231128",
+      "lat": -33.152879,
+      "lon": 18.121392,
+      "cluster_id": 93,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.3436,
+      "mean_r2_when_train": 0.186
+    },
+    {
+      "site_id": "s2lam051_231113",
+      "lat": -33.975987,
+      "lon": 20.839731216430664,
+      "cluster_id": 40,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam006_230808",
+      "lat": -33.207846,
+      "lon": 18.09440040588379,
+      "cluster_id": 56,
+      "richness": 26.0,
+      "mean_r2_when_val": 0.2886,
+      "mean_r2_when_train": 0.1942
+    },
+    {
+      "site_id": "s2lam155_231025",
+      "lat": -33.479613,
+      "lon": 20.514623,
+      "cluster_id": 25,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1562,
+      "mean_r2_when_train": 0.2057
+    },
+    {
+      "site_id": "s2lam042_231031",
+      "lat": -32.222782135009766,
+      "lon": 19.116443,
+      "cluster_id": 20,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2083
+    },
+    {
+      "site_id": "s2lam112_231031",
+      "lat": -32.242130279541016,
+      "lon": 19.129219,
+      "cluster_id": 20,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2083
+    },
+    {
+      "site_id": "s2lam143_231005",
+      "lat": -33.341178,
+      "lon": 21.857118,
+      "cluster_id": 49,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam107_231117",
+      "lat": -34.042136,
+      "lon": 23.19222450256348,
+      "cluster_id": 67,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2365,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam116_231110",
+      "lat": -34.409568,
+      "lon": 20.577579498291016,
+      "cluster_id": 80,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2572,
+      "mean_r2_when_train": 0.197
+    },
+    {
+      "site_id": "s2lam138_231117",
+      "lat": -33.914805,
+      "lon": 23.14512062072754,
+      "cluster_id": 61,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2758,
+      "mean_r2_when_train": 0.1945
+    },
+    {
+      "site_id": "s2lam038_231110",
+      "lat": -33.943021,
+      "lon": 23.14214324951172,
+      "cluster_id": 5,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1691,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam137_231117",
+      "lat": -33.658342,
+      "lon": 23.134028,
+      "cluster_id": 36,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.0493,
+      "mean_r2_when_train": 0.2226
+    },
+    {
+      "site_id": "s2lam063_231125",
+      "lat": -34.746738,
+      "lon": 19.976938247680664,
+      "cluster_id": 87,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2184,
+      "mean_r2_when_train": 0.1995
+    },
+    {
+      "site_id": "s2lam126_231029",
+      "lat": -34.647204,
+      "lon": 19.60416412353516,
+      "cluster_id": 72,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1841,
+      "mean_r2_when_train": 0.2033
+    },
+    {
+      "site_id": "s2lam130_231005",
+      "lat": -33.342135,
+      "lon": 21.847423,
+      "cluster_id": 49,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam021_231125",
+      "lat": -34.731568,
+      "lon": 19.953805,
+      "cluster_id": 87,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2184,
+      "mean_r2_when_train": 0.1995
+    },
+    {
+      "site_id": "s2lam131_231001",
+      "lat": -33.579188,
+      "lon": 23.398155212402344,
+      "cluster_id": 16,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam143_231013",
+      "lat": -33.36571502685547,
+      "lon": 22.098403,
+      "cluster_id": 49,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam058_231028",
+      "lat": -34.75310516357422,
+      "lon": 19.686715,
+      "cluster_id": 54,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1456,
+      "mean_r2_when_train": 0.2094
+    },
+    {
+      "site_id": "s2lam118_231117",
+      "lat": -33.867383,
+      "lon": 23.172992,
+      "cluster_id": 2,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2224,
+      "mean_r2_when_train": 0.1995
+    },
+    {
+      "site_id": "s2lam107_231103",
+      "lat": -33.88874816894531,
+      "lon": 22.969281,
+      "cluster_id": 33,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2271,
+      "mean_r2_when_train": 0.2002
+    },
+    {
+      "site_id": "s2lam116_231117",
+      "lat": -34.710132,
+      "lon": 20.113615036010746,
+      "cluster_id": 26,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam038_231117",
+      "lat": -34.052768,
+      "lon": 23.21170234680176,
+      "cluster_id": 67,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2365,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam118_231122",
+      "lat": -33.648136138916016,
+      "lon": 22.958066940307617,
+      "cluster_id": 13,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2074
+    },
+    {
+      "site_id": "s2lam133_231103",
+      "lat": -34.075933,
+      "lon": 18.39813804626465,
+      "cluster_id": 30,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam041_231130",
+      "lat": -33.942027,
+      "lon": 23.603066,
+      "cluster_id": 75,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam093_231004",
+      "lat": -33.987271,
+      "lon": 22.696611404418945,
+      "cluster_id": 32,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1569,
+      "mean_r2_when_train": 0.2079
+    },
+    {
+      "site_id": "s2lam144_231130",
+      "lat": -34.323225,
+      "lon": 18.9643669128418,
+      "cluster_id": 105,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1832,
+      "mean_r2_when_train": 0.2034
+    },
+    {
+      "site_id": "s2lam046_231106",
+      "lat": -32.436223,
+      "lon": 19.179288,
+      "cluster_id": 65,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2282,
+      "mean_r2_when_train": 0.1998
+    },
+    {
+      "site_id": "s2lam107_231110",
+      "lat": -33.94816970825195,
+      "lon": 23.142734,
+      "cluster_id": 5,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1691,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam123_231125",
+      "lat": -34.733978271484375,
+      "lon": 19.969947,
+      "cluster_id": 87,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2184,
+      "mean_r2_when_train": 0.1995
+    },
+    {
+      "site_id": "s2lam103_231114",
+      "lat": -33.738121032714844,
+      "lon": 21.672266006469727,
+      "cluster_id": 78,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1821,
+      "mean_r2_when_train": 0.2042
+    },
+    {
+      "site_id": "s2lam123_231010",
+      "lat": -34.61711502075195,
+      "lon": 19.89518928527832,
+      "cluster_id": 64,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.218,
+      "mean_r2_when_train": 0.2
+    },
+    {
+      "site_id": "s2lam149_231025",
+      "lat": -33.49174880981445,
+      "lon": 20.484359741210938,
+      "cluster_id": 25,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1562,
+      "mean_r2_when_train": 0.2057
+    },
+    {
+      "site_id": "s2lam103_231019",
+      "lat": -33.642181396484375,
+      "lon": 21.63960838317871,
+      "cluster_id": 69,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.0496,
+      "mean_r2_when_train": 0.215
+    },
+    {
+      "site_id": "s2lam152_231109",
+      "lat": -33.926508,
+      "lon": 22.44729804992676,
+      "cluster_id": 100,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.0967,
+      "mean_r2_when_train": 0.2122
+    },
+    {
+      "site_id": "s2lam025_231109",
+      "lat": -33.929194,
+      "lon": 22.450878143310547,
+      "cluster_id": 100,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.0967,
+      "mean_r2_when_train": 0.2122
+    },
+    {
+      "site_id": "s2lam065_231020",
+      "lat": -33.9819450378418,
+      "lon": 20.824960708618164,
+      "cluster_id": 40,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam078_231010",
+      "lat": -34.809432,
+      "lon": 19.944318,
+      "cluster_id": 34,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2006,
+      "mean_r2_when_train": 0.2019
+    },
+    {
+      "site_id": "s2lam020_231010",
+      "lat": -34.803752,
+      "lon": 19.941432,
+      "cluster_id": 34,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2006,
+      "mean_r2_when_train": 0.2019
+    },
+    {
+      "site_id": "s2lam095_230814",
+      "lat": -33.87969970703125,
+      "lon": 22.438499450683597,
+      "cluster_id": 3,
+      "richness": 27.0,
+      "mean_r2_when_val": 0.2464,
+      "mean_r2_when_train": 0.1979
+    },
+    {
+      "site_id": "s2lam071_231127",
+      "lat": -33.197724,
+      "lon": 18.086577,
+      "cluster_id": 56,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.2886,
+      "mean_r2_when_train": 0.1942
+    },
+    {
+      "site_id": "s2lam078_231117",
+      "lat": -34.714917,
+      "lon": 20.096583,
+      "cluster_id": 26,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam110_231010",
+      "lat": -33.934748,
+      "lon": 19.896443,
+      "cluster_id": 58,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.206,
+      "mean_r2_when_train": 0.2012
+    },
+    {
+      "site_id": "s2lam052_231103",
+      "lat": -34.087061,
+      "lon": 18.41974449157715,
+      "cluster_id": 30,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam016_231020",
+      "lat": -33.988816,
+      "lon": 22.606345,
+      "cluster_id": 46,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.2044,
+      "mean_r2_when_train": 0.2015
+    },
+    {
+      "site_id": "s2lam117_231117",
+      "lat": -33.662202,
+      "lon": 23.133907318115234,
+      "cluster_id": 36,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.0493,
+      "mean_r2_when_train": 0.2226
+    },
+    {
+      "site_id": "s2lam088_231103",
+      "lat": -33.902684,
+      "lon": 22.96699905395508,
+      "cluster_id": 33,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.2271,
+      "mean_r2_when_train": 0.2002
+    },
+    {
+      "site_id": "s2lam052_231128",
+      "lat": -33.201803,
+      "lon": 18.140403747558597,
+      "cluster_id": 28,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.1669,
+      "mean_r2_when_train": 0.2084
+    },
+    {
+      "site_id": "s2lam016_231110",
+      "lat": -33.948201,
+      "lon": 23.163759,
+      "cluster_id": 5,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.1691,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam079_231130",
+      "lat": -33.935994,
+      "lon": 23.60051727294922,
+      "cluster_id": 75,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam027_231127",
+      "lat": -33.247096,
+      "lon": 18.1938591003418,
+      "cluster_id": 29,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.2577,
+      "mean_r2_when_train": 0.1956
+    },
+    {
+      "site_id": "s2lam133_231115",
+      "lat": -34.105865478515625,
+      "lon": 18.46260643005371,
+      "cluster_id": 30,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam022_231010",
+      "lat": -33.7351188659668,
+      "lon": 21.935096,
+      "cluster_id": 52,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.2117,
+      "mean_r2_when_train": 0.1999
+    },
+    {
+      "site_id": "s2lam003_231103",
+      "lat": -34.082324,
+      "lon": 18.411441,
+      "cluster_id": 30,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam038_231103",
+      "lat": -33.892846,
+      "lon": 22.97085189819336,
+      "cluster_id": 33,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.2271,
+      "mean_r2_when_train": 0.2002
+    },
+    {
+      "site_id": "s2lam096_231128",
+      "lat": -33.113004,
+      "lon": 18.09089469909668,
+      "cluster_id": 7,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.2857,
+      "mean_r2_when_train": 0.1935
+    },
+    {
+      "site_id": "s2lam052_231011",
+      "lat": -34.305877685546875,
+      "lon": 18.43749237060547,
+      "cluster_id": 17,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.1396,
+      "mean_r2_when_train": 0.2044
+    },
+    {
+      "site_id": "s2lam020_231117",
+      "lat": -34.711753,
+      "lon": 20.090303421020508,
+      "cluster_id": 26,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam193_231124",
+      "lat": -34.089171,
+      "lon": 18.41744804382324,
+      "cluster_id": 30,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam038_231027",
+      "lat": -34.082716,
+      "lon": 22.96849822998047,
+      "cluster_id": 6,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.192,
+      "mean_r2_when_train": 0.203
+    },
+    {
+      "site_id": "s2lam093_231117",
+      "lat": -34.055364,
+      "lon": 23.21868896484375,
+      "cluster_id": 67,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.2365,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam160_231005",
+      "lat": -33.340179443359375,
+      "lon": 21.878358,
+      "cluster_id": 49,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam092_231031",
+      "lat": -32.197751,
+      "lon": 19.094085,
+      "cluster_id": 20,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2083
+    },
+    {
+      "site_id": "s2lam045_231016",
+      "lat": -34.72459030151367,
+      "lon": 19.7728328704834,
+      "cluster_id": 11,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.1002,
+      "mean_r2_when_train": 0.2211
+    },
+    {
+      "site_id": "s2lam076_230622",
+      "lat": -33.626019,
+      "lon": 22.525299072265625,
+      "cluster_id": 81,
+      "richness": 28.0,
+      "mean_r2_when_val": 0.1223,
+      "mean_r2_when_train": 0.2078
+    },
+    {
+      "site_id": "s2lam162_231115",
+      "lat": -33.675775,
+      "lon": 21.893667221069336,
+      "cluster_id": 21,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.2729,
+      "mean_r2_when_train": 0.1947
+    },
+    {
+      "site_id": "s2lam079_231020",
+      "lat": -33.993067,
+      "lon": 22.618194580078125,
+      "cluster_id": 46,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.2044,
+      "mean_r2_when_train": 0.2015
+    },
+    {
+      "site_id": "s2lam026_231010",
+      "lat": -34.81013870239258,
+      "lon": 19.972653,
+      "cluster_id": 34,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.2006,
+      "mean_r2_when_train": 0.2019
+    },
+    {
+      "site_id": "s2lam084_231110",
+      "lat": -34.400334,
+      "lon": 20.555894,
+      "cluster_id": 80,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.2572,
+      "mean_r2_when_train": 0.197
+    },
+    {
+      "site_id": "s2lam125_231122",
+      "lat": -33.645426,
+      "lon": 22.953788,
+      "cluster_id": 13,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2074
+    },
+    {
+      "site_id": "s2lam030_231025",
+      "lat": -33.021329,
+      "lon": 19.052000045776367,
+      "cluster_id": 95,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.204,
+      "mean_r2_when_train": 0.2016
+    },
+    {
+      "site_id": "s2lam045_231028",
+      "lat": -34.72818374633789,
+      "lon": 19.6804141998291,
+      "cluster_id": 54,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.1456,
+      "mean_r2_when_train": 0.2094
+    },
+    {
+      "site_id": "s2lam137_231003",
+      "lat": -33.603022,
+      "lon": 23.35382652282715,
+      "cluster_id": 85,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.1785,
+      "mean_r2_when_train": 0.2049
+    },
+    {
+      "site_id": "s2lam175_231122",
+      "lat": -32.345544,
+      "lon": 19.033037185668945,
+      "cluster_id": 62,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.0552,
+      "mean_r2_when_train": 0.2181
+    },
+    {
+      "site_id": "s2lam010_231127",
+      "lat": -33.22257232666016,
+      "lon": 18.107852,
+      "cluster_id": 39,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.2028,
+      "mean_r2_when_train": 0.2017
+    },
+    {
+      "site_id": "s2lam041_231117",
+      "lat": -34.06201171875,
+      "lon": 23.231513,
+      "cluster_id": 67,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.2365,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam040_231103",
+      "lat": -33.921281,
+      "lon": 22.957158,
+      "cluster_id": 33,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.2271,
+      "mean_r2_when_train": 0.2002
+    },
+    {
+      "site_id": "s2lam104_231110",
+      "lat": -33.95659637451172,
+      "lon": 23.143182,
+      "cluster_id": 5,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.1691,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam168_231122",
+      "lat": -32.396407,
+      "lon": 19.087181091308597,
+      "cluster_id": 71,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.1941,
+      "mean_r2_when_train": 0.2024
+    },
+    {
+      "site_id": "s2lam148_231009",
+      "lat": -34.064732,
+      "lon": 20.439239501953125,
+      "cluster_id": 98,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.3531,
+      "mean_r2_when_train": 0.1921
+    },
+    {
+      "site_id": "s2lam045_231117",
+      "lat": -34.706518,
+      "lon": 20.097312927246094,
+      "cluster_id": 26,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam096_231027",
+      "lat": -34.00044250488281,
+      "lon": 18.954147338867188,
+      "cluster_id": 94,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.2262,
+      "mean_r2_when_train": 0.1988
+    },
+    {
+      "site_id": "s2lam040_231027",
+      "lat": -34.069052,
+      "lon": 22.944949,
+      "cluster_id": 6,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.192,
+      "mean_r2_when_train": 0.203
+    },
+    {
+      "site_id": "s2lam134_231107",
+      "lat": -34.327681,
+      "lon": 18.84815216064453,
+      "cluster_id": 47,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.1842,
+      "mean_r2_when_train": 0.2035
+    },
+    {
+      "site_id": "s2lam104_231117",
+      "lat": -34.073490142822266,
+      "lon": 23.22666549682617,
+      "cluster_id": 67,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.2365,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam047_231128",
+      "lat": -33.173597,
+      "lon": 18.137392044067383,
+      "cluster_id": 93,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.3436,
+      "mean_r2_when_train": 0.186
+    },
+    {
+      "site_id": "s2lam001_231013",
+      "lat": -33.28460693359375,
+      "lon": 22.05200958251953,
+      "cluster_id": 86,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.2045,
+      "mean_r2_when_train": 0.2015
+    },
+    {
+      "site_id": "s2lam107_231004",
+      "lat": -33.990745544433594,
+      "lon": 22.698811,
+      "cluster_id": 32,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.1569,
+      "mean_r2_when_train": 0.2079
+    },
+    {
+      "site_id": "s2lam120_231117",
+      "lat": -34.70018768310547,
+      "lon": 20.131092071533203,
+      "cluster_id": 26,
+      "richness": 29.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam148_231114",
+      "lat": -33.908868,
+      "lon": 22.023463,
+      "cluster_id": 4,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.1791,
+      "mean_r2_when_train": 0.2046
+    },
+    {
+      "site_id": "s2lam088_231027",
+      "lat": -34.082229,
+      "lon": 22.96084213256836,
+      "cluster_id": 6,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.192,
+      "mean_r2_when_train": 0.203
+    },
+    {
+      "site_id": "s2lam016_231103",
+      "lat": -33.913482666015625,
+      "lon": 22.949432373046875,
+      "cluster_id": 33,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.2271,
+      "mean_r2_when_train": 0.2002
+    },
+    {
+      "site_id": "s2lam073_231020",
+      "lat": -33.983857,
+      "lon": 20.828557,
+      "cluster_id": 40,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam123_231022",
+      "lat": -34.47476959228516,
+      "lon": 20.48619270324707,
+      "cluster_id": 18,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.1602,
+      "mean_r2_when_train": 0.2085
+    },
+    {
+      "site_id": "s2lam104_231020",
+      "lat": -33.977611,
+      "lon": 22.60512924194336,
+      "cluster_id": 46,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.2044,
+      "mean_r2_when_train": 0.2015
+    },
+    {
+      "site_id": "s2lam123_231117",
+      "lat": -34.694868,
+      "lon": 20.148072,
+      "cluster_id": 26,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam093_231011",
+      "lat": -33.960999,
+      "lon": 23.401491165161133,
+      "cluster_id": 77,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.3448,
+      "mean_r2_when_train": 0.191
+    },
+    {
+      "site_id": "s2lam136_231022",
+      "lat": -34.442845,
+      "lon": 20.420026779174805,
+      "cluster_id": 43,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.1191,
+      "mean_r2_when_train": 0.2175
+    },
+    {
+      "site_id": "s2lam109_231010",
+      "lat": -33.944028,
+      "lon": 19.894899368286133,
+      "cluster_id": 58,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.206,
+      "mean_r2_when_train": 0.2012
+    },
+    {
+      "site_id": "s2lam002_231103",
+      "lat": -34.07581329345703,
+      "lon": 18.402034,
+      "cluster_id": 30,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam079_231125",
+      "lat": -33.960716247558594,
+      "lon": 23.54374122619629,
+      "cluster_id": 75,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam003_231127",
+      "lat": -33.147425,
+      "lon": 18.012425,
+      "cluster_id": 42,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.2262,
+      "mean_r2_when_train": 0.2002
+    },
+    {
+      "site_id": "s2lam108_231010",
+      "lat": -33.68373107910156,
+      "lon": 21.90862464904785,
+      "cluster_id": 21,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.2729,
+      "mean_r2_when_train": 0.1947
+    },
+    {
+      "site_id": "s2lam029_231010",
+      "lat": -33.677968,
+      "lon": 21.89628219604492,
+      "cluster_id": 21,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.2729,
+      "mean_r2_when_train": 0.1947
+    },
+    {
+      "site_id": "s2lam085_231128",
+      "lat": -33.119229,
+      "lon": 18.063431,
+      "cluster_id": 7,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.2857,
+      "mean_r2_when_train": 0.1935
+    },
+    {
+      "site_id": "s2lam115_231019",
+      "lat": -33.651216,
+      "lon": 21.642072677612305,
+      "cluster_id": 69,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.0496,
+      "mean_r2_when_train": 0.215
+    },
+    {
+      "site_id": "s2lam065_231010",
+      "lat": -33.917247,
+      "lon": 19.900258,
+      "cluster_id": 58,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.206,
+      "mean_r2_when_train": 0.2012
+    },
+    {
+      "site_id": "s2lam142_231130",
+      "lat": -34.321593,
+      "lon": 18.9655876159668,
+      "cluster_id": 105,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.1832,
+      "mean_r2_when_train": 0.2034
+    },
+    {
+      "site_id": "s2lam150_231113",
+      "lat": -33.91544342041016,
+      "lon": 22.415671,
+      "cluster_id": 79,
+      "richness": 30.0,
+      "mean_r2_when_val": 0.1929,
+      "mean_r2_when_train": 0.2029
+    },
+    {
+      "site_id": "s2lam130_231117",
+      "lat": -33.76129531860352,
+      "lon": 23.140722274780277,
+      "cluster_id": 12,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.0563,
+      "mean_r2_when_train": 0.2063
+    },
+    {
+      "site_id": "s2lam088_231011",
+      "lat": -33.987441,
+      "lon": 23.392194747924805,
+      "cluster_id": 77,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.3448,
+      "mean_r2_when_train": 0.191
+    },
+    {
+      "site_id": "s2lam038_231011",
+      "lat": -33.97393035888672,
+      "lon": 23.39703941345215,
+      "cluster_id": 77,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.3448,
+      "mean_r2_when_train": 0.191
+    },
+    {
+      "site_id": "s2lam121_231028",
+      "lat": -34.751323,
+      "lon": 19.691984176635746,
+      "cluster_id": 54,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.1456,
+      "mean_r2_when_train": 0.2094
+    },
+    {
+      "site_id": "s2lam041_231004",
+      "lat": -33.990023,
+      "lon": 22.663056,
+      "cluster_id": 57,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.2704,
+      "mean_r2_when_train": 0.1933
+    },
+    {
+      "site_id": "s2lam021_231117",
+      "lat": -34.709313,
+      "lon": 20.109485,
+      "cluster_id": 26,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam134_231128",
+      "lat": -33.138748,
+      "lon": 18.09944725036621,
+      "cluster_id": 48,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.3099,
+      "mean_r2_when_train": 0.187
+    },
+    {
+      "site_id": "s2lam040_231117",
+      "lat": -34.078025,
+      "lon": 23.226762,
+      "cluster_id": 67,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.2365,
+      "mean_r2_when_train": 0.1957
+    },
+    {
+      "site_id": "s2lam101_231022",
+      "lat": -34.449541,
+      "lon": 20.411946,
+      "cluster_id": 43,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.1191,
+      "mean_r2_when_train": 0.2175
+    },
+    {
+      "site_id": "s2lam111_231117",
+      "lat": -33.858808,
+      "lon": 23.184257,
+      "cluster_id": 2,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.2224,
+      "mean_r2_when_train": 0.1995
+    },
+    {
+      "site_id": "s2lam113_231103",
+      "lat": -34.07923126220703,
+      "lon": 18.409593,
+      "cluster_id": 30,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam006_231127",
+      "lat": -33.229818,
+      "lon": 18.163672,
+      "cluster_id": 88,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.1042,
+      "mean_r2_when_train": 0.2069
+    },
+    {
+      "site_id": "s2lam088_231130",
+      "lat": -33.947682,
+      "lon": 23.602895736694336,
+      "cluster_id": 75,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam121_231117",
+      "lat": -34.70941925048828,
+      "lon": 20.107236862182617,
+      "cluster_id": 26,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam133_231127",
+      "lat": -33.1492805480957,
+      "lon": 18.029157638549805,
+      "cluster_id": 42,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.2262,
+      "mean_r2_when_train": 0.2002
+    },
+    {
+      "site_id": "s2lam126_231022",
+      "lat": -34.46166229248047,
+      "lon": 20.430646,
+      "cluster_id": 43,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.1191,
+      "mean_r2_when_train": 0.2175
+    },
+    {
+      "site_id": "s2lam040_231130",
+      "lat": -33.94599533081055,
+      "lon": 23.624932,
+      "cluster_id": 75,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam010_231115",
+      "lat": -34.102161,
+      "lon": 18.455468,
+      "cluster_id": 30,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam063_231022",
+      "lat": -34.473159,
+      "lon": 20.4583797454834,
+      "cluster_id": 22,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.2281,
+      "mean_r2_when_train": 0.1998
+    },
+    {
+      "site_id": "s2lam088_231020",
+      "lat": -33.979949951171875,
+      "lon": 22.611579,
+      "cluster_id": 46,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.2044,
+      "mean_r2_when_train": 0.2015
+    },
+    {
+      "site_id": "s2lam079_231103",
+      "lat": -33.916046142578125,
+      "lon": 22.957498,
+      "cluster_id": 33,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.2271,
+      "mean_r2_when_train": 0.2002
+    },
+    {
+      "site_id": "s2lam113_231127",
+      "lat": -33.225797,
+      "lon": 18.13915252685547,
+      "cluster_id": 84,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.1574,
+      "mean_r2_when_train": 0.2062
+    },
+    {
+      "site_id": "s2lam117_231013",
+      "lat": -33.36790084838867,
+      "lon": 22.107932,
+      "cluster_id": 49,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879
+    },
+    {
+      "site_id": "s2lam040_231125",
+      "lat": -33.987046,
+      "lon": 23.534931182861328,
+      "cluster_id": 75,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam126_230710",
+      "lat": -34.0713005065918,
+      "lon": 20.43899917602539,
+      "cluster_id": 98,
+      "richness": 31.0,
+      "mean_r2_when_val": 0.3531,
+      "mean_r2_when_train": 0.1921
+    },
+    {
+      "site_id": "s2lam107_231130",
+      "lat": -33.947282,
+      "lon": 23.616674423217773,
+      "cluster_id": 75,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam093_231125",
+      "lat": -33.983027,
+      "lon": 23.5427303314209,
+      "cluster_id": 75,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam158_231203",
+      "lat": -33.584825,
+      "lon": 23.401063,
+      "cluster_id": 16,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966
+    },
+    {
+      "site_id": "s2lam056_231128",
+      "lat": -33.118582,
+      "lon": 18.076745,
+      "cluster_id": 7,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.2857,
+      "mean_r2_when_train": 0.1935
+    },
+    {
+      "site_id": "s2lam105_231110",
+      "lat": -34.373935,
+      "lon": 20.517940521240234,
+      "cluster_id": 74,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.2436,
+      "mean_r2_when_train": 0.1907
+    },
+    {
+      "site_id": "s2lam157_231009",
+      "lat": -34.07735061645508,
+      "lon": 20.45464324951172,
+      "cluster_id": 98,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.3531,
+      "mean_r2_when_train": 0.1921
+    },
+    {
+      "site_id": "s2lam060_231025",
+      "lat": -33.47527313232422,
+      "lon": 20.67740249633789,
+      "cluster_id": 68,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.1903,
+      "mean_r2_when_train": 0.2032
+    },
+    {
+      "site_id": "s2lam093_231020",
+      "lat": -33.984194,
+      "lon": 22.607503,
+      "cluster_id": 46,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.2044,
+      "mean_r2_when_train": 0.2015
+    },
+    {
+      "site_id": "s2lam058_231022",
+      "lat": -34.46110153198242,
+      "lon": 20.426916122436523,
+      "cluster_id": 43,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.1191,
+      "mean_r2_when_train": 0.2175
+    },
+    {
+      "site_id": "s2lam016_231125",
+      "lat": -33.969426,
+      "lon": 23.563199,
+      "cluster_id": 75,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam107_231125",
+      "lat": -33.971259,
+      "lon": 23.561038970947266,
+      "cluster_id": 75,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam141_231010",
+      "lat": -33.922632,
+      "lon": 19.88656044006348,
+      "cluster_id": 58,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.206,
+      "mean_r2_when_train": 0.2012
+    },
+    {
+      "site_id": "s2lam040_231020",
+      "lat": -33.982879638671875,
+      "lon": 22.604379,
+      "cluster_id": 46,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.2044,
+      "mean_r2_when_train": 0.2015
+    },
+    {
+      "site_id": "s2lam160_231117",
+      "lat": -33.86491775512695,
+      "lon": 23.152417,
+      "cluster_id": 2,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.2224,
+      "mean_r2_when_train": 0.1995
+    },
+    {
+      "site_id": "s2lam104_231125",
+      "lat": -33.96788787841797,
+      "lon": 23.538434982299805,
+      "cluster_id": 75,
+      "richness": 32.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam104_231004",
+      "lat": -33.981121,
+      "lon": 22.714095,
+      "cluster_id": 32,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.1569,
+      "mean_r2_when_train": 0.2079
+    },
+    {
+      "site_id": "s2lam015_231128",
+      "lat": -33.113294,
+      "lon": 18.074722290039062,
+      "cluster_id": 7,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.2857,
+      "mean_r2_when_train": 0.1935
+    },
+    {
+      "site_id": "s2lam077_231128",
+      "lat": -33.162866,
+      "lon": 18.12755584716797,
+      "cluster_id": 93,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.3436,
+      "mean_r2_when_train": 0.186
+    },
+    {
+      "site_id": "s2lam051_231010",
+      "lat": -33.91726303100586,
+      "lon": 19.884328,
+      "cluster_id": 58,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.206,
+      "mean_r2_when_train": 0.2012
+    },
+    {
+      "site_id": "s2lam038_231130",
+      "lat": -33.957406,
+      "lon": 23.56983757019043,
+      "cluster_id": 75,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam087_231019",
+      "lat": -33.720262,
+      "lon": 21.6417236328125,
+      "cluster_id": 31,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.1643,
+      "mean_r2_when_train": 0.2055
+    },
+    {
+      "site_id": "s2lam051_231030",
+      "lat": -33.949391,
+      "lon": 21.057559967041016,
+      "cluster_id": 106,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.1756,
+      "mean_r2_when_train": 0.2075
+    },
+    {
+      "site_id": "s2lam017_231128",
+      "lat": -33.117189,
+      "lon": 18.085847,
+      "cluster_id": 7,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.2857,
+      "mean_r2_when_train": 0.1935
+    },
+    {
+      "site_id": "s2lam126_231016",
+      "lat": -34.732444763183594,
+      "lon": 19.785778045654297,
+      "cluster_id": 11,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.1002,
+      "mean_r2_when_train": 0.2211
+    },
+    {
+      "site_id": "s2lam126_231117",
+      "lat": -34.708117,
+      "lon": 20.104608,
+      "cluster_id": 26,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam029_231114",
+      "lat": -33.754541,
+      "lon": 21.66156578063965,
+      "cluster_id": 45,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.2595,
+      "mean_r2_when_train": 0.1961
+    },
+    {
+      "site_id": "s2lam044_231117",
+      "lat": -33.752952575683594,
+      "lon": 23.167333,
+      "cluster_id": 12,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.0563,
+      "mean_r2_when_train": 0.2063
+    },
+    {
+      "site_id": "s2lam032_231019",
+      "lat": -33.639155,
+      "lon": 21.651409,
+      "cluster_id": 69,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.0496,
+      "mean_r2_when_train": 0.215
+    },
+    {
+      "site_id": "s2lam086_231010",
+      "lat": -33.931983,
+      "lon": 19.894443,
+      "cluster_id": 58,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.206,
+      "mean_r2_when_train": 0.2012
+    },
+    {
+      "site_id": "s2lam040_231011",
+      "lat": -33.995719,
+      "lon": 23.402665,
+      "cluster_id": 77,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.3448,
+      "mean_r2_when_train": 0.191
+    },
+    {
+      "site_id": "s2lam131_231117",
+      "lat": -33.83102798461914,
+      "lon": 23.179633,
+      "cluster_id": 101,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.1675,
+      "mean_r2_when_train": 0.2052
+    },
+    {
+      "site_id": "s2lam079_231011",
+      "lat": -34.001407623291016,
+      "lon": 23.401946,
+      "cluster_id": 77,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.3448,
+      "mean_r2_when_train": 0.191
+    },
+    {
+      "site_id": "s2lam104_231011",
+      "lat": -33.96826934814453,
+      "lon": 23.402442,
+      "cluster_id": 77,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.3448,
+      "mean_r2_when_train": 0.191
+    },
+    {
+      "site_id": "s2lam002_231127",
+      "lat": -33.161856,
+      "lon": 18.045541763305664,
+      "cluster_id": 19,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.2015,
+      "mean_r2_when_train": 0.2018
+    },
+    {
+      "site_id": "s2lam139_231009",
+      "lat": -34.059617,
+      "lon": 20.43155288696289,
+      "cluster_id": 98,
+      "richness": 33.0,
+      "mean_r2_when_val": 0.3531,
+      "mean_r2_when_train": 0.1921
+    },
+    {
+      "site_id": "s2lam045_231022",
+      "lat": -34.454242,
+      "lon": 20.431411,
+      "cluster_id": 43,
+      "richness": 34.0,
+      "mean_r2_when_val": 0.1191,
+      "mean_r2_when_train": 0.2175
+    },
+    {
+      "site_id": "s2lam052_231115",
+      "lat": -34.104815,
+      "lon": 18.445317,
+      "cluster_id": 30,
+      "richness": 34.0,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047
+    },
+    {
+      "site_id": "s2lam117_231005",
+      "lat": -33.345622,
+      "lon": 21.81857681274414,
+      "cluster_id": 99,
+      "richness": 34.0,
+      "mean_r2_when_val": 0.0116,
+      "mean_r2_when_train": 0.2139
+    },
+    {
+      "site_id": "s2lam038_231020",
+      "lat": -33.978564,
+      "lon": 22.60932922363281,
+      "cluster_id": 46,
+      "richness": 34.0,
+      "mean_r2_when_val": 0.2044,
+      "mean_r2_when_train": 0.2015
+    },
+    {
+      "site_id": "s2lam023_231117",
+      "lat": -34.707845,
+      "lon": 20.117433,
+      "cluster_id": 26,
+      "richness": 34.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam114_231125",
+      "lat": -33.9736442565918,
+      "lon": 23.543231,
+      "cluster_id": 75,
+      "richness": 34.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam096_231107",
+      "lat": -34.353588,
+      "lon": 18.837701,
+      "cluster_id": 66,
+      "richness": 34.0,
+      "mean_r2_when_val": 0.0809,
+      "mean_r2_when_train": 0.2068
+    },
+    {
+      "site_id": "s2lam078_231022",
+      "lat": -34.455806,
+      "lon": 20.439433,
+      "cluster_id": 43,
+      "richness": 34.0,
+      "mean_r2_when_val": 0.1191,
+      "mean_r2_when_train": 0.2175
+    },
+    {
+      "site_id": "s2lam136_231110",
+      "lat": -34.42267608642578,
+      "lon": 20.640744,
+      "cluster_id": 90,
+      "richness": 34.0,
+      "mean_r2_when_val": 0.1721,
+      "mean_r2_when_train": 0.2044
+    },
+    {
+      "site_id": "s2lam041_231020",
+      "lat": -33.987151,
+      "lon": 22.64668846130371,
+      "cluster_id": 57,
+      "richness": 34.0,
+      "mean_r2_when_val": 0.2704,
+      "mean_r2_when_train": 0.1933
+    },
+    {
+      "site_id": "s2lam114_231130",
+      "lat": -33.955858,
+      "lon": 23.601829528808597,
+      "cluster_id": 75,
+      "richness": 35.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam026_231117",
+      "lat": -34.705907,
+      "lon": 20.11843490600586,
+      "cluster_id": 26,
+      "richness": 35.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam015_231107",
+      "lat": -34.354611,
+      "lon": 18.82887458801269,
+      "cluster_id": 66,
+      "richness": 35.0,
+      "mean_r2_when_val": 0.0809,
+      "mean_r2_when_train": 0.2068
+    },
+    {
+      "site_id": "s2lam107_231027",
+      "lat": -34.058529,
+      "lon": 22.9359130859375,
+      "cluster_id": 6,
+      "richness": 35.0,
+      "mean_r2_when_val": 0.192,
+      "mean_r2_when_train": 0.203
+    },
+    {
+      "site_id": "s2lam129_231117",
+      "lat": -34.696495056152344,
+      "lon": 20.137937545776367,
+      "cluster_id": 26,
+      "richness": 35.0,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992
+    },
+    {
+      "site_id": "s2lam132_231128",
+      "lat": -33.125875,
+      "lon": 18.061246,
+      "cluster_id": 7,
+      "richness": 35.0,
+      "mean_r2_when_val": 0.2857,
+      "mean_r2_when_train": 0.1935
+    },
+    {
+      "site_id": "s2lam074_231125",
+      "lat": -33.95463180541992,
+      "lon": 23.514409,
+      "cluster_id": 75,
+      "richness": 35.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam161_231009",
+      "lat": -34.071307,
+      "lon": 20.439599990844727,
+      "cluster_id": 98,
+      "richness": 36.0,
+      "mean_r2_when_val": 0.3531,
+      "mean_r2_when_train": 0.1921
+    },
+    {
+      "site_id": "s2lam022_231019",
+      "lat": -33.635191,
+      "lon": 21.67481803894043,
+      "cluster_id": 44,
+      "richness": 37.0,
+      "mean_r2_when_val": 0.2532,
+      "mean_r2_when_train": 0.1961
+    },
+    {
+      "site_id": "s2lam163_231010",
+      "lat": -33.91755676269531,
+      "lon": 19.87162208557129,
+      "cluster_id": 58,
+      "richness": 37.0,
+      "mean_r2_when_val": 0.206,
+      "mean_r2_when_train": 0.2012
+    },
+    {
+      "site_id": "s2lam073_231010",
+      "lat": -33.911895,
+      "lon": 19.885568,
+      "cluster_id": 58,
+      "richness": 38.0,
+      "mean_r2_when_val": 0.206,
+      "mean_r2_when_train": 0.2012
+    },
+    {
+      "site_id": "s2lam093_231130",
+      "lat": -33.95744323730469,
+      "lon": 23.633887,
+      "cluster_id": 75,
+      "richness": 38.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam074_231130",
+      "lat": -33.954389,
+      "lon": 23.629485,
+      "cluster_id": 75,
+      "richness": 38.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam123_231110",
+      "lat": -34.413509368896484,
+      "lon": 20.63172721862793,
+      "cluster_id": 90,
+      "richness": 38.0,
+      "mean_r2_when_val": 0.1721,
+      "mean_r2_when_train": 0.2044
+    },
+    {
+      "site_id": "s2lam058_231110",
+      "lat": -34.374848,
+      "lon": 20.5349178314209,
+      "cluster_id": 74,
+      "richness": 38.0,
+      "mean_r2_when_val": 0.2436,
+      "mean_r2_when_train": 0.1907
+    },
+    {
+      "site_id": "s2lam104_231130",
+      "lat": -33.965346,
+      "lon": 23.585840225219727,
+      "cluster_id": 75,
+      "richness": 39.0,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067
+    },
+    {
+      "site_id": "s2lam140_231009",
+      "lat": -34.072675,
+      "lon": 20.45067977905273,
+      "cluster_id": 98,
+      "richness": 39.0,
+      "mean_r2_when_val": 0.3531,
+      "mean_r2_when_train": 0.1921
+    }
+  ],
+  "clusters": [
+    {
+      "cluster_id": 99,
+      "times_in_val": 6,
+      "times_in_train": 94,
+      "mean_r2_when_val": 0.0116,
+      "mean_r2_when_train": 0.2139,
+      "influence_diff": -0.2023
+    },
+    {
+      "cluster_id": 15,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.0468,
+      "mean_r2_when_train": 0.2171,
+      "influence_diff": -0.1702
+    },
+    {
+      "cluster_id": 36,
+      "times_in_val": 12,
+      "times_in_train": 88,
+      "mean_r2_when_val": 0.0493,
+      "mean_r2_when_train": 0.2226,
+      "influence_diff": -0.1733
+    },
+    {
+      "cluster_id": 69,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.0496,
+      "mean_r2_when_train": 0.215,
+      "influence_diff": -0.1654
+    },
+    {
+      "cluster_id": 62,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.0552,
+      "mean_r2_when_train": 0.2181,
+      "influence_diff": -0.1628
+    },
+    {
+      "cluster_id": 12,
+      "times_in_val": 3,
+      "times_in_train": 97,
+      "mean_r2_when_val": 0.0563,
+      "mean_r2_when_train": 0.2063,
+      "influence_diff": -0.15
+    },
+    {
+      "cluster_id": 83,
+      "times_in_val": 12,
+      "times_in_train": 88,
+      "mean_r2_when_val": 0.0767,
+      "mean_r2_when_train": 0.2188,
+      "influence_diff": -0.1422
+    },
+    {
+      "cluster_id": 66,
+      "times_in_val": 4,
+      "times_in_train": 96,
+      "mean_r2_when_val": 0.0809,
+      "mean_r2_when_train": 0.2068,
+      "influence_diff": -0.126
+    },
+    {
+      "cluster_id": 100,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.0967,
+      "mean_r2_when_train": 0.2122,
+      "influence_diff": -0.1154
+    },
+    {
+      "cluster_id": 11,
+      "times_in_val": 16,
+      "times_in_train": 84,
+      "mean_r2_when_val": 0.1002,
+      "mean_r2_when_train": 0.2211,
+      "influence_diff": -0.121
+    },
+    {
+      "cluster_id": 88,
+      "times_in_val": 5,
+      "times_in_train": 95,
+      "mean_r2_when_val": 0.1042,
+      "mean_r2_when_train": 0.2069,
+      "influence_diff": -0.1027
+    },
+    {
+      "cluster_id": 59,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.1055,
+      "mean_r2_when_train": 0.2125,
+      "influence_diff": -0.107
+    },
+    {
+      "cluster_id": 82,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.106,
+      "mean_r2_when_train": 0.2136,
+      "influence_diff": -0.1076
+    },
+    {
+      "cluster_id": 43,
+      "times_in_val": 16,
+      "times_in_train": 84,
+      "mean_r2_when_val": 0.1191,
+      "mean_r2_when_train": 0.2175,
+      "influence_diff": -0.0984
+    },
+    {
+      "cluster_id": 81,
+      "times_in_val": 7,
+      "times_in_train": 93,
+      "mean_r2_when_val": 0.1223,
+      "mean_r2_when_train": 0.2078,
+      "influence_diff": -0.0854
+    },
+    {
+      "cluster_id": 13,
+      "times_in_val": 7,
+      "times_in_train": 93,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2074,
+      "influence_diff": -0.0808
+    },
+    {
+      "cluster_id": 20,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.1266,
+      "mean_r2_when_train": 0.2083,
+      "influence_diff": -0.0817
+    },
+    {
+      "cluster_id": 38,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.1313,
+      "mean_r2_when_train": 0.2079,
+      "influence_diff": -0.0766
+    },
+    {
+      "cluster_id": 53,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.1331,
+      "mean_r2_when_train": 0.2103,
+      "influence_diff": -0.0771
+    },
+    {
+      "cluster_id": 17,
+      "times_in_val": 4,
+      "times_in_train": 96,
+      "mean_r2_when_val": 0.1396,
+      "mean_r2_when_train": 0.2044,
+      "influence_diff": -0.0648
+    },
+    {
+      "cluster_id": 35,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.1431,
+      "mean_r2_when_train": 0.2076,
+      "influence_diff": -0.0645
+    },
+    {
+      "cluster_id": 54,
+      "times_in_val": 12,
+      "times_in_train": 88,
+      "mean_r2_when_val": 0.1456,
+      "mean_r2_when_train": 0.2094,
+      "influence_diff": -0.0639
+    },
+    {
+      "cluster_id": 75,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.1517,
+      "mean_r2_when_train": 0.2067,
+      "influence_diff": -0.0551
+    },
+    {
+      "cluster_id": 25,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.1562,
+      "mean_r2_when_train": 0.2057,
+      "influence_diff": -0.0495
+    },
+    {
+      "cluster_id": 32,
+      "times_in_val": 12,
+      "times_in_train": 88,
+      "mean_r2_when_val": 0.1569,
+      "mean_r2_when_train": 0.2079,
+      "influence_diff": -0.051
+    },
+    {
+      "cluster_id": 84,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.1574,
+      "mean_r2_when_train": 0.2062,
+      "influence_diff": -0.0488
+    },
+    {
+      "cluster_id": 24,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.1575,
+      "mean_r2_when_train": 0.2073,
+      "influence_diff": -0.0498
+    },
+    {
+      "cluster_id": 18,
+      "times_in_val": 14,
+      "times_in_train": 86,
+      "mean_r2_when_val": 0.1602,
+      "mean_r2_when_train": 0.2085,
+      "influence_diff": -0.0483
+    },
+    {
+      "cluster_id": 31,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.1643,
+      "mean_r2_when_train": 0.2055,
+      "influence_diff": -0.0412
+    },
+    {
+      "cluster_id": 40,
+      "times_in_val": 12,
+      "times_in_train": 88,
+      "mean_r2_when_val": 0.1657,
+      "mean_r2_when_train": 0.2067,
+      "influence_diff": -0.041
+    },
+    {
+      "cluster_id": 28,
+      "times_in_val": 16,
+      "times_in_train": 84,
+      "mean_r2_when_val": 0.1669,
+      "mean_r2_when_train": 0.2084,
+      "influence_diff": -0.0415
+    },
+    {
+      "cluster_id": 101,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.1675,
+      "mean_r2_when_train": 0.2052,
+      "influence_diff": -0.0376
+    },
+    {
+      "cluster_id": 104,
+      "times_in_val": 14,
+      "times_in_train": 86,
+      "mean_r2_when_val": 0.168,
+      "mean_r2_when_train": 0.2073,
+      "influence_diff": -0.0393
+    },
+    {
+      "cluster_id": 5,
+      "times_in_val": 15,
+      "times_in_train": 85,
+      "mean_r2_when_val": 0.1691,
+      "mean_r2_when_train": 0.2075,
+      "influence_diff": -0.0384
+    },
+    {
+      "cluster_id": 51,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.1696,
+      "mean_r2_when_train": 0.2046,
+      "influence_diff": -0.035
+    },
+    {
+      "cluster_id": 63,
+      "times_in_val": 14,
+      "times_in_train": 86,
+      "mean_r2_when_val": 0.1706,
+      "mean_r2_when_train": 0.2069,
+      "influence_diff": -0.0363
+    },
+    {
+      "cluster_id": 90,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.1721,
+      "mean_r2_when_train": 0.2044,
+      "influence_diff": -0.0323
+    },
+    {
+      "cluster_id": 30,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.1752,
+      "mean_r2_when_train": 0.2047,
+      "influence_diff": -0.0295
+    },
+    {
+      "cluster_id": 106,
+      "times_in_val": 18,
+      "times_in_train": 82,
+      "mean_r2_when_val": 0.1756,
+      "mean_r2_when_train": 0.2075,
+      "influence_diff": -0.0319
+    },
+    {
+      "cluster_id": 85,
+      "times_in_val": 12,
+      "times_in_train": 88,
+      "mean_r2_when_val": 0.1785,
+      "mean_r2_when_train": 0.2049,
+      "influence_diff": -0.0264
+    },
+    {
+      "cluster_id": 4,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.1791,
+      "mean_r2_when_train": 0.2046,
+      "influence_diff": -0.0255
+    },
+    {
+      "cluster_id": 37,
+      "times_in_val": 4,
+      "times_in_train": 96,
+      "mean_r2_when_val": 0.1803,
+      "mean_r2_when_train": 0.2027,
+      "influence_diff": -0.0223
+    },
+    {
+      "cluster_id": 78,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.1821,
+      "mean_r2_when_train": 0.2042,
+      "influence_diff": -0.0221
+    },
+    {
+      "cluster_id": 105,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.1832,
+      "mean_r2_when_train": 0.2034,
+      "influence_diff": -0.0202
+    },
+    {
+      "cluster_id": 72,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.1841,
+      "mean_r2_when_train": 0.2033,
+      "influence_diff": -0.0193
+    },
+    {
+      "cluster_id": 47,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.1842,
+      "mean_r2_when_train": 0.2035,
+      "influence_diff": -0.0193
+    },
+    {
+      "cluster_id": 68,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.1903,
+      "mean_r2_when_train": 0.2032,
+      "influence_diff": -0.0128
+    },
+    {
+      "cluster_id": 6,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.192,
+      "mean_r2_when_train": 0.203,
+      "influence_diff": -0.011
+    },
+    {
+      "cluster_id": 79,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.1929,
+      "mean_r2_when_train": 0.2029,
+      "influence_diff": -0.0099
+    },
+    {
+      "cluster_id": 71,
+      "times_in_val": 7,
+      "times_in_train": 93,
+      "mean_r2_when_val": 0.1941,
+      "mean_r2_when_train": 0.2024,
+      "influence_diff": -0.0083
+    },
+    {
+      "cluster_id": 14,
+      "times_in_val": 12,
+      "times_in_train": 88,
+      "mean_r2_when_val": 0.196,
+      "mean_r2_when_train": 0.2026,
+      "influence_diff": -0.0066
+    },
+    {
+      "cluster_id": 34,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.2006,
+      "mean_r2_when_train": 0.2019,
+      "influence_diff": -0.0014
+    },
+    {
+      "cluster_id": 41,
+      "times_in_val": 7,
+      "times_in_train": 93,
+      "mean_r2_when_val": 0.2015,
+      "mean_r2_when_train": 0.2018,
+      "influence_diff": -0.0003
+    },
+    {
+      "cluster_id": 19,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.2015,
+      "mean_r2_when_train": 0.2018,
+      "influence_diff": -0.0003
+    },
+    {
+      "cluster_id": 39,
+      "times_in_val": 6,
+      "times_in_train": 94,
+      "mean_r2_when_val": 0.2028,
+      "mean_r2_when_train": 0.2017,
+      "influence_diff": 0.0011
+    },
+    {
+      "cluster_id": 95,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.204,
+      "mean_r2_when_train": 0.2016,
+      "influence_diff": 0.0025
+    },
+    {
+      "cluster_id": 46,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.2044,
+      "mean_r2_when_train": 0.2015,
+      "influence_diff": 0.0028
+    },
+    {
+      "cluster_id": 86,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.2045,
+      "mean_r2_when_train": 0.2015,
+      "influence_diff": 0.003
+    },
+    {
+      "cluster_id": 58,
+      "times_in_val": 12,
+      "times_in_train": 88,
+      "mean_r2_when_val": 0.206,
+      "mean_r2_when_train": 0.2012,
+      "influence_diff": 0.0048
+    },
+    {
+      "cluster_id": 52,
+      "times_in_val": 16,
+      "times_in_train": 84,
+      "mean_r2_when_val": 0.2117,
+      "mean_r2_when_train": 0.1999,
+      "influence_diff": 0.0118
+    },
+    {
+      "cluster_id": 64,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.218,
+      "mean_r2_when_train": 0.2,
+      "influence_diff": 0.0181
+    },
+    {
+      "cluster_id": 102,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.2182,
+      "mean_r2_when_train": 0.2004,
+      "influence_diff": 0.0178
+    },
+    {
+      "cluster_id": 87,
+      "times_in_val": 12,
+      "times_in_train": 88,
+      "mean_r2_when_val": 0.2184,
+      "mean_r2_when_train": 0.1995,
+      "influence_diff": 0.0189
+    },
+    {
+      "cluster_id": 70,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.2184,
+      "mean_r2_when_train": 0.1997,
+      "influence_diff": 0.0187
+    },
+    {
+      "cluster_id": 2,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.2224,
+      "mean_r2_when_train": 0.1995,
+      "influence_diff": 0.0229
+    },
+    {
+      "cluster_id": 26,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.2227,
+      "mean_r2_when_train": 0.1992,
+      "influence_diff": 0.0235
+    },
+    {
+      "cluster_id": 89,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.2236,
+      "mean_r2_when_train": 0.1999,
+      "influence_diff": 0.0237
+    },
+    {
+      "cluster_id": 103,
+      "times_in_val": 13,
+      "times_in_train": 87,
+      "mean_r2_when_val": 0.2242,
+      "mean_r2_when_train": 0.1984,
+      "influence_diff": 0.0258
+    },
+    {
+      "cluster_id": 8,
+      "times_in_val": 14,
+      "times_in_train": 86,
+      "mean_r2_when_val": 0.2253,
+      "mean_r2_when_train": 0.1979,
+      "influence_diff": 0.0274
+    },
+    {
+      "cluster_id": 76,
+      "times_in_val": 14,
+      "times_in_train": 86,
+      "mean_r2_when_val": 0.2257,
+      "mean_r2_when_train": 0.1979,
+      "influence_diff": 0.0278
+    },
+    {
+      "cluster_id": 55,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.2261,
+      "mean_r2_when_train": 0.1991,
+      "influence_diff": 0.027
+    },
+    {
+      "cluster_id": 42,
+      "times_in_val": 6,
+      "times_in_train": 94,
+      "mean_r2_when_val": 0.2262,
+      "mean_r2_when_train": 0.2002,
+      "influence_diff": 0.026
+    },
+    {
+      "cluster_id": 94,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.2262,
+      "mean_r2_when_train": 0.1988,
+      "influence_diff": 0.0274
+    },
+    {
+      "cluster_id": 33,
+      "times_in_val": 6,
+      "times_in_train": 94,
+      "mean_r2_when_val": 0.2271,
+      "mean_r2_when_train": 0.2002,
+      "influence_diff": 0.027
+    },
+    {
+      "cluster_id": 22,
+      "times_in_val": 7,
+      "times_in_train": 93,
+      "mean_r2_when_val": 0.2281,
+      "mean_r2_when_train": 0.1998,
+      "influence_diff": 0.0283
+    },
+    {
+      "cluster_id": 65,
+      "times_in_val": 7,
+      "times_in_train": 93,
+      "mean_r2_when_val": 0.2282,
+      "mean_r2_when_train": 0.1998,
+      "influence_diff": 0.0284
+    },
+    {
+      "cluster_id": 67,
+      "times_in_val": 15,
+      "times_in_train": 85,
+      "mean_r2_when_val": 0.2365,
+      "mean_r2_when_train": 0.1957,
+      "influence_diff": 0.0408
+    },
+    {
+      "cluster_id": 50,
+      "times_in_val": 12,
+      "times_in_train": 88,
+      "mean_r2_when_val": 0.2372,
+      "mean_r2_when_train": 0.1969,
+      "influence_diff": 0.0403
+    },
+    {
+      "cluster_id": 74,
+      "times_in_val": 21,
+      "times_in_train": 79,
+      "mean_r2_when_val": 0.2436,
+      "mean_r2_when_train": 0.1907,
+      "influence_diff": 0.0529
+    },
+    {
+      "cluster_id": 3,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.2464,
+      "mean_r2_when_train": 0.1979,
+      "influence_diff": 0.0485
+    },
+    {
+      "cluster_id": 16,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.2484,
+      "mean_r2_when_train": 0.1966,
+      "influence_diff": 0.0518
+    },
+    {
+      "cluster_id": 44,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.2532,
+      "mean_r2_when_train": 0.1961,
+      "influence_diff": 0.0572
+    },
+    {
+      "cluster_id": 92,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.2538,
+      "mean_r2_when_train": 0.1954,
+      "influence_diff": 0.0584
+    },
+    {
+      "cluster_id": 96,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.2561,
+      "mean_r2_when_train": 0.1957,
+      "influence_diff": 0.0604
+    },
+    {
+      "cluster_id": 80,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.2572,
+      "mean_r2_when_train": 0.197,
+      "influence_diff": 0.0602
+    },
+    {
+      "cluster_id": 29,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.2577,
+      "mean_r2_when_train": 0.1956,
+      "influence_diff": 0.0621
+    },
+    {
+      "cluster_id": 45,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.2595,
+      "mean_r2_when_train": 0.1961,
+      "influence_diff": 0.0634
+    },
+    {
+      "cluster_id": 27,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.2615,
+      "mean_r2_when_train": 0.1959,
+      "influence_diff": 0.0656
+    },
+    {
+      "cluster_id": 97,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.2626,
+      "mean_r2_when_train": 0.195,
+      "influence_diff": 0.0676
+    },
+    {
+      "cluster_id": 23,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.2653,
+      "mean_r2_when_train": 0.1939,
+      "influence_diff": 0.0713
+    },
+    {
+      "cluster_id": 57,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.2704,
+      "mean_r2_when_train": 0.1933,
+      "influence_diff": 0.0771
+    },
+    {
+      "cluster_id": 1,
+      "times_in_val": 14,
+      "times_in_train": 86,
+      "mean_r2_when_val": 0.2714,
+      "mean_r2_when_train": 0.1904,
+      "influence_diff": 0.081
+    },
+    {
+      "cluster_id": 21,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.2729,
+      "mean_r2_when_train": 0.1947,
+      "influence_diff": 0.0782
+    },
+    {
+      "cluster_id": 61,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.2758,
+      "mean_r2_when_train": 0.1945,
+      "influence_diff": 0.0814
+    },
+    {
+      "cluster_id": 73,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.2763,
+      "mean_r2_when_train": 0.1944,
+      "influence_diff": 0.0818
+    },
+    {
+      "cluster_id": 7,
+      "times_in_val": 9,
+      "times_in_train": 91,
+      "mean_r2_when_val": 0.2857,
+      "mean_r2_when_train": 0.1935,
+      "influence_diff": 0.0922
+    },
+    {
+      "cluster_id": 60,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.2868,
+      "mean_r2_when_train": 0.1944,
+      "influence_diff": 0.0924
+    },
+    {
+      "cluster_id": 56,
+      "times_in_val": 8,
+      "times_in_train": 92,
+      "mean_r2_when_val": 0.2886,
+      "mean_r2_when_train": 0.1942,
+      "influence_diff": 0.0944
+    },
+    {
+      "cluster_id": 48,
+      "times_in_val": 12,
+      "times_in_train": 88,
+      "mean_r2_when_val": 0.3099,
+      "mean_r2_when_train": 0.187,
+      "influence_diff": 0.1228
+    },
+    {
+      "cluster_id": 49,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.3269,
+      "mean_r2_when_train": 0.1879,
+      "influence_diff": 0.139
+    },
+    {
+      "cluster_id": 93,
+      "times_in_val": 10,
+      "times_in_train": 90,
+      "mean_r2_when_val": 0.3436,
+      "mean_r2_when_train": 0.186,
+      "influence_diff": 0.1575
+    },
+    {
+      "cluster_id": 77,
+      "times_in_val": 7,
+      "times_in_train": 93,
+      "mean_r2_when_val": 0.3448,
+      "mean_r2_when_train": 0.191,
+      "influence_diff": 0.1538
+    },
+    {
+      "cluster_id": 91,
+      "times_in_val": 6,
+      "times_in_train": 94,
+      "mean_r2_when_val": 0.3531,
+      "mean_r2_when_train": 0.1921,
+      "influence_diff": 0.1609
+    },
+    {
+      "cluster_id": 98,
+      "times_in_val": 6,
+      "times_in_train": 94,
+      "mean_r2_when_val": 0.3531,
+      "mean_r2_when_train": 0.1921,
+      "influence_diff": 0.161
+    },
+    {
+      "cluster_id": 9,
+      "times_in_val": 5,
+      "times_in_train": 95,
+      "mean_r2_when_val": 0.3707,
+      "mean_r2_when_train": 0.1929,
+      "influence_diff": 0.1778
+    },
+    {
+      "cluster_id": 10,
+      "times_in_val": 11,
+      "times_in_train": 89,
+      "mean_r2_when_val": 0.4949,
+      "mean_r2_when_train": 0.1655,
+      "influence_diff": 0.3293
+    }
+  ]
+}
