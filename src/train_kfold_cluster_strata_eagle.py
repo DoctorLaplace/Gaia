@@ -245,35 +245,10 @@ def main():
     if args.test_run:
         tif_paths = tif_paths[:2]
 
-    # Filter by tile_names.json if mode is 10nm (large list of tiles)
-    if args.mode == "10nm" and not args.test_run:
-        tile_path = os.path.join(project_root, "tile_names.json")
-        if os.path.exists(tile_path):
-            import json
-            try:
-                with open(tile_path, 'r', encoding='utf-8') as f:
-                    tiles = {t['tile'] for t in json.load(f)['tiles']}
-            except (UnicodeDecodeError, json.JSONDecodeError):
-                with open(tile_path, 'r', encoding='utf-16') as f:
-                    tiles = {t['tile'] for t in json.load(f)['tiles']}
-            
-            import re
-            filtered_paths = []
-            for p in tif_paths:
-                m_col = re.search(r'_C(\d+)_', p)
-                m_row = re.search(r'_R(\d+)_', p)
-                if m_col and m_row:
-                    col = int(m_col.group(1))
-                    row = int(m_row.group(1))
-                    if f"{col}_{row}" in tiles or f"{row}_{col}" in tiles:
-                        filtered_paths.append(p)
-            
-            if filtered_paths:
-                tif_paths = filtered_paths
-                print(f"{Colors.OKBLUE}[*] Filtered to {len(tif_paths)} tiles from tile_names.json{Colors.ENDC}")
-
     # -- Build Dataset --
     cache_suffix = f"_p{patch_size}_{args.mode}_strata.json"
+    if args.test_run:
+        cache_suffix = f"_p{patch_size}_{args.mode}_strata_test.json"
     mapping_cache = os.path.join(project_root, "data", "eagle", "mapping" + cache_suffix)
 
     full_dataset = MultiFlightEagleDataset(
