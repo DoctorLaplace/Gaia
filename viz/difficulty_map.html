@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive diagnostic map for exploring generalization difficulty and model validation performance of clusters in the Gaia project.">
     <title>Gaia Generalization Difficulty Map</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -285,6 +286,66 @@
             opacity: 0.6;
             font-weight: 500;
         }
+
+        /* Floating Basemap Controls */
+        .map-controls {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            gap: 6px;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 4px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+
+        .map-control-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .map-control-btn svg {
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .map-control-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .map-control-btn:hover svg {
+            opacity: 1;
+        }
+
+        .map-control-btn.active {
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.25), rgba(88, 166, 255, 0.1));
+            border: 1px solid rgba(88, 166, 255, 0.4);
+            box-shadow: 0 0 12px rgba(88, 166, 255, 0.2);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .map-control-btn.active svg {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -328,6 +389,18 @@
         <!-- Interactive Map Canvas -->
         <div id="map"></div>
 
+        <!-- Basemap Toggles -->
+        <div class="map-controls">
+            <button class="map-control-btn active" id="btn-dark" onclick="setBasemap('dark')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                Dark Map
+            </button>
+            <button class="map-control-btn" id="btn-satellite" onclick="setBasemap('satellite')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                Satellite Terrain
+            </button>
+        </div>
+
         <!-- Floating Legend -->
         <div class="legend">
             <div class="legend-title">Validation R² (Difficulty)</div>
@@ -346,6 +419,16 @@
         let siteMarkers = [];
         let clusterLayerGroups = {};
         let activeClusterId = null;
+
+        // Predefined basemap layers
+        const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 20
+        });
+
+        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        });
 
         // Color interpolation from Red -> Yellow -> Green
         function getDifficultyColor(val) {
@@ -428,14 +511,32 @@
             });
         }
 
+        function setBasemap(type) {
+            if (type === 'dark') {
+                if (map.hasLayer(satelliteLayer)) {
+                    map.removeLayer(satelliteLayer);
+                }
+                darkLayer.addTo(map);
+                document.getElementById('btn-dark').classList.add('active');
+                document.getElementById('btn-satellite').classList.remove('active');
+            } else if (type === 'satellite') {
+                if (map.hasLayer(darkLayer)) {
+                    map.removeLayer(darkLayer);
+                }
+                satelliteLayer.addTo(map);
+                document.getElementById('btn-satellite').classList.add('active');
+                document.getElementById('btn-dark').classList.remove('active');
+            }
+        }
+
         function setupMap() {
             map = L.map('map', {
                 zoomControl: false,
                 attributionControl: false
             }).setView([-33.9, 21.0], 8);
 
-            // Dark Basemap Layer
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+            // Add default basemap
+            darkLayer.addTo(map);
 
             // Initialize marker group dictionary
             dataset.clusters.forEach(c => {
