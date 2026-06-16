@@ -37,6 +37,16 @@ def main():
             print(f"  - {name} ({size/1024/1024:.2f} MB) | Error: {err}")
         if len(corrupted) > 30:
             print(f"  ... and {len(corrupted) - 30} more files.")
+            
+        # Save corrupted filenames to corrupted_files.txt
+        out_txt = os.path.join(os.path.dirname(tif_dir), "corrupted_files.txt")
+        try:
+            with open(out_txt, "w", encoding="utf-8") as f_out:
+                for name, _, _ in corrupted:
+                    f_out.write(name + "\n")
+            print(f"\n[OK] Saved list of corrupted filenames to: {out_txt}")
+        except Exception as e:
+            print(f"[!] Failed to save list of corrupted files: {e}")
     else:
         print("[OK] All files are healthy and valid!")
 
