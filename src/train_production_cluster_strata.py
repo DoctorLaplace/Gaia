@@ -278,7 +278,7 @@ class MultiFlightBioScapeDataset(Dataset):
 
 def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=None, 
                      test_run=False, freeze_encoder=True, unfreeze_epoch=None,
-                     use_mosaic=False, mask_water_vapor=True, leave_out=15, seed=42):
+                     use_mosaic=False, mask_water_vapor=True, leave_out=15, seed=42, patience=25):
     # Load config
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     with open(os.path.join(project_root, "configs", "config.yaml"), 'r') as f:
@@ -432,7 +432,7 @@ def train_production(nc_dir=None, richness_csv=None, epochs=None, batch_size=Non
     
     best_r2 = -float('inf')
     patience_counter = 0
-    patience = 25
+    patience = patience
     
     for epoch in range(1, epochs + 1):
         # Progressive unfreezing
@@ -528,6 +528,8 @@ if __name__ == "__main__":
                         help="Fine-tune all parameters")
     parser.add_argument("--unfreeze-epoch", type=int, default=None,
                         help="Unfreeze encoder at this epoch for progressive fine-tuning")
+    parser.add_argument("--patience", type=int, default=25,
+                        help="Early stopping patience (default: 25)")
     parser.add_argument("--mosaic", action="store_true", help="Use Level 3 Mosaic tiles")
     parser.add_argument("--no-mask", dest="mask", action="store_false", help="Disable water vapor masking")
     parser.set_defaults(mask=True)
@@ -538,4 +540,5 @@ if __name__ == "__main__":
     train_production(args.nc_dir, args.richness_csv, epochs=args.epochs, 
                      test_run=args.test_run, freeze_encoder=args.freeze,
                      unfreeze_epoch=args.unfreeze_epoch, use_mosaic=args.mosaic,
-                     mask_water_vapor=args.mask, leave_out=args.leave_out, seed=args.seed)
+                     mask_water_vapor=args.mask, leave_out=args.leave_out, seed=args.seed,
+                     patience=args.patience)

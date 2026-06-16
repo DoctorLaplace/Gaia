@@ -86,7 +86,7 @@ def run_single_session(run_idx, train_idx, val_idx, full_dataset, config, device
     best_rmse = float('inf')
     best_mae = float('inf')
     patience_counter = 0
-    patience = 15 # Shorter patience for detector runs
+    patience = args.patience
 
     for epoch in range(1, epochs + 1):
         if args.freeze and args.unfreeze_epoch and epoch == args.unfreeze_epoch:
@@ -161,6 +161,8 @@ def main():
                         help="Fine-tune all parameters")
     parser.add_argument("--unfreeze-epoch", type=int, default=None,
                         help="Unfreeze encoder at this epoch")
+    parser.add_argument("--patience", type=int, default=15,
+                        help="Early stopping patience (default: 15)")
     parser.add_argument("--mosaic", action="store_true", help="Use Level 3 Mosaic tiles")
     parser.add_argument("--no-mask", dest="mask", action="store_false", help="Disable water vapor masking")
     parser.set_defaults(mask=True)

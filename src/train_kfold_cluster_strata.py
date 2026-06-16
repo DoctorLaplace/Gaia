@@ -98,7 +98,7 @@ def run_fold(fold_idx, k, train_idx, val_idx, val_clusters, full_dataset, config
     best_r2 = -float('inf')
     best_metrics = {}
     patience_counter = 0
-    patience = 25
+    patience = args.patience
 
     for epoch in range(1, epochs + 1):
         # -- Progressive unfreezing --
@@ -197,6 +197,8 @@ def main():
                         help="Fine-tune all parameters")
     parser.add_argument("--unfreeze-epoch", type=int, default=None,
                         help="Unfreeze encoder at this epoch")
+    parser.add_argument("--patience", type=int, default=25,
+                        help="Early stopping patience (default: 25)")
     parser.add_argument("--mosaic", action="store_true", help="Use Level 3 Mosaic tiles")
     parser.add_argument("--no-mask", dest="mask", action="store_false", help="Disable water vapor masking")
     parser.set_defaults(mask=True)
