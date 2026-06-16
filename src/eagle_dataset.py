@@ -92,8 +92,8 @@ class SingleEagleTiffDataset:
         """Resample spectral bands to match the 200-band EnMAP foundation model."""
         target_wavs = np.linspace(400, 2450, 200)
         
-        # Replace NoData fill values (less than 0) and boundary noise with 0.0 before interpolation
-        patch_raw = np.where(patch_raw < 0.0, 0.0, patch_raw)
+        # Replace NaNs, Infs, NoData fill values (less than 0), and boundary noise with 0.0 before interpolation
+        patch_raw = np.where(np.isnan(patch_raw) | np.isinf(patch_raw) | (patch_raw < 0.0), 0.0, patch_raw)
         
         # Resample along spectral dimension (channel-last for interpolation)
         patch_hwc = np.transpose(patch_raw, (1, 2, 0))
