@@ -224,8 +224,8 @@ class MultiFlightEagleDataset(Dataset):
                             ))
                 ds.close()
             except Exception as e:
-                # print(f"Error mapping {tif_path}: {e}")
-                pass
+                import traceback
+                traceback.print_exc()
             return local_mappings
 
         all_results = []
