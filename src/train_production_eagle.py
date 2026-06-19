@@ -138,7 +138,7 @@ def train_eagle(tif_dir=None, richness_csv=None, epochs=None, batch_size=None,
     criterion = nn.MSELoss()
     optimizer = optim.AdamW(
         filter(lambda p: p.requires_grad, model.parameters()),
-        lr=lr, weight_decay=0.05
+        lr=lr, weight_decay=0.15
     )
     scheduler = optim.lr_scheduler.OneCycleLR(
         optimizer, max_lr=lr, epochs=epochs,
@@ -156,8 +156,8 @@ def train_eagle(tif_dir=None, richness_csv=None, epochs=None, batch_size=None,
                 param.requires_grad = True
             optimizer = optim.AdamW([
                 {'params': model.encoder.mlp_head.parameters(), 'lr': lr},
-                {'params': [p for n, p in model.encoder.named_parameters() if 'mlp_head' not in n], 'lr': lr * 0.3},
-            ], weight_decay=0.05)
+                {'params': [p for n, p in model.encoder.named_parameters() if 'mlp_head' not in n], 'lr': lr * 0.1},
+            ], weight_decay=0.15)
             scheduler = optim.lr_scheduler.OneCycleLR(
                 optimizer, max_lr=lr, epochs=epochs - epoch + 1,
                 steps_per_epoch=len(train_loader), pct_start=0.05
