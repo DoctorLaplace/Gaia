@@ -86,7 +86,7 @@ def main():
             if args.epochs is not None:
                 cmd.extend(["--epochs", str(args.epochs)])
             if args.batch_size is not None:
-                cmd.extend(["--batch-size", str(args.batch_size)])
+                cmd.extend(["--batch_size", str(args.batch_size)])
             if args.test_run:
                 cmd.append("--test-run")
 
