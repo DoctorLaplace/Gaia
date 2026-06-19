@@ -103,11 +103,43 @@ def main():
             log_file = open(log_file_path, "w", encoding="utf-8")
             
             proc = subprocess.Popen(cmd, env=env, stdout=log_file, stderr=subprocess.STDOUT)
-            active_processes[proc] = (fold_idx, gpu_id, log_file, log_file_path)
+            active_processes[proc] = {
+                'fold_idx': fold_idx,
+                'gpu_id': gpu_id,
+                'log_file': log_file,
+                'log_file_path': log_file_path,
+                'offset': 0
+            }
 
-        # Check for completed processes
+        # Check for completed processes and stream log updates
         finished_procs = []
-        for proc, (fold_idx, gpu_id, log_file, log_file_path) in active_processes.items():
+        for proc, info in active_processes.items():
+            fold_idx = info['fold_idx']
+            gpu_id = info['gpu_id']
+            log_file_path = info['log_file_path']
+            log_file = info['log_file']
+
+            # Read new log lines
+            if os.path.exists(log_file_path):
+                try:
+                    with open(log_file_path, "r", encoding="utf-8", errors="ignore") as f:
+                        f.seek(info['offset'])
+                        new_content = f.read()
+                        info['offset'] = f.tell()
+                        
+                        if new_content:
+                            for line in new_content.splitlines():
+                                line_str = line.strip()
+                                if not line_str:
+                                    continue
+                                # Filter out tqdm progress bars to keep output clean
+                                if "%|" in line_str or "it/s" in line_str:
+                                    continue
+                                # Print update with a distinct fold & GPU tag
+                                print(f"{Colors.OKCYAN}[Fold {fold_idx+1:2d} (GPU {gpu_id})]{Colors.ENDC} {line}")
+                except Exception:
+                    pass
+
             ret = proc.poll()
             if ret is not None:
                 finished_procs.append(proc)
@@ -130,7 +162,7 @@ def main():
 
         # Clean up finished processes
         for proc in finished_procs:
-            fold_idx, gpu_id, _, _ = active_processes[proc]
+            gpu_id = active_processes[proc]['gpu_id']
             del active_processes[proc]
             available_gpus.append(gpu_id)
 
