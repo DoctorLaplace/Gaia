@@ -197,6 +197,8 @@ def main():
     parser.add_argument("--test-run", action="store_true",
                         help="Quick smoke test (2 folds, 2 epochs)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for K-Fold splitting")
+    parser.add_argument("--fold", type=int, default=None,
+                        help="Run only this specific fold index (0-indexed) and save results to a temporary JSON file")
     args = parser.parse_args()
 
     # -- Load Config --
@@ -242,13 +244,8 @@ def main():
         print(f"{Colors.FAIL}[!] No .tif files found in {tif_dir}{Colors.ENDC}")
         return
 
-    if args.test_run:
-        tif_paths = tif_paths[:2]
-
     # -- Build Dataset --
     cache_suffix = f"_p{patch_size}_{args.mode}_strata.json"
-    if args.test_run:
-        cache_suffix = f"_p{patch_size}_{args.mode}_strata_test.json"
     mapping_cache = os.path.join(project_root, "data", "eagle", "mapping" + cache_suffix)
 
     full_dataset = MultiFlightEagleDataset(
@@ -289,6 +286,9 @@ def main():
     t0 = time.time()
 
     for fold_idx, (train_clusters_idx, val_clusters_idx) in enumerate(kf.split(val_candidates)):
+        if args.fold is not None and fold_idx != args.fold:
+            continue
+
         val_clusters = val_candidates[val_clusters_idx]
         
         train_idx = np.where(~np.isin(sample_clusters, val_clusters))[0]
@@ -303,6 +303,16 @@ def main():
             full_dataset, config, device, args
         )
         fold_results.append(metrics)
+
+        # Save single fold results to temp file if --fold is specified
+        if args.fold is not None:
+            import json
+            temp_path = os.path.join(project_root, "reports", f"temp_fold_{args.mode}_{fold_idx}.json")
+            os.makedirs(os.path.dirname(temp_path), exist_ok=True)
+            with open(temp_path, "w") as f:
+                json.dump(metrics, f)
+            print(f"{Colors.OKGREEN}[OK] Fold {fold_idx+1} results saved to {temp_path}{Colors.ENDC}")
+            return
 
     elapsed = time.time() - t0
 
