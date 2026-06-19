@@ -43,7 +43,7 @@ bioscape:
   s3_block_size_kb: 8192      # 8MB blocks for reduced S3 requests
   s3_cache_size_mb: 500       
   rdcc_nbytes_mb: 64          # 32MB HDF5 chunk cache per worker
-  num_workers: 8              # Matched to server CPU count to avoid warnings
+  num_workers: 2              # Matched to 14 cores total for 4 parallel GPU runs (4 x 2 workers + 4 mains = 12 processes)
   
   richness_csv: "data/bioscape/western_cape_site_embeddings.csv"
   patch_size: 24
