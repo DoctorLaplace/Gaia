@@ -7,139 +7,132 @@ Gaia is a masked spatial-spectral vision transformer fine-tuned on EnMAP foundat
 ### 1. Prerequisites
 - **Python 3.10+** (Recommend a virtual env)
 - **CUDA GPU** with at least 8GB VRAM.
-- **NASA Earthdata Account**: [Register here](https://urs.earthdata.nasa.gov/).
 
 ### 2. Environment Setup
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Data Acquisition (Smart Sync)
-Downloads AVIRIS-NG granules, applies Dr. Clark's Bad Band List (BBL), and optionally downsamples.
-Data is automatically organized by resolution: `data/bioscape/30m/` and `data/bioscape/5m/`.
+### 3. Data Acquisition 
+* For the old BioSCape data download instructions see README_OLD.md *
+Download the three EAGLE resampled archives to ~/Downloads (or directory of your choice).
 
-#### Option A: Targeted Sync (Recommended, ~535 labeled granules)
+Next run:
+
 ```bash
-# 1. Generate the labeled inventory
-python src/generate_labeled_inventory.py
-
-# 2. Download 30m (default, ~35MB each, fast local training)
-python src/smart_sync.py --local
-
-# 3. Download 5m (original resolution, ~1.3GB each, for supercomputer)
-python src/smart_sync.py --local --res 5
+python scratch/extract_eagle_data.py
+```
+or
+```bash
+python scratch/extract_eagle_data.py --zip-dir different_directory_path
 ```
 
-#### Option B: Full Dataset Sync (3,648 granules, 500GB+)
+To upload to a remote server (NRP) there are two options.
+
+#### A. Upload full zips then extract:
+Simpler since you don't need to confirm upload multiple times, may cause issues if download breaks before its finished. You must also ensure you have space for the full zip file and the extracted data (so ~2x storage requirement). Reccomendation: try zip upload first then proceed to option B if that doesn't work. 
+
+Once zip files are uploaded follow extraction as described previously.
+
+#### B. Upload uncompressed files:
+The extracted files will live in Gaia/data/eagle, directly upload this folder to its equivalent location. Once complete to ensure all files uploaded correctly run:
+
 ```bash
-python src/smart_sync.py --inventory full_inventory.txt --local --res 30
+python scratch/verify_dataset_integrity.py
 ```
 
-#### Option C: S3 Upload (for NRP Nautilus)
+If any files are corrupted download corrupted_files.txt to your local Gaia/data/eagle folder. Then on your local machine run:
+
 ```bash
-python src/smart_sync.py --res 30
+python scratch/prepare_repair.py
 ```
+
+A folder titled repair will be created in eagle containing all files to be reuploaded. Directly upload those to their corresponding folder (either 30m_native or 30m_10nm).
+
+Repeat as needed until the whole dataset verifies cleanly. 
 
 ### 4. Model Training
-Gaia uses a Masked Spatial-Spectral Transformer (SST) with EnMAP foundation weights.
+Gaia uses a Masked Spatial-Spectral Transformer with EnMAP foundation weights
+(`checkpoints/pretrained_ViTSpatialSpectral_200ep_enmap.pth`), fine-tuned on the
+EAGLE tiles with a small MLP regression head (`GaiaTransferModel` in
+`src/model_transfer.py`). The train/validation split holds out whole clusters
+(geographic site groups from `CLUSTER_ID`) so validation always measures
+generalization to unseen regions.
 
 ```bash
-# Train on 30m data (default, from config)
-python src/train_production.py --epochs 250
+# Train the production checkpoint (10nm mode, hold out 10 clusters for validation)
+python src/train_production_cluster_strata_eagle.py --mode 10nm --epochs 250
 
-# Train on 5m data (override directory)
-python src/train_production.py --nc_dir data/bioscape/5m --epochs 250
-
-# Quick test run (2 granules, 1 epoch)
-python src/train_production.py --test-run
+# Quick smoke test (2 tiles, 2 epochs, 1 held-out cluster)
+python src/train_production_cluster_strata_eagle.py --test-run
 ```
 
-### 5. Evaluation
-Evaluates the best checkpoint on a held-out validation set (10%, same split as training).
+Key flags: `--mode {native,10nm}`, `--leave-out N` (clusters held out, default 10),
+`--freeze` / `--no-freeze` (encoder frozen by default), `--unfreeze-epoch N`
+(progressive unfreeze), `--seed`, `--patience`.
+
+The best epoch is written to `checkpoints/gaia_eagle_best_strata.pth` (bundles the
+richness mean/std and per-band normalization stats needed for inference).
+
+### 5. K-Fold Cross-Validation (Rigorous)
+Cluster-stratified K-fold: each fold holds out a disjoint set of clusters, so every
+site is scored exactly once on a model that never saw its region.
 
 ```bash
-python src/evaluate.py --nc_dir data/bioscape/30m
+# 5-fold cluster-stratified CV
+python src/train_kfold_cluster_strata_eagle.py --k 5 --mode 10nm
 ```
 
-Outputs:
-- **Performance Dashboard**: `reports/gaia_performance_dashboard.png` (Styled scatter + baseline comparison).
-- **CSV Results**: `reports/evaluation_results.csv` (Per-site predictions vs. Mean Baseline).
-- Terminal summary of R-squared improvement over the "Mean Predictor".
+Reports two headline numbers:
+- **Mean R² ± Std Dev** across folds.
+- **Pooled R²** — every fold's held-out prediction concatenated onto one scatter and scored in a single `r2_score` call.
 
-### 6. K-Fold Cross-Validation (Rigorous)
-Performs Group K-Fold validation using flightlines to ensure the model generalizes to entirely new geographic regions. 
+Outputs (`<mode>` is `native` or `10nm`):
+- `reports/kfold_cluster_strata_results_eagle_<mode>.csv` — per-fold R² / RMSE / MAE.
+- `reports/kfold_pooled_oof_eagle_<mode>.csv` — pooled out-of-fold predictions (site, actual, predicted).
+- `reports/kfold_predictions_matrix_eagle_<mode>.csv` — wide per-site prediction matrix (one row per fold + an `actual` row).
+- `reports/kfold_plots/fold_*_scatter.png` and `reports/kfold_plots/pooled_oof_scatter_eagle_<mode>.png`.
+
+### 6. Inference / Heatmap
+Slides a trained model over every tile in a directory and exports predictions as a
+point layer for QGIS.
 
 ```bash
-# Run 5-fold CV (Takes ~100 minutes)
-python src/train_kfold.py --folds 5 --freeze
+python -m src.generate_heatmap --checkpoint checkpoints/gaia_eagle_best_strata.pth --mode 10nm --format gpkg
 ```
 
-This script computes the **Mean R² ± Std Dev** across all folds, providing a much more robust estimate of performance than a single held-out split. Results are saved to `reports/kfold_results.csv`.
+Writes `reports/heatmap_<mode>.geojson` (or `.gpkg` with `--format gpkg`).
 
-### 7. Interactive Geospatial Visualizer
-```bash
-# 1. Update mapping from all local granules
-python viz/regenerate_mapping.py
-
-# 2. Export patches (with robust per-band normalization)
-python viz/export_viz_data.py
-
-# 3. Start the server (provides a clickable link)
-python src/serve_viz.py
-```
-Open: [http://localhost:8000/viz/index.html](http://localhost:8000/viz/index.html)
-
----
-
-## Remote Training (NRP Nautilus)
-
-### Accessing the Workspace
-```bash
-coder ssh nasa-gaia
-```
-
-### S3 Storage Management (Ceph)
-
-#### Local (Windows/Dev):
-```bash
-python src/s3_ls.py              # List all buckets
-python src/s3_ls.py gaia-datasets  # List bucket contents
-```
-
-#### NRP Nautilus (Linux):
-- **List S3**: `s3cmd ls s3://your-bucket-name/`
-- **Upload**: `s3cmd put FILE s3://BUCKET/`
-- **Download**: `s3cmd get s3://BUCKET/FILE .`
-- **Rclone Sync**: `rclone sync /local/path nautilus-s3:bucket-name`
-
-#### Endpoints
-- **Internal (High Performance)**: `http://rook-ceph-rgw-nautiluss3.rook`
-- **External (Local Access)**: `https://s3-west.nrp-nautilus.io`
-
----
 
 ## Project Structure
 ```
-data/bioscape/
-  30m/             Downsampled + BBL-cleaned granules (local training)
-  5m/              Full-resolution granules (supercomputer)
-  *.csv, *.npy     Shared labels and normalization stats
+data/
+  eagle/
+    30m_native/    Native wavelength resolution EAGLE mosaic tiles (.tif)
+    30m_10nm/      10 nm FWHM resampled EAGLE mosaic tiles (.tif)
+  bioscape/
+    western_cape_site_embeddings.csv   Per-site species-richness labels
+    biosoundscape_site_metadata.csv    Site -> CLUSTER_ID (geographic groups for stratified splits)
 src/
-  smart_sync.py              Targeted downloader with BBL + downsampling
-  train_production.py        Fine-tuning with foundation weights
-  train_kfold.py             5-Fold Group validation by flightline
-  evaluate.py                Premium dashboard with baseline comparison
-  bioscape_dataset.py        NetCDF dataset loader (5m and 30m compatible)
-  generate_labeled_inventory.py   CMR spatial query for richness sites
-  serve_viz.py               Visualizer server with clean CLI links
-  s3_ls.py                   Local S3 bucket browser
-configs/config.yaml          All training hyperparameters and paths
-checkpoints/                 Foundation + fine-tuned model weights
+  train_production_cluster_strata_eagle.py   Fine-tune on EAGLE; cluster-held-out split -> production checkpoint
+  train_kfold_cluster_strata_eagle.py        Cluster-stratified K-fold CV (mean + pooled R²)
+  generate_heatmap.py                        Sweep a trained model over tiles -> richness point layer for QGIS
+  model_transfer.py                          GaiaTransferModel: pretrained ViT encoder + MLP regression head
+  vit_spatial_spectral.py                    Masked spatial-spectral ViT backbone
+  pos_embed.py                               Sin-cos positional embeddings for the backbone
+  eagle_dataset.py                           EAGLE GeoTIFF dataset (tile<->site mapping, band norm, clusters)
+  legacy/                                    Superseded BioSCape / S3 pipeline (kept for reference, not maintained)
+  obsolete/                                  Dead one-off scripts
+scratch/
+  extract_eagle_data.py        Unpack downloaded EAGLE archives into data/eagle/
+  verify_dataset_integrity.py  Check an uploaded dataset for corrupt tiles
+  prepare_repair.py            Stage corrupt tiles for re-upload
+configs/config.yaml            All training hyperparameters and paths (bioscape: block)
+checkpoints/                   Foundation + fine-tuned model weights
 reports/
-  kfold_results.csv          Cross-validation performance table
-  gaia_performance_dashboard.png  Visual evaluation summary
-viz/                         Leaflet geospatial explorer
-  regenerate_mapping.py      Site mapping re-scanner (syncs local data)
-  export_viz_data.py         Robust patch extractor for web UI
-  data/                      Binary patches and metadata
+  kfold_cluster_strata_results_eagle_*.csv   Per-fold CV metrics
+  kfold_pooled_oof_eagle_*.csv               Pooled out-of-fold predictions
+  kfold_plots/                               Per-fold + pooled scatter plots
+  heatmap_*.geojson / .gpkg                  Richness prediction layers
+viz/                           Leaflet geospatial explorer (BioSCape-era; not updated for EAGLE)
 ```
