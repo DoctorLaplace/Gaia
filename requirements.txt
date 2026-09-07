@@ -32,3 +32,10 @@ earthaccess
 netcdf4
 xarray
 pandas
+
+# Other missing
+rasterio
+
+# Heatmap gpkg export (optional; GeoJSON export works without these)
+geopandas
+shapely
