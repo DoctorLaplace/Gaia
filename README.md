@@ -14,7 +14,7 @@ pip install -r requirements.txt
 ```
 
 ### 3. Data Acquisition 
-* For the old BioSCape data download instructions see README_OLD.md *
+_For the old BioSCape data download instructions see README_OLD.md_
 Download the three EAGLE resampled archives to ~/Downloads (or directory of your choice).
 
 Next run:
