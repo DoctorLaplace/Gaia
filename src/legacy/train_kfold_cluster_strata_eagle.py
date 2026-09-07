@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.eagle_dataset import MultiFlightEagleDataset, SingleEagleTiffDataset
-from src.model_transfer import GaiaTransferModel, Colors
+from src.train_production_cluster_strata_eagle import GaiaTransferModel, Colors
 
 def run_fold(fold_idx, k, train_idx, val_idx, val_clusters, full_dataset, config, device, args):
     """Train and evaluate a single fold. Returns a metrics dict."""
@@ -45,9 +45,8 @@ def run_fold(fold_idx, k, train_idx, val_idx, val_clusters, full_dataset, config
 
     # -- DataLoaders --
     # Windows doesn't handle multi-processing for rasterio cleanly, default to 0 on Windows
-    # num_workers = 0 if os.name == 'nt' else b_cfg.get('num_workers', 4)
-    num_workers = 0
-    
+    num_workers = 0 if os.name == 'nt' else b_cfg.get('num_workers', 4)
+
     train_loader = DataLoader(
         Subset(full_dataset, train_idx.tolist()),
         batch_size=batch_size, shuffle=True,
@@ -342,8 +341,6 @@ def main():
 
     fold_results = []
     pred_matrix_rows = []
-    oof_idx_parts = []   # held-out sample indices, per fold
-    oof_pred_parts = []  # held-out predictions, per fold (for pooled R^2)
     t0 = time.time()
 
     for fold_idx, (train_clusters_idx, val_clusters_idx) in enumerate(kf.split(val_candidates)):
@@ -361,11 +358,6 @@ def main():
             full_dataset, config, device, args
         )
         fold_results.append(metrics)
-
-        # all_preds is dense inference over the whole dataset with this fold's best
-        # weights, so all_preds[val_idx] are exactly this fold's held-out predictions.
-        oof_idx_parts.append(val_idx)
-        oof_pred_parts.append(np.asarray(all_preds)[val_idx])
 
         row = {'fold_idx': fold_idx + 1}
         row.update(dict(zip(site_ids, all_preds)))
@@ -389,42 +381,6 @@ def main():
         print(f"{Colors.FAIL}[!] No folds completed successfully.{Colors.ENDC}")
         return
 
-    # -- Pooled ("concatenated") out-of-fold R²: every held-out prediction on one graph --
-    oof_idx = np.concatenate(oof_idx_parts)
-    oof_pred = np.concatenate(oof_pred_parts)
-    oof_actual = np.array([mappings[i][3] for i in oof_idx])
-
-    pooled_r2 = r2_score(oof_actual, oof_pred)
-    pooled_rmse = np.sqrt(mean_squared_error(oof_actual, oof_pred))
-    pooled_mae = mean_absolute_error(oof_actual, oof_pred)
-
-    oof_df = pd.DataFrame({
-        'site_id': [site_ids[i] for i in oof_idx],
-        'actual': oof_actual,
-        'predicted': oof_pred,
-    })
-    oof_path = os.path.join(project_root, "reports", f"kfold_pooled_oof_eagle_{args.mode}.csv")
-    oof_df.to_csv(oof_path, index=False)
-    print(f"{Colors.OKGREEN}[OK] Pooled out-of-fold predictions saved to: {oof_path}{Colors.ENDC}")
-
-    fig, ax = plt.subplots(figsize=(5, 5))
-    ax.scatter(oof_actual, oof_pred, color='tab:blue', alpha=0.6, s=18)
-    lims = [oof_actual.min() - 2, oof_actual.max() + 2]
-    ax.plot(lims, lims, '--k', alpha=0.3, label='1:1')
-    ax.set_xlim(lims); ax.set_ylim(lims)
-    ax.set_xlabel("Actual richness")
-    ax.set_ylabel("Predicted richness")
-    ax.set_title(f"Pooled out-of-fold ({len(oof_idx)} sites)\n"
-                 f"R² = {pooled_r2:.4f}  RMSE = {pooled_rmse:.2f}", fontsize='small')
-    ax.legend(fontsize='x-small', loc='upper left')
-    fig.tight_layout()
-    pooled_plot_path = os.path.join(project_root, "reports", "kfold_plots",
-                                    f"pooled_oof_scatter_eagle_{args.mode}.png")
-    os.makedirs(os.path.dirname(pooled_plot_path), exist_ok=True)
-    fig.savefig(pooled_plot_path, dpi=150)
-    plt.close(fig)
-    print(f"{Colors.OKGREEN}[OK] Saved pooled out-of-fold scatter plot to: {pooled_plot_path}{Colors.ENDC}")
-
     # -- Final Summary --
     df = pd.DataFrame(fold_results)
     mean_r2 = df['r2'].mean()
@@ -442,10 +398,6 @@ def main():
     print(f"{Colors.OKGREEN}  Mean R2:   {mean_r2:.4f} +/- {std_r2:.4f}{Colors.ENDC}")
     print(f"{Colors.OKGREEN}  Mean RMSE: {mean_rmse:.2f} +/- {std_rmse:.2f}{Colors.ENDC}")
     print(f"{Colors.OKGREEN}  Mean MAE:  {mean_mae:.2f} +/- {std_mae:.2f}{Colors.ENDC}")
-    print(f"{Colors.OKCYAN}{'-'*60}{Colors.ENDC}")
-    print(f"{Colors.OKGREEN}  Pooled R2:   {pooled_r2:.4f}   (all {len(oof_idx)} held-out preds, one graph){Colors.ENDC}")
-    print(f"{Colors.OKGREEN}  Pooled RMSE: {pooled_rmse:.2f}{Colors.ENDC}")
-    print(f"{Colors.OKGREEN}  Pooled MAE:  {pooled_mae:.2f}{Colors.ENDC}")
     print(f"{Colors.OKCYAN}  Total Time: {elapsed/60:.1f} minutes{Colors.ENDC}")
     print(f"{Colors.HEADER}{'='*60}{Colors.ENDC}")
 

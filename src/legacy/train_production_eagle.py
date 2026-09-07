@@ -8,18 +8,31 @@ from torch.utils.data import DataLoader, Subset
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 import yaml
+
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.eagle_dataset import MultiFlightEagleDataset
-from src.model_transfer import GaiaTransferModel, Colors
+from src.vit_spatial_spectral import ViTSpatialSpectral
+from src.train_production import GaiaTransferModel
 
-def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=None,
-                       test_run=False, freeze_encoder=True, unfreeze_epoch=None,
-                       mode="native", mask_water_vapor=True, leave_out=10, seed=42, patience=25):
+def train_eagle(tif_dir=None, richness_csv=None, epochs=None, batch_size=None,
+                test_run=False, freeze_encoder=True, unfreeze_epoch=None,
+                mode="native", mask_water_vapor=True, patience=25):
     # Load config
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     with open(os.path.join(project_root, "configs", "config.yaml"), 'r') as f:
@@ -40,14 +53,13 @@ def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=
     patch_size = b_cfg.get('patch_size', 16)
     
     device = torch.device(config.get('device', 'cuda') if torch.cuda.is_available() else "cpu")
-    print(f"{Colors.HEADER}===================================================={Colors.ENDC}\n{Colors.HEADER}Gaia EAGLE Cluster-Stratified Fine-Tuning ({mode} mode) on {device}{Colors.ENDC}")
+    print(f"{Colors.HEADER}===================================================={Colors.ENDC}\n{Colors.HEADER}Gaia EAGLE Fine-Tuning ({mode} mode) on {device}{Colors.ENDC}")
     print(f"[*] Target Directory: {tif_dir}")
     print(f"[*] Labels CSV: {richness_csv}")
 
     if test_run:
-        print(f"{Colors.FAIL}[!] TEST RUN ENABLED: Using only 2 tiles, 2 epochs, 1 held-out cluster.{Colors.ENDC}")
-        epochs = 2
-        leave_out = 1
+        print(f"{Colors.FAIL}[!] TEST RUN ENABLED: Using only 2 tiles and 1 epoch.{Colors.ENDC}")
+        epochs = 1
 
     if not os.path.exists(tif_dir):
         print(f"{Colors.FAIL}[!] Directory not found: {tif_dir}. Run extract_eagle_data.py first.{Colors.ENDC}")
@@ -63,9 +75,9 @@ def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=
         tif_paths = tif_paths[:2]
 
     # Caching path for mapped dataset
-    cache_suffix = f"_p{patch_size}_{mode}_strata.json"
+    cache_suffix = f"_p{patch_size}_{mode}.json"
     if test_run:
-        cache_suffix = f"_p{patch_size}_{mode}_strata_test.json"
+        cache_suffix = f"_p{patch_size}_{mode}_test.json"
     mapping_cache = os.path.join(project_root, "data", "eagle", "mapping" + cache_suffix)
     
     full_dataset = MultiFlightEagleDataset(
@@ -92,45 +104,23 @@ def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=
     richness_std = float(all_richness.std()) + 1e-6
     print(f"{Colors.OKBLUE}[*] Richness Stats: mean={richness_mean:.1f}, std={richness_std:.1f}, min={all_richness.min():.0f}, max={all_richness.max():.0f}{Colors.ENDC}")
 
-    # --- Cluster-Stratified Train/Validation Split ---
-    mappings = full_dataset.mappings
-    sample_clusters = np.array([m[4] for m in mappings])
-    unique_clusters = np.unique(sample_clusters)
-    
-    # Exclude noise (-1) from validation split options
-    val_candidates = unique_clusters[unique_clusters != -1]
-    
-    if leave_out >= len(val_candidates):
-        print(f"{Colors.WARNING}[!] Warning: Requested leaving out {leave_out} clusters, but only {len(val_candidates)} candidates exist. Leaving out {len(val_candidates)-1} instead.{Colors.ENDC}")
-        leave_out = max(1, len(val_candidates) - 1)
-        
-    np.random.seed(seed)
-    val_clusters = np.random.choice(val_candidates, size=leave_out, replace=False)
-    
-    train_idx = np.where(~np.isin(sample_clusters, val_clusters))[0]
-    val_idx = np.where(np.isin(sample_clusters, val_clusters))[0]
-    
-    print(f"\n{Colors.OKGREEN}[OK] Cluster-Stratified Split completed (using seed {seed}):")
-    print(f"    - Held out {len(val_clusters)} clusters for validation: {sorted(list(val_clusters))}")
-    print(f"    - Training set: {len(train_idx)} samples from {len(unique_clusters) - len(val_clusters)} clusters")
-    print(f"    - Validation set: {len(val_idx)} samples from {len(val_clusters)} clusters{Colors.ENDC}\n")
-
-    if len(val_idx) == 0:
-        print(f"{Colors.FAIL}[!] Validation set has 0 samples. Try another seed or adjust leave-out.{Colors.ENDC}")
-        return
+    indices = np.arange(len(full_dataset))
+    val_split = b_cfg.get('val_split', 0.2)
+    train_idx, val_idx = train_test_split(indices, test_size=val_split, random_state=42)
 
     # Windows multi-processing doesn't work well with rasterio, so use num_workers=0 on Windows
-    # num_workers = 0 if os.name == 'nt' else b_cfg.get('num_workers', 4)
-    num_workers = 0
+    num_workers = 0 if os.name == 'nt' else b_cfg.get('num_workers', 4)
     print(f"{Colors.OKBLUE}[*] Enabling {num_workers} dataloader workers...{Colors.ENDC}")
 
-    train_loader = DataLoader(Subset(full_dataset, train_idx.tolist()), batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
-    val_loader = DataLoader(Subset(full_dataset, val_idx.tolist()), batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
+    train_loader = DataLoader(Subset(full_dataset, train_idx), batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
+    val_loader = DataLoader(Subset(full_dataset, val_idx), batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
 
     model = GaiaTransferModel(num_targets=1, patch_size=patch_size).to(device)
     foundation_ckpt = os.path.join(project_root, "checkpoints", "pretrained_ViTSpatialSpectral_200ep_enmap.pth")
     if os.path.exists(foundation_ckpt):
         model.load_foundation_weights(foundation_ckpt, device)
+    else:
+        print(f"{Colors.WARNING}[!] Pretrained foundation weights not found at {foundation_ckpt}. Initializing randomly.{Colors.ENDC}")
 
     # Freeze encoder
     if freeze_encoder:
@@ -216,7 +206,7 @@ def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=
                 'band_mean': full_dataset.band_mean.flatten().tolist() if full_dataset.band_mean is not None else None,
                 'band_std': full_dataset.band_std.flatten().tolist() if full_dataset.band_std is not None else None,
             }
-            torch.save(ckpt_data, os.path.join(project_root, "checkpoints", "gaia_eagle_best_strata.pth"))
+            torch.save(ckpt_data, os.path.join(project_root, "checkpoints", "gaia_eagle_best.pth"))
             print(f"{Colors.OKGREEN}[OK] New Best EAGLE Model Saved (R²: {best_r2:.4f}){Colors.ENDC}")
         else:
             patience_counter += 1
@@ -228,27 +218,25 @@ def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Gaia EAGLE Cluster-Stratified Production Training")
+    parser = argparse.ArgumentParser(description="Gaia EAGLE Training Production Script")
     parser.add_argument("--tif_dir", type=str, help="Override path to EAGLE TIFF tiles directory")
     parser.add_argument("--richness_csv", type=str, help="Override path to richness labels CSV")
     parser.add_argument("--epochs", type=int, help="Number of epochs to train")
     parser.add_argument("--batch_size", type=int, help="Batch size for training")
-    parser.add_argument("--test-run", action="store_true", help="Quick test run (2 epochs, 1 held-out cluster)")
+    parser.add_argument("--test-run", action="store_true", help="Quick test run (1 epoch on 2 tiles)")
     parser.add_argument("--freeze", action="store_true", default=True, help="Freeze encoder, train only head (default)")
     parser.add_argument("--no-freeze", dest="freeze", action="store_false", help="Fine-tune all parameters")
-    parser.add_argument("--unfreeze-epoch", type=int, default=None, help="Unfreeze encoder at this epoch")
+    parser.add_argument("--unfreeze-epoch", type=int, default=None, help="Unfreeze encoder at this epoch for progressive fine-tuning")
     parser.add_argument("--mode", type=str, choices=["native", "10nm"], default="native",
                         help="Select EAGLE data mode: native (32 target tiles) or 10nm (1517 mosaic tiles)")
     parser.add_argument("--no-mask", dest="mask", action="store_false", help="Disable water vapor masking")
-    parser.add_argument("--leave-out", type=int, default=10, help="Number of clusters to hold out for validation")
-    parser.add_argument("--seed", type=int, default=42, help="Seed for split reproducibility")
     parser.add_argument("--patience", type=int, default=25, help="Patience for early stopping")
     parser.set_defaults(mask=True)
     
     args = parser.parse_args()
-    train_eagle_strata(
+    train_eagle(
         tif_dir=args.tif_dir, richness_csv=args.richness_csv, epochs=args.epochs,
         batch_size=args.batch_size, test_run=args.test_run, freeze_encoder=args.freeze,
         unfreeze_epoch=args.unfreeze_epoch, mode=args.mode, mask_water_vapor=args.mask,
-        leave_out=args.leave_out, seed=args.seed, patience=args.patience
+        patience=args.patience
     )

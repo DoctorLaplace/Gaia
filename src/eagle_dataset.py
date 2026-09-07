@@ -135,6 +135,36 @@ class SingleEagleTiffDataset:
         patch = self.resample_to_foundation(patch_raw, self.wavelengths)
         return patch
 
+    def iter_grid_patches(self, stride=None):
+        """
+        Walk the full raster in a grid, yielding a valid patch at every
+        `stride` pixels (default: non-overlapping, stride=patch_size).
+        Used for full-tile inference (e.g. heatmap generation) rather than
+        querying at known site lat/lon.
+        """
+        self._ensure_open()
+        p = self.patch_size // 2
+        step = stride or self.patch_size
+
+        for row_idx in range(p, self.height - p, step):
+            for col_idx in range(p, self.width - p, step):
+                window = ((row_idx - p, row_idx + p), (col_idx - p, col_idx + p))
+                patch_raw = self.src.read(window=window)
+
+                # Same nodata filter as get_patch_at_latlon, to match training-time behavior
+                check_band = patch_raw[min(50, self.count - 1), :, :]
+                nodata_ratio = (check_band < 0.0).mean()
+                if nodata_ratio >= 0.5:
+                    continue
+
+                patch = self.resample_to_foundation(patch_raw, self.wavelengths)
+
+                # Pixel center -> map coords -> WGS84
+                easting, northing = self.transform * (col_idx, row_idx)
+                lon, lat = self.inverse_transformer.transform(easting, northing)
+
+                yield patch, lat, lon, row_idx, col_idx
+
     def close(self):
         if hasattr(self, 'src') and self.src is not None:
             try:
@@ -216,11 +246,12 @@ class MultiFlightEagleDataset(Dataset):
                         patch = ds.get_patch_at_latlon(float(row['lat']), float(row['lon']))
                         if patch is not None:
                             local_mappings.append((
-                                tif_path, 
-                                float(row['lat']), 
-                                float(row['lon']), 
+                                tif_path,
+                                float(row['lat']),
+                                float(row['lon']),
                                 float(row['richness']),
-                                int(row.get('CLUSTER_ID', -1))
+                                int(row.get('CLUSTER_ID', -1)),
+                                str(row.get('SiteID', f"site_{len(local_mappings)}"))
                             ))
                 ds.close()
             except Exception as e:

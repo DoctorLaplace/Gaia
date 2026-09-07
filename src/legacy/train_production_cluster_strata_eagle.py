@@ -11,11 +11,23 @@ import pandas as pd
 from sklearn.metrics import r2_score
 import yaml
 
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.eagle_dataset import MultiFlightEagleDataset
-from src.model_transfer import GaiaTransferModel, Colors
+from src.vit_spatial_spectral import ViTSpatialSpectral
+from src.train_production import GaiaTransferModel
 
 def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=None,
                        test_run=False, freeze_encoder=True, unfreeze_epoch=None,
@@ -120,8 +132,7 @@ def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=
         return
 
     # Windows multi-processing doesn't work well with rasterio, so use num_workers=0 on Windows
-    # num_workers = 0 if os.name == 'nt' else b_cfg.get('num_workers', 4)
-    num_workers = 0
+    num_workers = 0 if os.name == 'nt' else b_cfg.get('num_workers', 4)
     print(f"{Colors.OKBLUE}[*] Enabling {num_workers} dataloader workers...{Colors.ENDC}")
 
     train_loader = DataLoader(Subset(full_dataset, train_idx.tolist()), batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
