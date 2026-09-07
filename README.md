@@ -17,8 +17,6 @@ pip install -r requirements.txt
 _For the old BioSCape data download instructions see README_OLD.md_
 Download the three EAGLE resampled archives to ~/Downloads (or directory of your choice).
 
-Next run:
-
 ```bash
 python scratch/extract_eagle_data.py
 ```
@@ -35,13 +33,13 @@ Simpler since you don't need to confirm upload multiple times, may cause issues 
 Once zip files are uploaded follow extraction as described previously.
 
 #### B. Upload uncompressed files:
-The extracted files will live in Gaia/data/eagle, directly upload this folder to its equivalent location. Once complete to ensure all files uploaded correctly run:
+The extracted files will live in Gaia/data/eagle, directly upload this folder to its equivalent location. Once complete ensure all files uploaded correctly:
 
 ```bash
 python scratch/verify_dataset_integrity.py
 ```
 
-If any files are corrupted download corrupted_files.txt to your local Gaia/data/eagle folder. Then on your local machine run:
+If any files are corrupted download corrupted_files.txt to your local Gaia/data/eagle folder. Then on your local machine:
 
 ```bash
 python scratch/prepare_repair.py
