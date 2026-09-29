@@ -88,6 +88,27 @@ def main():
     richness_mean = ckpt['richness_mean']
     richness_std = ckpt['richness_std']
 
+    input_normalization = ckpt.get('input_normalization')
+    band_mean = band_std = None
+    if input_normalization == 'per_band_zscore':
+        try:
+            band_mean = torch.as_tensor(ckpt['band_mean'], device=device, dtype=torch.float32)
+            band_std = torch.as_tensor(ckpt['band_std'], device=device, dtype=torch.float32)
+        except (KeyError, TypeError, ValueError, RuntimeError) as exc:
+            raise ValueError("per_band_zscore requires valid band_mean and band_std arrays") from exc
+        if (
+            band_mean.numel() != 200
+            or band_std.numel() != 200
+            or not torch.isfinite(band_mean).all().item()
+            or not torch.isfinite(band_std).all().item()
+            or not (band_std > 0).all().item()
+        ):
+            raise ValueError("per_band_zscore requires 200 finite means and strictly positive stds")
+        band_mean = band_mean.reshape(1, 200, 1, 1)
+        band_std = band_std.reshape(1, 200, 1, 1)
+    elif input_normalization is not None:
+        raise ValueError(f"Unknown input normalization: {input_normalization!r}")
+
     model = GaiaTransferModel(num_targets=1, patch_size=patch_size).to(device)
     model.load_state_dict(ckpt['model_state_dict'])
     model.eval()
@@ -107,6 +128,7 @@ def main():
 
     def flush_geojson(batch_lats, batch_lons, batch_preds, batch_tiles, batch_rows, batch_cols):
         nonlocal n_written
+        assert geojson_f is not None
         for lat, lon, pred, tile, row, col in zip(batch_lats, batch_lons, batch_preds, batch_tiles, batch_rows, batch_cols):
             feature = {
                 "type": "Feature",
@@ -124,6 +146,9 @@ def main():
         if not batch_patches:
             return
         x = torch.stack(batch_patches).to(device)
+        if band_mean is not None:
+            x = (x - band_mean) / band_std
+        
         with torch.no_grad():
             preds_norm = model(x).cpu().numpy().flatten()
         preds_real = preds_norm * richness_std + richness_mean
@@ -149,7 +174,7 @@ def main():
 
     run_batch()  # flush remainder
 
-    if args.format == "geojson":
+    if geojson_f is not None:
         geojson_f.write('\n]}\n')
         geojson_f.close()
         print(f"{Colors.OKGREEN}[OK] Wrote {n_written} points to {out_path}{Colors.ENDC}")

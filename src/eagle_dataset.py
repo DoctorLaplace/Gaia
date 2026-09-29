@@ -282,6 +282,8 @@ class MultiFlightEagleDataset(Dataset):
 
     def compute_band_stats(self, cache_path=None):
         """Compute global per-band mean/std across ALL patches. Results are cached to disk."""
+        if not self.mask_water_vapor:
+            cache_path = None
         if cache_path and os.path.exists(cache_path):
             import json
             with open(cache_path, 'r') as f:
@@ -301,7 +303,10 @@ class MultiFlightEagleDataset(Dataset):
             tif_path, lat, lon, _, *rest = self.mappings[i]
             with self.cache_lock:
                 if tif_path not in self.dataset_cache:
-                    self.dataset_cache[tif_path] = SingleEagleTiffDataset(tif_path, patch_size=self.patch_size)
+                    self.dataset_cache[tif_path] = SingleEagleTiffDataset(
+                        tif_path, patch_size=self.patch_size,
+                        mask_water_vapor=self.mask_water_vapor
+                    )
                 ds = self.dataset_cache[tif_path]
             
             patch = ds.get_patch_at_latlon(lat, lon)
@@ -320,8 +325,7 @@ class MultiFlightEagleDataset(Dataset):
                 n_pixels += p_pixels
                 
         if n_pixels == 0:
-            print("[!] Could not compute band stats (no valid pixels found).")
-            return
+            raise ValueError("Cannot compute band statistics: no valid pixels")
             
         global_mean = running_sum / n_pixels
         global_std = ((running_sq_sum / n_pixels) - global_mean ** 2).clamp(min=0).sqrt().clamp(min=1e-6)
@@ -356,7 +360,8 @@ class MultiFlightEagleDataset(Dataset):
         patch = ds.get_patch_at_latlon(lat, lon)
         if patch is None:
             patch = torch.zeros(200, self.patch_size, self.patch_size)
-            
+        elif self.band_mean is not None and self.band_std is not None:
+            patch = (patch - self.band_mean) / self.band_std
         if self.augment:
             patch = torch.rot90(patch, k=np.random.randint(0, 4), dims=(1, 2))
             if np.random.random() > 0.5:

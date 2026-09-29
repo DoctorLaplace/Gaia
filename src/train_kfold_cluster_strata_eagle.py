@@ -21,9 +21,12 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from src.eagle_dataset import MultiFlightEagleDataset, SingleEagleTiffDataset
 from src.model_transfer import GaiaTransferModel, Colors
+from src.seed import set_seed
 
 def run_fold(fold_idx, k, train_idx, val_idx, val_clusters, full_dataset, config, device, args):
     """Train and evaluate a single fold. Returns a metrics dict."""
+    seed = (args.seed + fold_idx) % 2**32
+    set_seed(seed)
     b_cfg = config['bioscape']
     batch_size = args.batch_size or b_cfg['batch_size']
     epochs = args.epochs or b_cfg['epochs']
@@ -51,12 +54,14 @@ def run_fold(fold_idx, k, train_idx, val_idx, val_clusters, full_dataset, config
     train_loader = DataLoader(
         Subset(full_dataset, train_idx.tolist()),
         batch_size=batch_size, shuffle=True,
-        num_workers=num_workers, pin_memory=True
+        num_workers=num_workers, pin_memory=True,
+        generator=torch.Generator().manual_seed(seed)
     )
     val_loader = DataLoader(
         Subset(full_dataset, val_idx.tolist()),
         batch_size=batch_size, shuffle=False,
-        num_workers=num_workers, pin_memory=True
+        num_workers=num_workers, pin_memory=True,
+        generator=torch.Generator().manual_seed(seed)
     )
 
     # -- Model --
@@ -115,6 +120,8 @@ def run_fold(fold_idx, k, train_idx, val_idx, val_clusters, full_dataset, config
             )
 
         # -- Train --
+        # Shared augmentation flag requires sequential loaders with num_workers=0.
+        full_dataset.augment = True
         model.train()
         train_loss = 0
         pbar = tqdm(train_loader,
@@ -133,6 +140,7 @@ def run_fold(fold_idx, k, train_idx, val_idx, val_clusters, full_dataset, config
             pbar.set_postfix({'loss': f"{loss.item():.4f}"})
 
         # -- Validate --
+        full_dataset.augment = False
         model.eval()
         val_preds, val_targets = [], []
         with torch.no_grad():
@@ -181,16 +189,15 @@ def run_fold(fold_idx, k, train_idx, val_idx, val_clusters, full_dataset, config
 
     # -- Dense inference over the ENTIRE dataset (train + held-out) with this fold's model --
     model.eval()
-    was_augmenting = full_dataset.augment
     full_dataset.augment = False  # deterministic predictions, no random rot/flip
     full_loader = DataLoader(full_dataset, batch_size=batch_size, shuffle=False,
-                              num_workers=num_workers, pin_memory=True)
+                              num_workers=num_workers, pin_memory=True,
+                              generator=torch.Generator().manual_seed(seed))
     all_preds = []
     with torch.no_grad():
         for images, labels in full_loader:
             out_norm = model(images.to(device))
             all_preds.extend(out_norm.cpu().numpy().flatten() * richness_std + richness_mean)
-    full_dataset.augment = was_augmenting
     all_preds = np.array(all_preds)
 
     # -- Scatter plot: held-out (scored) vs train (context only, not scored) --
@@ -248,7 +255,7 @@ def main():
     parser.set_defaults(mask=True)
     parser.add_argument("--test-run", action="store_true",
                         help="Quick smoke test (2 folds, 2 epochs)")
-    parser.add_argument("--seed", type=int, default=42, help="Random seed for K-Fold splitting")
+    parser.add_argument("--seed", type=int, default=42, help="Seed for cluster splits and training RNGs (default: 42)")
     args = parser.parse_args()
 
     # -- Load Config --

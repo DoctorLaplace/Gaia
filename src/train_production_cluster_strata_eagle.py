@@ -16,10 +16,12 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from src.eagle_dataset import MultiFlightEagleDataset
 from src.model_transfer import GaiaTransferModel, Colors
+from src.seed import set_seed
 
 def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=None,
                        test_run=False, freeze_encoder=True, unfreeze_epoch=None,
                        mode="native", mask_water_vapor=True, leave_out=10, seed=42, patience=25):
+    set_seed(seed)
     # Load config
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     with open(os.path.join(project_root, "configs", "config.yaml"), 'r') as f:
@@ -53,7 +55,7 @@ def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=
         print(f"{Colors.FAIL}[!] Directory not found: {tif_dir}. Run extract_eagle_data.py first.{Colors.ENDC}")
         return
 
-    tif_paths = [os.path.join(tif_dir, f) for f in os.listdir(tif_dir) if f.endswith('.tif')]
+    tif_paths = sorted(os.path.join(tif_dir, f) for f in os.listdir(tif_dir) if f.endswith('.tif'))
     
     if not tif_paths:
         print(f"{Colors.FAIL}[!] No .tif files found in {tif_dir}{Colors.ENDC}")
@@ -104,8 +106,7 @@ def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=
         print(f"{Colors.WARNING}[!] Warning: Requested leaving out {leave_out} clusters, but only {len(val_candidates)} candidates exist. Leaving out {len(val_candidates)-1} instead.{Colors.ENDC}")
         leave_out = max(1, len(val_candidates) - 1)
         
-    np.random.seed(seed)
-    val_clusters = np.random.choice(val_candidates, size=leave_out, replace=False)
+    val_clusters = np.random.RandomState(seed).choice(val_candidates, size=leave_out, replace=False)
     
     train_idx = np.where(~np.isin(sample_clusters, val_clusters))[0]
     val_idx = np.where(np.isin(sample_clusters, val_clusters))[0]
@@ -124,8 +125,8 @@ def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=
     num_workers = 0
     print(f"{Colors.OKBLUE}[*] Enabling {num_workers} dataloader workers...{Colors.ENDC}")
 
-    train_loader = DataLoader(Subset(full_dataset, train_idx.tolist()), batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
-    val_loader = DataLoader(Subset(full_dataset, val_idx.tolist()), batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
+    train_loader = DataLoader(Subset(full_dataset, train_idx.tolist()), batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True, generator=torch.Generator().manual_seed(seed))
+    val_loader = DataLoader(Subset(full_dataset, val_idx.tolist()), batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True, generator=torch.Generator().manual_seed(seed))
 
     model = GaiaTransferModel(num_targets=1, patch_size=patch_size).to(device)
     foundation_ckpt = os.path.join(project_root, "checkpoints", "pretrained_ViTSpatialSpectral_200ep_enmap.pth")
@@ -173,6 +174,8 @@ def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=
                 steps_per_epoch=len(train_loader), pct_start=0.05
             )
 
+        # Shared augmentation flag requires sequential loaders with num_workers=0.
+        full_dataset.augment = True
         model.train()
         train_loss = 0
         pbar = tqdm(train_loader, desc=f"Epoch {epoch}")
@@ -193,6 +196,7 @@ def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=
             pbar.set_postfix({'loss': f"{loss.item():.4f}"})
             scheduler.step()
 
+        full_dataset.augment = False
         model.eval()
         val_preds, val_targets = [], []
         with torch.no_grad():
@@ -215,6 +219,7 @@ def train_eagle_strata(tif_dir=None, richness_csv=None, epochs=None, batch_size=
                 'richness_std': richness_std,
                 'band_mean': full_dataset.band_mean.flatten().tolist() if full_dataset.band_mean is not None else None,
                 'band_std': full_dataset.band_std.flatten().tolist() if full_dataset.band_std is not None else None,
+                'input_normalization': 'per_band_zscore',
             }
             torch.save(ckpt_data, os.path.join(project_root, "checkpoints", "gaia_eagle_best_strata.pth"))
             print(f"{Colors.OKGREEN}[OK] New Best EAGLE Model Saved (R²: {best_r2:.4f}){Colors.ENDC}")
@@ -241,7 +246,7 @@ if __name__ == "__main__":
                         help="Select EAGLE data mode: native (32 target tiles) or 10nm (1517 mosaic tiles)")
     parser.add_argument("--no-mask", dest="mask", action="store_false", help="Disable water vapor masking")
     parser.add_argument("--leave-out", type=int, default=10, help="Number of clusters to hold out for validation")
-    parser.add_argument("--seed", type=int, default=42, help="Seed for split reproducibility")
+    parser.add_argument("--seed", type=int, default=42, help="Seed for cluster splits and training RNGs (default: 42)")
     parser.add_argument("--patience", type=int, default=25, help="Patience for early stopping")
     parser.set_defaults(mask=True)
     
