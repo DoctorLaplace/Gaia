@@ -43,6 +43,14 @@ def run_fold(fold_idx, k, train_idx, val_idx, val_clusters, full_dataset, config
     print(f"{Colors.OKBLUE}[*] Fold {fold_idx+1} Richness: "
           f"mean={richness_mean:.1f}, std={richness_std:.1f}{Colors.ENDC}")
 
+    # Compute per-band normalization stats from this fold's training samples only.
+    full_dataset.compute_band_stats(train_idx)
+
+    # Clear open files before DataLoader (critical on Windows to avoid process inheritance bugs)
+    for ds in full_dataset.dataset_cache.values():
+        ds.close()
+    full_dataset.dataset_cache.clear()
+
     # -- DataLoaders --
     # Windows doesn't handle multi-processing for rasterio cleanly, default to 0 on Windows
     num_workers = 0 if os.name == 'nt' else b_cfg.get('num_workers', 4)
@@ -243,8 +251,6 @@ def main():
                         help="Early stopping patience (default: 25)")
     parser.add_argument("--mode", type=str, choices=["native", "10nm"], default="native",
                         help="Select EAGLE data mode: native (32 target tiles) or 10nm (1517 mosaic tiles)")
-    parser.add_argument("--no-mask", dest="mask", action="store_false", help="Disable water vapor masking")
-    parser.set_defaults(mask=True)
     parser.add_argument("--test-run", action="store_true",
                         help="Quick smoke test (2 folds, 2 epochs)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for K-Fold splitting")
@@ -304,20 +310,12 @@ def main():
 
     full_dataset = MultiFlightEagleDataset(
         tif_paths, richness_csv, patch_size=patch_size,
-        augment=True, cache_path=mapping_cache, mask_water_vapor=args.mask
+        augment=True, cache_path=mapping_cache
     )
     if len(full_dataset) == 0:
         print(f"{Colors.FAIL}[!] No training samples found. Stopping.{Colors.ENDC}")
         return
 
-    # Compute band stats (cached)
-    band_stats_cache = os.path.join(project_root, "data", "eagle", "band_stats" + cache_suffix)
-    full_dataset.compute_band_stats(cache_path=band_stats_cache)
-
-    # Clear open files before DataLoader (critical on Windows to avoid process inheritance bugs)
-    for ds in full_dataset.dataset_cache.values():
-        ds.close()
-    full_dataset.dataset_cache.clear()
 
     # -- Stratified Split logic --
     mappings = full_dataset.mappings

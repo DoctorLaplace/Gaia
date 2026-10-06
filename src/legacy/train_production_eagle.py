@@ -27,12 +27,13 @@ class Colors:
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.eagle_dataset import MultiFlightEagleDataset
+from src.enmap_bands import INPUT_SPECTRAL_MAPPING
 from src.vit_spatial_spectral import ViTSpatialSpectral
 from src.train_production import GaiaTransferModel
 
 def train_eagle(tif_dir=None, richness_csv=None, epochs=None, batch_size=None,
                 test_run=False, freeze_encoder=True, unfreeze_epoch=None,
-                mode="native", mask_water_vapor=True, patience=25):
+                mode="native", patience=25):
     # Load config
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     with open(os.path.join(project_root, "configs", "config.yaml"), 'r') as f:
@@ -82,21 +83,13 @@ def train_eagle(tif_dir=None, richness_csv=None, epochs=None, batch_size=None,
     
     full_dataset = MultiFlightEagleDataset(
         tif_paths, richness_csv, patch_size=patch_size,
-        augment=True, cache_path=mapping_cache, mask_water_vapor=mask_water_vapor
+        augment=True, cache_path=mapping_cache
     )
     
     if len(full_dataset) == 0:
         print(f"{Colors.FAIL}[!] No training samples found. Stopping.{Colors.ENDC}")
         return
 
-    # Compute/Load global per-band normalization stats
-    band_stats_cache = os.path.join(project_root, "data", "eagle", "band_stats" + cache_suffix)
-    full_dataset.compute_band_stats(cache_path=band_stats_cache)
-
-    # Clear open files before DataLoader (critical on Windows to avoid process inheritance bugs)
-    for ds in full_dataset.dataset_cache.values():
-        ds.close()
-    full_dataset.dataset_cache.clear()
 
     # Compute target richness stats
     all_richness = np.array([m[3] for m in full_dataset.mappings])
@@ -107,6 +100,14 @@ def train_eagle(tif_dir=None, richness_csv=None, epochs=None, batch_size=None,
     indices = np.arange(len(full_dataset))
     val_split = b_cfg.get('val_split', 0.2)
     train_idx, val_idx = train_test_split(indices, test_size=val_split, random_state=42)
+
+    # Compute per-band normalization stats from training samples only.
+    full_dataset.compute_band_stats(train_idx)
+
+    # Clear open files before DataLoader (critical on Windows to avoid process inheritance bugs)
+    for ds in full_dataset.dataset_cache.values():
+        ds.close()
+    full_dataset.dataset_cache.clear()
 
     # Windows multi-processing doesn't work well with rasterio, so use num_workers=0 on Windows
     num_workers = 0 if os.name == 'nt' else b_cfg.get('num_workers', 4)
@@ -205,6 +206,8 @@ def train_eagle(tif_dir=None, richness_csv=None, epochs=None, batch_size=None,
                 'richness_std': richness_std,
                 'band_mean': full_dataset.band_mean.flatten().tolist() if full_dataset.band_mean is not None else None,
                 'band_std': full_dataset.band_std.flatten().tolist() if full_dataset.band_std is not None else None,
+                'input_normalization': 'per_band_zscore',
+                'input_spectral_mapping': INPUT_SPECTRAL_MAPPING,
             }
             torch.save(ckpt_data, os.path.join(project_root, "checkpoints", "gaia_eagle_best.pth"))
             print(f"{Colors.OKGREEN}[OK] New Best EAGLE Model Saved (R²: {best_r2:.4f}){Colors.ENDC}")
@@ -229,14 +232,12 @@ if __name__ == "__main__":
     parser.add_argument("--unfreeze-epoch", type=int, default=None, help="Unfreeze encoder at this epoch for progressive fine-tuning")
     parser.add_argument("--mode", type=str, choices=["native", "10nm"], default="native",
                         help="Select EAGLE data mode: native (32 target tiles) or 10nm (1517 mosaic tiles)")
-    parser.add_argument("--no-mask", dest="mask", action="store_false", help="Disable water vapor masking")
     parser.add_argument("--patience", type=int, default=25, help="Patience for early stopping")
-    parser.set_defaults(mask=True)
     
     args = parser.parse_args()
     train_eagle(
         tif_dir=args.tif_dir, richness_csv=args.richness_csv, epochs=args.epochs,
         batch_size=args.batch_size, test_run=args.test_run, freeze_encoder=args.freeze,
-        unfreeze_epoch=args.unfreeze_epoch, mode=args.mode, mask_water_vapor=args.mask,
+        unfreeze_epoch=args.unfreeze_epoch, mode=args.mode,
         patience=args.patience
     )

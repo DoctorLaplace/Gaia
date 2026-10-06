@@ -72,9 +72,14 @@ Key flags: `--mode {native,10nm}`, `--leave-out N` (clusters held out, default 1
 The best epoch is written to `checkpoints/gaia_eagle_best_strata.pth` (bundles the
 richness mean/std and per-band normalization stats needed for inference).
 
-### 5. K-Fold Cross-Validation (Rigorous)
-Cluster-stratified K-fold: each fold holds out a disjoint set of clusters, so every
-site is scored exactly once on a model that never saw its region.
+### 5. K-Fold Cross-Validation
+Each outer fold holds out complete clusters and fits one model. Input per-band
+mean/std and target mean/std are fitted only on that fold's training sites and
+applied unchanged to validation sites. The best weights are selected by validation
+RMSE; there is no inner split or fresh refit. **Outer validation is used for epoch
+selection, so these scores are not independent nested-test estimates.**
+Cluster `-1` remains training-only; every eligible site receives exactly one OOF
+prediction. Grouping is not itself proof of geographic independence.
 
 ```bash
 # 5-fold cluster-stratified CV
@@ -82,14 +87,31 @@ python src/train_kfold_cluster_strata_eagle.py --k 5 --mode 10nm
 ```
 
 Reports two headline numbers:
-- **Mean R² ± Std Dev** across folds.
-- **Pooled R²** — every fold's held-out prediction concatenated onto one scatter and scored in a single `r2_score` call.
+- **Mean R² ± Std Dev** across defined folds, with the number used. Singleton and
+  constant-target folds have missing R², but retain their RMSE/MAE and predictions.
+- **Pooled R²** — all eligible held-out predictions, including singleton folds.
 
-Outputs (`<mode>` is `native` or `10nm`):
-- `reports/kfold_cluster_strata_results_eagle_<mode>.csv` — per-fold R² / RMSE / MAE.
-- `reports/kfold_pooled_oof_eagle_<mode>.csv` — pooled out-of-fold predictions (site, actual, predicted).
-- `reports/kfold_predictions_matrix_eagle_<mode>.csv` — wide per-site prediction matrix (one row per fold + an `actual` row).
-- `reports/kfold_plots/fold_*_scatter.png` and `reports/kfold_plots/pooled_oof_scatter_eagle_<mode>.png`.
+Every invocation creates an exclusive
+`reports/<UTC timestamp>-eagle-<mode>-k<effective_k>/` directory:
+- `kfold_cluster_strata_results_eagle_<mode>.csv` — outer metrics, selected epoch,
+  and held-out clusters.
+- `kfold_pooled_oof_eagle_<mode>.csv` — site, actual, predicted.
+- `kfold_predictions_matrix_eagle_<mode>.csv` — dense per-fold predictions.
+- `kfold_plots/fold_*_scatter.png` and `kfold_plots/pooled_oof_scatter_eagle_<mode>.png`.
+- `run.json` — strict completed-run marker with full-precision metrics, exact
+  invocation, effective k, seed, spectral mapping, elapsed time, input/source hashes,
+  `exit_status: 0` and `evaluation_protocol: single_fit_outer_validation`.
+  It is absent for incomplete runs.
+
+The normal mapping cache must already exist and be audited. `--test-run` uses two
+folds/two epochs and all sites from the first up to four sorted eligible clusters
+plus noise, requiring at least two eligible groups, with a `-smoke` directory
+suffix; it does not regenerate a smaller mapping. Audit flags for partial or
+missing imagery do not authorize dropping cached sites: all 415 eligible sites,
+including the two all-NaN patches, are retained; the two noise sites train only.
+If a short schedule gives OneCycleLR an exactly zero-length warmup phase, that
+phase alone is omitted; ordinary initial/unfreeze schedules remain unchanged.
+Use `--k` equal to the live eligible cluster count for leave-one-cluster-out.
 
 ### 6. Inference / Heatmap
 Slides a trained model over every tile in a directory and exports predictions as a
@@ -100,6 +122,19 @@ python -m src.generate_heatmap --checkpoint checkpoints/gaia_eagle_best_strata.p
 ```
 
 Writes `reports/heatmap_<mode>.geojson` (or `.gpkg` with `--format gpkg`).
+
+EAGLE inputs use `enmap_200_v1`: interpolation to the foundation checkpoint's 200
+retained EnMAP wavelengths, not a uniform 400–2450 nm grid. Source TIFFs require
+complete, finite, positive, strictly increasing wavelength metadata. Atmospheric
+gap channels are omitted; the obsolete EAGLE mask switch has been removed.
+This aligns channel wavelengths, not spectral response functions or pretraining
+normalization; training-only per-band z-scores remain unchanged.
+
+Heatmap inference requires `input_spectral_mapping: enmap_200_v1` in the supervised
+checkpoint. Old unmarked/uniform-grid checkpoints are incompatible and rejected
+before output creation; retrain rather than merely adding metadata. Existing
+checkpoints remain untouched, and this restriction does not reject the foundation
+checkpoint used for training initialization.
 
 
 ## Project Structure

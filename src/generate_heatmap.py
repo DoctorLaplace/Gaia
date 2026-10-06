@@ -18,14 +18,15 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from src.eagle_dataset import SingleEagleTiffDataset
 from src.model_transfer import GaiaTransferModel, Colors
+from src.enmap_bands import INPUT_SPECTRAL_MAPPING
 
 
-def patch_generator(tif_paths, patch_size, stride, mask_water_vapor):
+def patch_generator(tif_paths, patch_size, stride):
     """Sequential, single-process sweep over every tile (no DataLoader/workers —
     see the GDAL fork-safety issue that caused training stalls)."""
     for tif_path in tqdm(tif_paths, desc="Tiles"):
         try:
-            ds = SingleEagleTiffDataset(tif_path, patch_size=patch_size, mask_water_vapor=mask_water_vapor)
+            ds = SingleEagleTiffDataset(tif_path, patch_size=patch_size)
         except Exception as e:
             print(f"{Colors.WARNING}[!] Skipping unreadable tile {os.path.basename(tif_path)}: {e}{Colors.ENDC}")
             continue
@@ -49,8 +50,6 @@ def main():
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--out", type=str, default=None, help="Output path (default: reports/heatmap_<mode>.<ext>)")
     parser.add_argument("--format", type=str, choices=["geojson", "gpkg"], default="geojson")
-    parser.add_argument("--no-mask", dest="mask", action="store_false", help="Disable water vapor masking")
-    parser.set_defaults(mask=True)
     args = parser.parse_args()
 
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -85,6 +84,8 @@ def main():
     device = torch.device(config.get('device', 'cuda') if torch.cuda.is_available() else "cpu")
     print(f"{Colors.HEADER}[*] Loading checkpoint: {args.checkpoint} on {device}{Colors.ENDC}")
     ckpt = torch.load(args.checkpoint, map_location=device, weights_only=False)
+    if ckpt.get('input_spectral_mapping') != INPUT_SPECTRAL_MAPPING:
+        raise ValueError('Checkpoint uses an incompatible or unspecified spectral mapping; retrain with enmap_200_v1 preprocessing.')
     richness_mean = ckpt['richness_mean']
     richness_std = ckpt['richness_std']
 
@@ -161,7 +162,7 @@ def main():
 
         batch_patches, batch_lats, batch_lons, batch_tiles, batch_rows, batch_cols = [], [], [], [], [], []
 
-    for patch, lat, lon, tile, row, col in patch_generator(tif_paths, patch_size, args.stride, args.mask):
+    for patch, lat, lon, tile, row, col in patch_generator(tif_paths, patch_size, args.stride):
         batch_patches.append(patch)
         batch_lats.append(lat)
         batch_lons.append(lon)

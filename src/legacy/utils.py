@@ -29,7 +29,7 @@ from src.data_houston2018 import (
     StandardizeHouston2018,
     Houston2018LabelTransform,
 )
-from src.data_enmap import wavelengths as enmaps_waves
+from src.enmap_bands import ENMAP_WAVELENGTHS_NM as enmaps_waves
 from src.data_houston2018 import wavelengths as houston_waves
 
 

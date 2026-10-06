@@ -10,15 +10,16 @@ from scipy.interpolate import interp1d
 from pyproj import Transformer
 from tqdm import tqdm
 
+from src.enmap_bands import FOUNDATION_WAVELENGTHS_NM
+
 class SingleEagleTiffDataset:
     """
     Dataset to handle a single NASA BioSCape AVIRIS-NG Level-3 EAGLE 30m GeoTIFF tile.
     Handles coordinate projection and lazy spectral resampling to the 200 foundation bands.
     """
-    def __init__(self, tif_path, patch_size=16, mask_water_vapor=True):
+    def __init__(self, tif_path, patch_size=16):
         self.tif_path = tif_path
         self.patch_size = patch_size
-        self.mask_water_vapor = mask_water_vapor
         
         self.src = None
         self._load_metadata()
@@ -31,48 +32,52 @@ class SingleEagleTiffDataset:
     def _load_metadata(self):
         was_open = self.src is not None
         self._ensure_open()
-        
-        # Extent bounds
-        self.bounds = self.src.bounds
-        self.width = self.src.width
-        self.height = self.src.height
-        self.transform = self.src.transform
-        self.count = self.src.count
-        
-        # Extract wavelengths from band descriptions
-        self.wavelengths = []
-        for d in self.src.descriptions:
-            if not d:
-                continue
-            # Try to match 'reflectance_wavelength=X' (native)
-            m_nat = re.search(r'wavelength=([\d.]+)', d)
-            if m_nat:
-                self.wavelengths.append(float(m_nat.group(1)))
-                continue
-            # Try to match 'EAGLE_Xnm' (10nm FWHM)
-            m_fwhm = re.search(r'EAGLE_(\d+)nm', d)
-            if m_fwhm:
-                self.wavelengths.append(float(m_fwhm.group(1)))
-                continue
-                
-        # If we failed to parse descriptions, fallback to linear spacing based on count
-        if len(self.wavelengths) != self.count:
-            if self.count == 425:
-                self.wavelengths = np.linspace(377.2, 2500.8, 425)
-            elif self.count == 180:
-                self.wavelengths = np.linspace(400.0, 2480.0, 180)
-            else:
-                self.wavelengths = np.linspace(400.0, 2500.0, self.count)
-        else:
-            self.wavelengths = np.array(self.wavelengths)
+        try:
+            self.bounds = self.src.bounds
+            self.width = self.src.width
+            self.height = self.src.height
+            self.transform = self.src.transform
+            self.count = self.src.count
 
-        # CRS Projection Transformer
-        crs = self.src.crs
-        self.transformer = Transformer.from_crs("epsg:4326", crs, always_xy=True)
-        self.inverse_transformer = Transformer.from_crs(crs, "epsg:4326", always_xy=True)
-        
-        if not was_open:
-            self.close()
+            wavelengths = []
+            for band, description in enumerate(self.src.descriptions, start=1):
+                # Parse a complete token so NaN/Inf or malformed numbers cannot
+                # accidentally be accepted as a truncated positive wavelength.
+                matches = re.findall(
+                    r'wavelength=([^\s,;]+)|EAGLE_(\d+)nm', description or ""
+                )
+                if len(matches) != 1:
+                    raise ValueError(
+                        f"{self.tif_path}: missing or invalid wavelength metadata "
+                        f"for band {band}; expected exactly one wavelength"
+                    )
+                token = matches[0][0] or matches[0][1]
+                try:
+                    wavelength = float(token)
+                except ValueError as exc:
+                    raise ValueError(
+                        f"{self.tif_path}: missing or invalid wavelength metadata "
+                        f"for band {band}: {token!r}"
+                    ) from exc
+                if not np.isfinite(wavelength) or wavelength <= 0:
+                    raise ValueError(
+                        f"{self.tif_path}: missing or invalid wavelength metadata "
+                        f"for band {band}: {token!r}"
+                    )
+                wavelengths.append(wavelength)
+            self.wavelengths = np.asarray(wavelengths, dtype=np.float64)
+            if len(self.wavelengths) != self.count or not np.all(np.diff(self.wavelengths) > 0):
+                raise ValueError(
+                    f"{self.tif_path}: missing or invalid wavelength metadata; "
+                    "source wavelengths must be strictly increasing"
+                )
+
+            crs = self.src.crs
+            self.transformer = Transformer.from_crs("epsg:4326", crs, always_xy=True)
+            self.inverse_transformer = Transformer.from_crs(crs, "epsg:4326", always_xy=True)
+        finally:
+            if not was_open:
+                self.close()
 
     def get_bounds_wgs84(self):
         """Returns bounds in WGS84 coordinates: (min_lon, min_lat, max_lon, max_lat)"""
@@ -80,17 +85,10 @@ class SingleEagleTiffDataset:
         lon2, lat2 = self.inverse_transformer.transform(self.bounds.right, self.bounds.top)
         return min(lon1, lon2), min(lat1, lat2), max(lon1, lon2), max(lat1, lat2)
 
-    def mask_patch(self, patch, wavelengths):
-        """Zero out water vapor bands (Atmospheric Cleaning)."""
-        BAD_RANGES = [(1340, 1480), (1780, 1970)]
-        for lo, hi in BAD_RANGES:
-            mask = (wavelengths >= lo) & (wavelengths <= hi)
-            patch[mask, :, :] = 0.0
-        return patch
 
     def resample_to_foundation(self, patch_raw, current_wavs):
         """Resample spectral bands to match the 200-band EnMAP foundation model."""
-        target_wavs = np.linspace(400, 2450, 200)
+        target_wavs = FOUNDATION_WAVELENGTHS_NM
         
         # Replace NaNs, Infs, NoData fill values (less than 0), and boundary noise with 0.0 before interpolation
         patch_raw = np.where(np.isnan(patch_raw) | np.isinf(patch_raw) | (patch_raw < 0.0), 0.0, patch_raw)
@@ -102,9 +100,6 @@ class SingleEagleTiffDataset:
         resampled_hwc = f(target_wavs)
         patch_tensor = torch.from_numpy(np.transpose(resampled_hwc, (2, 0, 1))).float()
         
-        if self.mask_water_vapor:
-            patch_tensor = self.mask_patch(patch_tensor, target_wavs)
-            
         return patch_tensor
 
     def get_patch_at_latlon(self, lat, lon):
@@ -177,8 +172,8 @@ class SingleEagleTiffDataset:
         self.close()
 
 class MultiFlightEagleDataset(Dataset):
-    def __init__(self, tif_paths, richness_csv, patch_size=16, augment=False, 
-                 cache_path=None, mask_water_vapor=True):
+    def __init__(self, tif_paths, richness_csv, patch_size=16, augment=False,
+                 cache_path=None):
         self.patch_size = patch_size
         self.augment = augment
         self.tif_paths = tif_paths
@@ -186,7 +181,6 @@ class MultiFlightEagleDataset(Dataset):
         self.mappings = []
         self.dataset_cache = {}
         self.cache_lock = threading.Lock()
-        self.mask_water_vapor = mask_water_vapor
         self.band_mean = None
         self.band_std = None
 
@@ -232,8 +226,9 @@ class MultiFlightEagleDataset(Dataset):
         
         def process_one(tif_path):
             local_mappings = []
+            ds = None
             try:
-                ds = SingleEagleTiffDataset(tif_path, patch_size=patch_size, mask_water_vapor=self.mask_water_vapor)
+                ds = SingleEagleTiffDataset(tif_path, patch_size=patch_size)
                 min_lon, min_lat, max_lon, max_lat = ds.get_bounds_wgs84()
                 
                 # Bounding box spatial filter
@@ -253,10 +248,11 @@ class MultiFlightEagleDataset(Dataset):
                                 int(row.get('CLUSTER_ID', -1)),
                                 str(row.get('SiteID', f"site_{len(local_mappings)}"))
                             ))
-                ds.close()
-            except Exception as e:
-                import traceback
-                traceback.print_exc()
+            except Exception as exc:
+                raise RuntimeError(f"Cannot map EAGLE tile {tif_path}") from exc
+            finally:
+                if ds is not None:
+                    ds.close()
             return local_mappings
 
         all_results = []
@@ -280,20 +276,10 @@ class MultiFlightEagleDataset(Dataset):
 
         print(f"[OK] EAGLE Dataset Ready: {len(self.mappings)} unique sites.")
 
-    def compute_band_stats(self, cache_path=None):
-        """Compute global per-band mean/std across ALL patches. Results are cached to disk."""
-        if not self.mask_water_vapor:
-            cache_path = None
-        if cache_path and os.path.exists(cache_path):
-            import json
-            with open(cache_path, 'r') as f:
-                stats = json.load(f)
-            self.band_mean = torch.tensor(stats['mean']).reshape(200, 1, 1)
-            self.band_std = torch.tensor(stats['std']).reshape(200, 1, 1)
-            print(f"[*] Loaded EAGLE band stats from cache: {cache_path}")
-            return
+    def compute_band_stats(self, train_idx):
+        """Compute per-band mean/std across training patches."""
         
-        print(f"[*] Computing global EAGLE band statistics across {len(self)} patches...")
+        print(f"[*] Computing EAGLE band statistics across {len(train_idx)} training patches...")
         
         running_sum = torch.zeros(200)
         running_sq_sum = torch.zeros(200)
@@ -304,8 +290,7 @@ class MultiFlightEagleDataset(Dataset):
             with self.cache_lock:
                 if tif_path not in self.dataset_cache:
                     self.dataset_cache[tif_path] = SingleEagleTiffDataset(
-                        tif_path, patch_size=self.patch_size,
-                        mask_water_vapor=self.mask_water_vapor
+                        tif_path, patch_size=self.patch_size
                     )
                 ds = self.dataset_cache[tif_path]
             
@@ -314,7 +299,7 @@ class MultiFlightEagleDataset(Dataset):
             return patch.sum(dim=(1, 2)), (patch**2).sum(dim=(1, 2)), patch.shape[1] * patch.shape[2]
 
         results = []
-        for i in tqdm(range(len(self)), desc="EAGLE Band Stats"):
+        for i in tqdm(train_idx, desc="EAGLE Band Stats"):
             results.append(process_patch(i))
             
         for res in results:
@@ -333,12 +318,6 @@ class MultiFlightEagleDataset(Dataset):
         self.band_mean = global_mean.reshape(200, 1, 1)
         self.band_std = global_std.reshape(200, 1, 1)
         
-        if cache_path:
-            import json
-            os.makedirs(os.path.dirname(cache_path), exist_ok=True)
-            with open(cache_path, 'w') as f:
-                json.dump({'mean': global_mean.tolist(), 'std': global_std.tolist()}, f)
-            print(f"[OK] EAGLE band stats cached to {cache_path}")
             
     def set_band_stats(self, band_mean, band_std):
         self.band_mean = torch.tensor(band_mean).reshape(200, 1, 1) if not isinstance(band_mean, torch.Tensor) else band_mean.reshape(200, 1, 1)
@@ -353,7 +332,7 @@ class MultiFlightEagleDataset(Dataset):
         with self.cache_lock:
             if tif_path not in self.dataset_cache:
                 self.dataset_cache[tif_path] = SingleEagleTiffDataset(
-                    tif_path, patch_size=self.patch_size, mask_water_vapor=self.mask_water_vapor
+                    tif_path, patch_size=self.patch_size
                 )
             ds = self.dataset_cache[tif_path]
         
